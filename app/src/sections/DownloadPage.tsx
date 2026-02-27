@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react';
-import { Check, FileText, Download, ChevronLeft, Eye } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Check, FileText, Home, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CVPreview } from '../components/CVPreview';
 import { ExportModal } from '../components/ExportModal';
+import { ConfettiEffect } from '../components/ConfettiEffect';
 import { useToast } from '../hooks/useToast';
 import type { CVData, CVSettings } from '../types/cv';
 
@@ -10,13 +11,30 @@ interface DownloadPageProps {
   cvData: CVData;
   settings: CVSettings;
   setSettings: (settings: CVSettings) => void;
+  onHomeClick?: () => void;
 }
 
 const templates = [
-  { id: 'budapest', name: 'Budapest', isRecommended: true, description: 'Design moderne avec sidebar colorée' },
-  { id: 'chicago', name: 'Chicago', isRecommended: true, description: 'Style classique centré' },
-  { id: 'modern', name: 'Moderne', isNew: true, description: 'Design épuré avec header coloré' },
+  { id: 'budapest', name: 'Budapest', description: 'Sidebar colorée à gauche', badge: 'Recommandé' },
+  { id: 'chicago', name: 'Chicago', description: 'Header centré classique', badge: 'Recommandé' },
+  { id: 'brunei', name: 'Brunei', description: 'Minimaliste élégant' },
+  { id: 'vladivostok', name: 'Vladivostok', description: 'Moderne sidebar droite' },
+  { id: 'sydney', name: 'Sydney', description: 'Épuré avec timeline', badge: 'Nouveau' },
+  { id: 'shanghai', name: 'Shanghai', description: 'Professionnel corporate' },
+  { id: 'kiev', name: 'Kiev', description: 'Créatif avec grande photo' },
+  { id: 'rotterdam', name: 'Rotterdam', description: 'Technique compétences visibles' },
+  { id: 'tokyo', name: 'Tokyo', description: 'Compact 2 colonnes' },
+  { id: 'stanford', name: 'Stanford', description: 'Sidebar foncée élégante', badge: 'Nouveau' },
+  { id: 'cambridge', name: 'Cambridge', description: 'Header bleu classique', badge: 'Nouveau' },
+  { id: 'oxford', name: 'Oxford', description: 'Sidebar droite structurée', badge: 'Nouveau' },
+  { id: 'otago', name: 'Otago', description: 'Minimaliste professionnel', badge: 'Nouveau' },
+  { id: 'berkeley', name: 'Berkeley', description: 'Design avec icônes', badge: 'Nouveau' },
+  { id: 'harvard', name: 'Harvard', description: 'Sidebar bleue avec timeline', badge: 'Nouveau' },
+  { id: 'auckland', name: 'Auckland', description: '2 colonnes équilibrées', badge: 'Nouveau' },
+  { id: 'edinburgh', name: 'Edinburgh', description: 'Header violet moderne', badge: 'Nouveau' },
+  { id: 'princeton', name: 'Princeton', description: 'Classique centré', badge: 'Nouveau' },
 ];
+
 
 const colors = [
   '#1a1a1a', '#2c3e50', '#1e3a8a', '#6b2c91', 
@@ -25,24 +43,32 @@ const colors = [
 ];
 
 const titleFonts = [
-  'Bebas Neue', 'Roboto', 'Arial', 'Playfair Display', 
-  'Montserrat', 'Poppins', 'Open Sans', 'Lato'
+  'Bebas Neue', 'Roboto', 'Arial', 'Roboto Mono', 'Bebas Kai',
+  'Source Sans Pro', 'Ubuntu', 'Open Sans', 'Cabin',
 ];
 
 const bodyFonts = [
-  'Lato', 'Open Sans', 'Roboto', 'Arial', 
-  'Source Sans Pro', 'Inter', 'Nunito', 'PT Sans'
+  'Lato', 'Open Sans', 'Playfair Display', 'Arial', 'Roboto',
+  'Roboto Mono', 'Source Sans Pro', 'Butler',
 ];
 
 export function DownloadPage({
   cvData,
   settings,
   setSettings,
+  onHomeClick,
 }: DownloadPageProps) {
   const [activeTab, setActiveTab] = useState<'template' | 'colors' | 'fonts'>('template');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(true);
   const previewRef = useRef<HTMLDivElement>(null);
   const { success } = useToast();
+
+  useEffect(() => {
+    // Trigger confetti on mount
+    const timer = setTimeout(() => setShowConfetti(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const getFilename = () => {
     return `CV-${cvData.contact.firstName}-${cvData.contact.lastName}`;
@@ -63,10 +89,11 @@ export function DownloadPage({
       <div className="bg-gray-900 text-white p-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button 
-            onClick={() => window.history.back()}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            onClick={onHomeClick}
+            className="p-2 hover:bg-red-500 rounded-lg transition-colors"
+            title="Retour à l'accueil"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <Home className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
             <FileText className="w-6 h-6 text-[#2196F3]" />
@@ -75,14 +102,6 @@ export function DownloadPage({
         </div>
         
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={() => setIsExportModalOpen(true)}
-            className="text-white border-white/30 hover:bg-white/10"
-          >
-            <Eye className="w-4 h-4 mr-2" />
-            Aperçu & Export
-          </Button>
           <Button
             onClick={() => setIsExportModalOpen(true)}
             className="bg-[#2196F3] hover:bg-[#1976D2]"
@@ -267,6 +286,9 @@ export function DownloadPage({
           </div>
         </div>
       </div>
+
+      {/* Confetti Effect */}
+      <ConfettiEffect trigger={showConfetti} />
 
       {/* Export Modal */}
       <ExportModal

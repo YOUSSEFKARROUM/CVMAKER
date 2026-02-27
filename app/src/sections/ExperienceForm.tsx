@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight, ArrowLeft, Plus, Trash2, ChevronUp, Bold, Italic, Underline, Strikethrough, List, ListOrdered, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,11 +45,12 @@ export function ExperienceForm({
   onBack,
   onSkip,
 }: ExperienceFormProps) {
+  const { t } = useTranslation();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [newExperience, setNewExperience] = useState<Experience | null>(null);
 
   const handleAdd = () => {
-    const id = Date.now().toString();
+    const id = crypto.randomUUID();
     setNewExperience({ ...emptyExperience, id });
     setExpandedId(id);
   };
@@ -98,7 +100,7 @@ export function ExperienceForm({
       <div className="flex justify-between items-start mb-4">
         <div>
           <p className="text-gray-500 text-sm">
-            {exp.jobTitle || '(Non spécifié)'}, {exp.employer || 'Inconnu'} - {exp.city || 'Inconnu'}
+            {exp.jobTitle || `(${t('common.notSpecified')})`}, {exp.employer || t('common.unknown')} - {exp.city || t('common.unknown')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -121,7 +123,7 @@ export function ExperienceForm({
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-xs uppercase text-gray-500">INTITULÉ DU POSTE</Label>
+              <Label className="text-xs uppercase text-gray-500">{t('experience.jobTitle')}</Label>
               <AutocompleteInput
                 value={exp.jobTitle}
                 onChange={(value) => isNew 
@@ -129,18 +131,18 @@ export function ExperienceForm({
                   : onUpdate(exp.id, { jobTitle: value })
                 }
                 suggestions={commonJobTitles}
-                placeholder="Chef de projet"
+                placeholder={t('experience.jobTitlePlaceholder') || 'Chef de projet'}
               />
             </div>
             <div>
-              <Label className="text-xs uppercase text-gray-500">EMPLOYEUR</Label>
+              <Label className="text-xs uppercase text-gray-500">{t('experience.employer')}</Label>
               <Input
                 value={exp.employer}
                 onChange={(e) => isNew
                   ? setNewExperience({ ...exp, employer: e.target.value })
                   : onUpdate(exp.id, { employer: e.target.value })
                 }
-                placeholder="Maroc Telecom"
+                placeholder={t('experience.employerPlaceholder') || 'Maroc Telecom'}
                 className="mt-1"
               />
             </div>
@@ -148,7 +150,7 @@ export function ExperienceForm({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-xs uppercase text-gray-500">DATE DE DÉBUT</Label>
+              <Label className="text-xs uppercase text-gray-500">{t('experience.startDate')}</Label>
               <Input
                 type="month"
                 value={exp.startDate}
@@ -160,7 +162,7 @@ export function ExperienceForm({
               />
             </div>
             <div>
-              <Label className="text-xs uppercase text-gray-500">DATE DE FIN</Label>
+              <Label className="text-xs uppercase text-gray-500">{t('experience.endDate')}</Label>
               <Input
                 type="month"
                 value={exp.endDate}
@@ -183,7 +185,7 @@ export function ExperienceForm({
                   : onUpdate(exp.id, { currentlyWorking: checked as boolean })
                 }
               />
-              <Label className="text-sm text-gray-500">J'occupe ce poste actuellement</Label>
+              <Label className="text-sm text-gray-500">{t('experience.currentlyWorking')}</Label>
             </div>
             <div className="flex items-center gap-2">
               <Checkbox
@@ -193,7 +195,7 @@ export function ExperienceForm({
                   : onUpdate(exp.id, { hideMonths: checked as boolean })
                 }
               />
-              <Label className="text-sm text-gray-500">Masquer les mois</Label>
+              <Label className="text-sm text-gray-500">{t('experience.hideMonths')}</Label>
             </div>
             <div className="flex items-center gap-2">
               <Checkbox
@@ -203,25 +205,25 @@ export function ExperienceForm({
                   : onUpdate(exp.id, { showDuration: checked as boolean })
                 }
               />
-              <Label className="text-sm text-gray-500">Afficher la durée</Label>
+              <Label className="text-sm text-gray-500">{t('experience.showDuration')}</Label>
             </div>
           </div>
 
           <div>
-            <Label className="text-xs uppercase text-gray-500">VILLE</Label>
+            <Label className="text-xs uppercase text-gray-500">{t('experience.city')}</Label>
             <Input
               value={exp.city}
               onChange={(e) => isNew
                 ? setNewExperience({ ...exp, city: e.target.value })
                 : onUpdate(exp.id, { city: e.target.value })
               }
-              placeholder="Casablanca"
+              placeholder={t('experience.cityPlaceholder') || 'Casablanca'}
               className="mt-1"
             />
           </div>
 
           <div>
-            <Label className="text-xs uppercase text-gray-500">DESCRIPTION</Label>
+            <Label className="text-xs uppercase text-gray-500">{t('experience.description')}</Label>
             <div className="border border-gray-200 rounded-lg mt-1">
               <div className="flex items-center gap-2 p-2 border-b border-gray-200">
                 <button className="p-1 hover:bg-gray-100 rounded"><Bold className="w-4 h-4" /></button>
@@ -238,24 +240,24 @@ export function ExperienceForm({
                   ? setNewExperience({ ...exp, description: e.target.value })
                   : onUpdate(exp.id, { description: e.target.value })
                 }
-                placeholder="J'ai travaillé comme chef de projet chez Maroc Telecom pendant cinq ans."
+                placeholder={t('experience.descriptionPlaceholder')}
                 className="w-full p-3 min-h-[100px] resize-none outline-none"
               />
             </div>
             <AISuggestionButton
               onSuggest={getAISuggestions}
               onApply={applySuggestion}
-              buttonText="Suggestions IA pour la description"
+              buttonText={t('experience.aiSuggestions')}
             />
           </div>
 
           {isNew && (
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={handleCancel}>
-                Annuler
+                {t('nav.cancel')}
               </Button>
               <Button onClick={handleSave} className="bg-[#2196F3] hover:bg-[#1976D2]">
-                Enregistrer
+                {t('nav.save')}
               </Button>
             </div>
           )}
@@ -267,10 +269,10 @@ export function ExperienceForm({
   return (
     <div className="max-w-2xl">
       <h2 className="text-3xl font-bold text-gray-800 mb-2">
-        <span className="text-[#2196F3]">Parlez-nous</span> de votre expérience
+        <span className="text-[#2196F3]">{t('experience.titleHighlight')}</span> {t('experience.title')}
       </h2>
       <p className="text-gray-500 mb-8">
-        Écrivez vos emplois (les plus récents) avec de courts points de ce que vous avez fait.
+        {t('experience.subtitle')}
       </p>
 
       <button
@@ -278,7 +280,7 @@ export function ExperienceForm({
         className="flex items-center gap-2 text-[#2196F3] font-medium mb-4 hover:underline"
       >
         <Plus className="w-5 h-5" />
-        Ajouter une expérience
+        {t('experience.add')}
       </button>
 
       {newExperience && renderExperienceForm(newExperience, true)}
@@ -292,7 +294,7 @@ export function ExperienceForm({
       )}
 
       <p className="text-gray-500 text-sm mb-8">
-        Dans cette section, listez des expériences professionnelles connexes acquises au cours des 10 dernières années ainsi que les dates. Mentionnez d'abord l'emploi le plus récent.
+        {t('experience.helpText')}
       </p>
 
       <div className="flex justify-between">
@@ -302,13 +304,13 @@ export function ExperienceForm({
           className="flex items-center gap-2 text-gray-500"
         >
           <ArrowLeft className="w-4 h-4" />
-          Revenir en arrière
+          {t('nav.back')}
         </Button>
         <Button
           onClick={handleNext}
           className="bg-[#2196F3] hover:bg-[#1976D2] text-white px-6 py-2 rounded flex items-center gap-2"
         >
-          Aller à Formation
+          {t('experience.nextStep')}
           <ArrowRight className="w-4 h-4" />
         </Button>
       </div>

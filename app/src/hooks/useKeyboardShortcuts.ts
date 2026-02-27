@@ -13,7 +13,13 @@ interface ShortcutConfig {
 export function useKeyboardShortcuts(shortcuts: ShortcutConfig[]) {
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
+      // Vérifier que event.key existe (certains événements spéciaux peuvent ne pas avoir de key)
+      if (!event.key) return;
+      
       for (const shortcut of shortcuts) {
+        // Vérifier que shortcut.key existe
+        if (!shortcut.key) continue;
+        
         const keyMatch = event.key.toLowerCase() === shortcut.key.toLowerCase();
         const ctrlMatch = !!shortcut.ctrl === event.ctrlKey;
         const shiftMatch = !!shortcut.shift === event.shiftKey;

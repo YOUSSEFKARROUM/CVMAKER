@@ -1,11 +1,9 @@
 import { useState } from 'react';
-import { X, Download, FileText, Image as ImageIcon, Printer, Loader2, Settings } from 'lucide-react';
+import { X, Download, FileText, Image as ImageIcon, Printer, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { exportToPDF, exportToImage, downloadImage, printCV } from '../utils/pdfExport';
+import { exportCVToPDF, exportToImage, downloadImage, printCV } from '../utils/pdfExport';
 import { useToast } from '../hooks/useToast';
-import type { PDFExportOptions } from '../utils/pdfExport';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -17,20 +15,7 @@ interface ExportModalProps {
 export function ExportModal({ isOpen, onClose, previewElement, filename }: ExportModalProps) {
   const [activeTab, setActiveTab] = useState<'pdf' | 'image' | 'print'>('pdf');
   const [isExporting, setIsExporting] = useState(false);
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const { success, error } = useToast();
-
-  // PDF Options
-  const [pdfOptions, setPdfOptions] = useState<PDFExportOptions>({
-    format: 'a4',
-    orientation: 'portrait',
-    quality: 2,
-    margins: { top: 10, right: 10, bottom: 10, left: 10 },
-    includeHeader: false,
-    includeFooter: false,
-    headerText: '',
-    footerText: '',
-  });
 
   // Image Options
   const [imageFormat, setImageFormat] = useState<'png' | 'jpeg' | 'webp'>('png');
@@ -44,10 +29,8 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
 
     setIsExporting(true);
     try {
-      await exportToPDF(previewElement, {
-        ...pdfOptions,
-        filename: `${filename}.pdf`,
-      });
+      // Utiliser la fonction optimisée pour les CV (A4 exact)
+      await exportCVToPDF(previewElement, `${filename}.pdf`);
       success('PDF exporté avec succès');
       onClose();
     } catch (err) {
@@ -146,162 +129,30 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
         <div className="flex-1 overflow-y-auto p-6">
           {activeTab === 'pdf' && (
             <div className="space-y-6">
-              {/* Format */}
-              <div>
-                <Label className="text-sm font-medium mb-2 block">Format de page</Label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(['a4', 'letter', 'legal'] as const).map((format) => (
-                    <button
-                      key={format}
-                      onClick={() => setPdfOptions({ ...pdfOptions, format })}
-                      className={`py-2 px-4 rounded-lg border transition-colors ${
-                        pdfOptions.format === format
-                          ? 'border-[#2196F3] bg-blue-50 text-[#2196F3]'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      {format.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <h3 className="font-medium text-blue-900 mb-2">Format A4 Optimisé</h3>
+                <p className="text-sm text-blue-800">
+                  Le PDF sera généré au format A4 exact (210mm x 297mm) avec une mise à l'échelle 
+                  automatique pour que tout le contenu soit visible sur une seule page.
+                </p>
               </div>
 
-              {/* Orientation */}
-              <div>
-                <Label className="text-sm font-medium mb-2 block">Orientation</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => setPdfOptions({ ...pdfOptions, orientation: 'portrait' })}
-                    className={`py-2 px-4 rounded-lg border transition-colors flex items-center justify-center gap-2 ${
-                      pdfOptions.orientation === 'portrait'
-                        ? 'border-[#2196F3] bg-blue-50 text-[#2196F3]'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="w-3 h-4 border border-current rounded-sm" />
-                    Portrait
-                  </button>
-                  <button
-                    onClick={() => setPdfOptions({ ...pdfOptions, orientation: 'landscape' })}
-                    className={`py-2 px-4 rounded-lg border transition-colors flex items-center justify-center gap-2 ${
-                      pdfOptions.orientation === 'landscape'
-                        ? 'border-[#2196F3] bg-blue-50 text-[#2196F3]'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="w-4 h-3 border border-current rounded-sm" />
-                    Paysage
-                  </button>
-                </div>
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Caractéristiques :</h4>
+                <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
+                  <li>Format exact A4 (210mm x 297mm)</li>
+                  <li>Haute qualité d'impression</li>
+                  <li>Une seule page avec ajustement automatique</li>
+                  <li>Compatible avec tous les logiciels PDF</li>
+                </ul>
               </div>
 
-              {/* Quality */}
-              <div>
-                <Label className="text-sm font-medium mb-2 block">
-                  Qualité: {pdfOptions.quality}x
-                </Label>
-                <input
-                  type="range"
-                  min="1"
-                  max="3"
-                  step="0.5"
-                  value={pdfOptions.quality}
-                  onChange={(e) => setPdfOptions({ ...pdfOptions, quality: parseFloat(e.target.value) })}
-                  className="w-full"
-                />
-                <div className="flex justify-between text-xs text-gray-500 mt-1">
-                  <span>Standard</span>
-                  <span>Haute</span>
-                  <span>Ultra</span>
-                </div>
-              </div>
-
-              {/* Advanced Options */}
-              <div>
-                <button
-                  onClick={() => setShowAdvanced(!showAdvanced)}
-                  className="flex items-center gap-2 text-[#2196F3] font-medium"
-                >
-                  <Settings className="w-4 h-4" />
-                  Options avancées
-                </button>
-
-                {showAdvanced && (
-                  <div className="mt-4 space-y-4 p-4 bg-gray-50 rounded-lg">
-                    {/* Margins */}
-                    <div>
-                      <Label className="text-sm font-medium mb-2 block">Marges (mm)</Label>
-                      <div className="grid grid-cols-4 gap-2">
-                        {(['top', 'right', 'bottom', 'left'] as const).map((side) => (
-                          <div key={side}>
-                            <Label className="text-xs text-gray-500 capitalize">{side}</Label>
-                            <input
-                              type="number"
-                              min="0"
-                              max="50"
-                              value={pdfOptions.margins?.[side] || 10}
-                              onChange={(e) =>
-                                setPdfOptions({
-                                  ...pdfOptions,
-                                  margins: {
-                                    ...pdfOptions.margins,
-                                    [side]: parseInt(e.target.value),
-                                  },
-                                })
-                              }
-                              className="w-full px-2 py-1 border rounded"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Header/Footer */}
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <Label className="text-sm">Inclure un en-tête</Label>
-                        <Switch
-                          checked={pdfOptions.includeHeader}
-                          onCheckedChange={(checked) =>
-                            setPdfOptions({ ...pdfOptions, includeHeader: checked })
-                          }
-                        />
-                      </div>
-                      {pdfOptions.includeHeader && (
-                        <input
-                          type="text"
-                          placeholder="Texte de l'en-tête"
-                          value={pdfOptions.headerText}
-                          onChange={(e) =>
-                            setPdfOptions({ ...pdfOptions, headerText: e.target.value })
-                          }
-                          className="w-full px-3 py-2 border rounded"
-                        />
-                      )}
-
-                      <div className="flex items-center justify-between">
-                        <Label className="text-sm">Inclure un pied de page</Label>
-                        <Switch
-                          checked={pdfOptions.includeFooter}
-                          onCheckedChange={(checked) =>
-                            setPdfOptions({ ...pdfOptions, includeFooter: checked })
-                          }
-                        />
-                      </div>
-                      {pdfOptions.includeFooter && (
-                        <input
-                          type="text"
-                          placeholder="Texte du pied de page"
-                          value={pdfOptions.footerText}
-                          onChange={(e) =>
-                            setPdfOptions({ ...pdfOptions, footerText: e.target.value })
-                          }
-                          className="w-full px-3 py-2 border rounded"
-                        />
-                      )}
-                    </div>
-                  </div>
-                )}
+              <div className="p-4 bg-amber-50 rounded-lg">
+                <p className="text-sm text-amber-800">
+                  <strong>Conseil :</strong> Si votre CV contient beaucoup de contenu, 
+                  il sera automatiquement réduit pour tenir sur une page A4. 
+                  Pour un meilleur résultat, limitez votre CV à une page.
+                </p>
               </div>
             </div>
           )}

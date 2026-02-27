@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight, ArrowLeft, Plus, Trash2, ChevronUp, Bold, Italic, Underline, Strikethrough, List, ListOrdered, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,17 +29,6 @@ const emptyEducation: Education = {
   description: '',
 };
 
-const diplomaOptions = [
-  { value: '', label: 'Sélectionner un diplôme' },
-  { value: 'Bac', label: 'Baccalauréat' },
-  { value: 'Bac+2', label: 'Bac+2 (DUT, BTS)' },
-  { value: 'Licence', label: 'Licence' },
-  { value: 'Master', label: 'Master' },
-  { value: 'Doctorat', label: 'Doctorat' },
-  { value: 'Certification', label: 'Certification professionnelle' },
-  { value: 'Autre', label: 'Autre' },
-];
-
 export function EducationForm({
   educations,
   onAdd,
@@ -49,11 +39,24 @@ export function EducationForm({
   onBack,
   onSkip,
 }: EducationFormProps) {
+  const { t } = useTranslation();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [newEducation, setNewEducation] = useState<Education | null>(null);
 
+  // Options de diplômes traduites
+  const diplomaOptions = [
+    { value: '', label: t('education.selectDiploma') },
+    { value: 'Bac', label: t('education.diplomas.bac') },
+    { value: 'Bac+2', label: t('education.diplomas.bac2') },
+    { value: 'Licence', label: t('education.diplomas.licence') },
+    { value: 'Master', label: t('education.diplomas.master') },
+    { value: 'Doctorat', label: t('education.diplomas.doctorat') },
+    { value: 'Certification', label: t('education.diplomas.certification') },
+    { value: 'Autre', label: t('education.diplomas.other') },
+  ];
+
   const handleAdd = () => {
-    const id = Date.now().toString();
+    const id = crypto.randomUUID();
     setNewEducation({ ...emptyEducation, id });
     setExpandedId(id);
   };
@@ -84,7 +87,7 @@ export function EducationForm({
       <div className="flex justify-between items-start mb-4">
         <div>
           <p className="text-gray-500 text-sm">
-            {edu.school || '(Non spécifié)'}, {edu.diploma || 'Inconnu'}
+            {edu.school || `(${t('common.notSpecified')})`}, {edu.diploma || t('common.unknown')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -107,7 +110,7 @@ export function EducationForm({
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-xs uppercase text-gray-500">ÉCOLE / UNIVERSITÉ</Label>
+              <Label className="text-xs uppercase text-gray-500">{t('education.school')}</Label>
               <AutocompleteInput
                 value={edu.school}
                 onChange={(value) => isNew 
@@ -115,23 +118,21 @@ export function EducationForm({
                   : onUpdate(edu.id, { school: value })
                 }
                 suggestions={commonSchools}
-                placeholder="Université Hassan II"
+                placeholder={t('education.schoolPlaceholder') || 'Université Hassan II'}
               />
             </div>
             <div>
-              <Label className="text-xs uppercase text-gray-500">DIPLÔME</Label>
+              <Label className="text-xs uppercase text-gray-500">{t('education.diploma')}</Label>
               <select
                 value={edu.diploma}
                 onChange={(e) => isNew
                   ? setNewEducation({ ...edu, diploma: e.target.value })
                   : onUpdate(edu.id, { diploma: e.target.value })
                 }
-                className="w-full mt-1 px-3 py-2 border border-gray-200 rounded-md text-sm"
+                className="w-full mt-1 h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2196F3]"
               >
-                {diplomaOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
+                {diplomaOptions.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
             </div>
@@ -139,7 +140,7 @@ export function EducationForm({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-xs uppercase text-gray-500">DATE D'OBTENTION</Label>
+              <Label className="text-xs uppercase text-gray-500">{t('education.graduationDate')}</Label>
               <Input
                 type="month"
                 value={edu.graduationDate}
@@ -151,21 +152,21 @@ export function EducationForm({
               />
             </div>
             <div>
-              <Label className="text-xs uppercase text-gray-500">VILLE</Label>
+              <Label className="text-xs uppercase text-gray-500">{t('education.city')}</Label>
               <Input
                 value={edu.city}
                 onChange={(e) => isNew
                   ? setNewEducation({ ...edu, city: e.target.value })
                   : onUpdate(edu.id, { city: e.target.value })
                 }
-                placeholder="Casablanca"
+                placeholder={t('education.cityPlaceholder') || 'Casablanca'}
                 className="mt-1"
               />
             </div>
           </div>
 
           <div>
-            <Label className="text-xs uppercase text-gray-500">DESCRIPTION</Label>
+            <Label className="text-xs uppercase text-gray-500">{t('education.description')}</Label>
             <div className="border border-gray-200 rounded-lg mt-1">
               <div className="flex items-center gap-2 p-2 border-b border-gray-200">
                 <button className="p-1 hover:bg-gray-100 rounded"><Bold className="w-4 h-4" /></button>
@@ -182,7 +183,7 @@ export function EducationForm({
                   ? setNewEducation({ ...edu, description: e.target.value })
                   : onUpdate(edu.id, { description: e.target.value })
                 }
-                placeholder="Licence en administration des affaires de l'Université Hassan II."
+                placeholder={t('education.descriptionPlaceholder') || 'Décrivez vos études et réalisations...'}
                 className="w-full p-3 min-h-[100px] resize-none outline-none"
               />
             </div>
@@ -191,10 +192,10 @@ export function EducationForm({
           {isNew && (
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={handleCancel}>
-                Annuler
+                {t('nav.cancel')}
               </Button>
               <Button onClick={handleSave} className="bg-[#2196F3] hover:bg-[#1976D2]">
-                Enregistrer
+                {t('nav.save')}
               </Button>
             </div>
           )}
@@ -206,10 +207,10 @@ export function EducationForm({
   return (
     <div className="max-w-2xl">
       <h2 className="text-3xl font-bold text-gray-800 mb-2">
-        Veuillez saisir les données relatives à vos <span className="text-[#2196F3]">études</span>
+        <span className="text-[#2196F3]">{t('education.titleHighlight')}</span> {t('education.title')}
       </h2>
       <p className="text-gray-500 mb-8">
-        Écrivez vos écoles ou cours que vous avez terminés.
+        {t('education.subtitle')}
       </p>
 
       <button
@@ -217,7 +218,7 @@ export function EducationForm({
         className="flex items-center gap-2 text-[#2196F3] font-medium mb-4 hover:underline"
       >
         <Plus className="w-5 h-5" />
-        Ajouter une formation
+        {t('education.add')}
       </button>
 
       {newEducation && renderEducationForm(newEducation, true)}
@@ -231,7 +232,7 @@ export function EducationForm({
       )}
 
       <p className="text-gray-500 text-sm mb-8">
-        Dans cette section, indiquez votre niveau d'études ; mentionnez vos diplômes et résultats scolaires, le cas échéant. Indiquez les dates d'obtention des diplômes.
+        {t('education.helpText')}
       </p>
 
       <div className="flex justify-between">
@@ -241,13 +242,13 @@ export function EducationForm({
           className="flex items-center gap-2 text-gray-500"
         >
           <ArrowLeft className="w-4 h-4" />
-          Revenir en arrière
+          {t('nav.back')}
         </Button>
         <Button
           onClick={handleNext}
           className="bg-[#2196F3] hover:bg-[#1976D2] text-white px-6 py-2 rounded flex items-center gap-2"
         >
-          Aller à Compétences
+          {t('education.nextStep')}
           <ArrowRight className="w-4 h-4" />
         </Button>
       </div>

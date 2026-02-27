@@ -179,6 +179,11 @@ button {
 
 /* Print styles for CV */
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  
   .no-print {
     display: none !important;
   }
@@ -188,6 +193,39 @@ button {
     margin: 0 !important;
     padding: 0 !important;
   }
+
+  #cv-preview {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+/* CV Preview in app - normal size */
+#cv-preview {
+  box-sizing: border-box;
+}
+
+/* Only for PDF export - applied via JS temporarily */
+[data-cv-preview].pdf-export-mode {
+  width: 210mm !important;
+  min-width: 210mm !important;
+  max-width: 210mm !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure proper rendering for PDF export */
+[data-cv-preview] {
+  transform-origin: top left;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Drag and drop styles */

@@ -128,7 +128,7 @@ export interface CVSettings {
   hiddenSections?: string[];
 }
 
-export type Step = 'landing' | 'contact' | 'experience' | 'education' | 'skills' | 'languages' | 'certifications' | 'profile' | 'finish' | 'download';
+export type Step = 'landing' | 'contact' | 'experience' | 'education' | 'skills' | 'languages' | 'certifications' | 'projects' | 'interests' | 'profile' | 'finish' | 'download';
 
 export interface CVStats {
   completeness: number;

@@ -4,19 +4,8 @@ import jsPDF from 'jspdf';
 export interface PDFExportOptions {
   filename?: string;
   quality?: number;
-  scale?: number;
   format?: 'a4' | 'letter' | 'legal';
   orientation?: 'portrait' | 'landscape';
-  margins?: {
-    top?: number;
-    right?: number;
-    bottom?: number;
-    left?: number;
-  };
-  includeHeader?: boolean;
-  includeFooter?: boolean;
-  headerText?: string;
-  footerText?: string;
 }
 
 const formatDimensions = {
@@ -25,160 +14,168 @@ const formatDimensions = {
   legal: { width: 216, height: 356 },
 };
 
+/**
+ * Exporte un CV vers PDF avec format A4 exact
+ * Cette version garantit que le CV tient sur une page avec les bonnes proportions
+ */
+export async function exportCVToPDF(
+  element: HTMLElement,
+  filename: string
+): Promise<void> {
+  // Attendre que tout soit chargé
+  await document.fonts.ready;
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  const format = 'a4';
+  const dims = formatDimensions[format];
+  const pageWidth = dims.width;  // 210mm
+  const pageHeight = dims.height; // 297mm
+
+  // Sauvegarder les styles et classes originaux
+  const originalStyles = {
+    width: element.style.width,
+    height: element.style.height,
+    maxWidth: element.style.maxWidth,
+    maxHeight: element.style.maxHeight,
+    transform: element.style.transform,
+    transformOrigin: element.style.transformOrigin,
+    position: element.style.position,
+    left: element.style.left,
+    top: element.style.top,
+    margin: element.style.margin,
+    padding: element.style.padding,
+  };
+  const hadPdfExportClass = element.classList.contains('pdf-export-mode');
+
+  try {
+    // 1. Préparer l'élément pour une capture parfaite
+    // Ajouter classe pour styles PDF
+    element.classList.add('pdf-export-mode');
+    
+    // Forcer une taille fixe exactement A4 pour le rendu
+    element.style.width = '210mm';
+    element.style.maxWidth = '210mm';
+    element.style.height = 'auto';
+    element.style.maxHeight = 'none';
+    element.style.margin = '0';
+    element.style.padding = '0';
+    element.style.transform = 'none';
+    element.style.position = 'relative';
+    element.style.left = '0';
+    element.style.top = '0';
+
+    // Attendre le rendu
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // 2. Capturer avec html2canvas
+    // Utiliser un scale élevé pour la qualité, mais nous réduirons ensuite
+    const canvas = await html2canvas(element, {
+      scale: 3, // Haute qualité
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+      width: element.offsetWidth,
+      height: element.offsetHeight,
+      windowWidth: element.offsetWidth,
+      windowHeight: element.offsetHeight,
+      x: 0,
+      y: 0,
+      scrollX: 0,
+      scrollY: 0,
+    });
+
+    // 3. Créer le PDF
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+    });
+
+    // 4. Calculer les dimensions pour fit parfait dans A4
+    const imgWidth = canvas.width;
+    const imgHeight = canvas.height;
+    const imgRatio = imgWidth / imgHeight;
+    const pageRatio = pageWidth / pageHeight;
+
+    let finalWidth: number;
+    let finalHeight: number;
+    let x: number;
+    let y: number;
+
+    // Déterminer comment ajuster l'image
+    if (imgRatio > pageRatio) {
+      // L'image est plus large que la page (relativement)
+      // On l'ajuste à la largeur de la page
+      finalWidth = pageWidth;
+      finalHeight = pageWidth / imgRatio;
+      x = 0;
+      y = (pageHeight - finalHeight) / 2; // Centrer verticalement
+    } else {
+      // L'image est plus haute que la page
+      // On l'ajuste à la hauteur de la page
+      finalHeight = pageHeight;
+      finalWidth = pageHeight * imgRatio;
+      x = (pageWidth - finalWidth) / 2; // Centrer horizontalement
+      y = 0;
+    }
+
+    // Si l'image dépasse toujours, la réduire davantage
+    if (finalWidth > pageWidth || finalHeight > pageHeight) {
+      const scaleX = pageWidth / finalWidth;
+      const scaleY = pageHeight / finalHeight;
+      const scale = Math.min(scaleX, scaleY);
+      finalWidth *= scale;
+      finalHeight *= scale;
+      x = (pageWidth - finalWidth) / 2;
+      y = (pageHeight - finalHeight) / 2;
+    }
+
+    // 5. Convertir en image et ajouter au PDF
+    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+    
+    pdf.addImage(
+      imgData,
+      'JPEG',
+      x,
+      y,
+      finalWidth,
+      finalHeight,
+      undefined,
+      'SLOW' // Meilleure qualité
+    );
+
+    // 6. Sauvegarder
+    pdf.save(filename);
+
+  } finally {
+    // Toujours restaurer les styles et classes originaux
+    if (!hadPdfExportClass) {
+      element.classList.remove('pdf-export-mode');
+    }
+    element.style.width = originalStyles.width;
+    element.style.height = originalStyles.height;
+    element.style.maxWidth = originalStyles.maxWidth;
+    element.style.maxHeight = originalStyles.maxHeight;
+    element.style.transform = originalStyles.transform;
+    element.style.transformOrigin = originalStyles.transformOrigin;
+    element.style.position = originalStyles.position;
+    element.style.left = originalStyles.left;
+    element.style.top = originalStyles.top;
+    element.style.margin = originalStyles.margin;
+    element.style.padding = originalStyles.padding;
+  }
+}
+
+/**
+ * Fonction legacy - utiliser exportCVToPDF à la place
+ */
 export async function exportToPDF(
   element: HTMLElement,
   options: PDFExportOptions = {}
 ): Promise<void> {
-  const { 
-    filename = `CV-${Date.now()}.pdf`, 
-    quality = 2,
-    scale = 2,
-    format = 'a4',
-    orientation = 'portrait',
-    margins = { top: 10, right: 10, bottom: 10, left: 10 },
-    includeHeader = false,
-    includeFooter = false,
-    headerText = '',
-    footerText = '',
-  } = options;
-
-  try {
-    // Get format dimensions
-    const dims = formatDimensions[format];
-    const pageWidth = orientation === 'portrait' ? dims.width : dims.height;
-    const pageHeight = orientation === 'portrait' ? dims.height : dims.width;
-
-    // Calculate content dimensions
-    const contentWidth = pageWidth - (margins.left || 0) - (margins.right || 0);
-    const contentHeight = pageHeight - (margins.top || 0) - (margins.bottom || 0);
-
-    // Create canvas from element
-    const canvas = await html2canvas(element, {
-      scale,
-      useCORS: true,
-      logging: false,
-      backgroundColor: '#ffffff',
-      windowWidth: element.scrollWidth,
-      windowHeight: element.scrollHeight,
-      onclone: (clonedDoc) => {
-        // Ensure fonts are loaded in cloned document
-        const clonedElement = clonedDoc.body.querySelector('[data-cv-preview]');
-        if (clonedElement) {
-          (clonedElement as HTMLElement).style.fontFamily = element.style.fontFamily;
-        }
-      },
-    });
-
-    // Calculate PDF dimensions
-    const imgWidth = contentWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    // Create PDF
-    const pdf = new jsPDF({
-      orientation,
-      unit: 'mm',
-      format,
-    });
-
-    const imgData = canvas.toDataURL('image/jpeg', quality);
-
-    let heightLeft = imgHeight;
-    let position = margins.top || 0;
-    let pageNumber = 1;
-
-    // Add first page
-    addPageContent(pdf, imgData, position, imgWidth, imgHeight, margins);
-    
-    // Add header if enabled
-    if (includeHeader && headerText) {
-      addHeader(pdf, headerText, margins, pageWidth);
-    }
-    
-    // Add footer if enabled
-    if (includeFooter && footerText) {
-      addFooter(pdf, footerText, margins, pageWidth, pageHeight, pageNumber);
-    }
-
-    heightLeft -= contentHeight;
-
-    // Add additional pages if needed
-    while (heightLeft > 0) {
-      pageNumber++;
-      position = (margins.top || 0) - (imgHeight - heightLeft);
-      pdf.addPage();
-      addPageContent(pdf, imgData, position, imgWidth, imgHeight, margins);
-      
-      if (includeHeader && headerText) {
-        addHeader(pdf, headerText, margins, pageWidth);
-      }
-      
-      if (includeFooter && footerText) {
-        addFooter(pdf, footerText, margins, pageWidth, pageHeight, pageNumber);
-      }
-      
-      heightLeft -= contentHeight;
-    }
-
-    // Save PDF
-    pdf.save(filename);
-  } catch (error) {
-    console.error('PDF export failed:', error);
-    throw new Error('Failed to export PDF');
-  }
-}
-
-function addPageContent(
-  pdf: jsPDF,
-  imgData: string,
-  position: number,
-  imgWidth: number,
-  imgHeight: number,
-  margins: { top?: number; right?: number; bottom?: number; left?: number }
-): void {
-  pdf.addImage(
-    imgData,
-    'JPEG',
-    margins.left || 0,
-    position,
-    imgWidth,
-    imgHeight,
-    undefined,
-    'FAST'
-  );
-}
-
-function addHeader(
-  pdf: jsPDF,
-  text: string,
-  margins: { top?: number; right?: number; bottom?: number; left?: number },
-  pageWidth: number
-): void {
-  pdf.setFontSize(10);
-  pdf.setTextColor(128, 128, 128);
-  pdf.text(
-    text,
-    pageWidth / 2,
-    (margins.top || 10) - 5,
-    { align: 'center' }
-  );
-}
-
-function addFooter(
-  pdf: jsPDF,
-  text: string,
-  margins: { top?: number; right?: number; bottom?: number; left?: number },
-  pageWidth: number,
-  pageHeight: number,
-  pageNumber: number
-): void {
-  pdf.setFontSize(10);
-  pdf.setTextColor(128, 128, 128);
-  pdf.text(
-    `${text} - Page ${pageNumber}`,
-    pageWidth / 2,
-    pageHeight - (margins.bottom || 10) + 5,
-    { align: 'center' }
-  );
+  const { filename = `CV-${Date.now()}.pdf` } = options;
+  return exportCVToPDF(element, filename);
 }
 
 export async function exportToImage(
@@ -216,7 +213,6 @@ export async function generateThumbnail(
     backgroundColor: '#ffffff',
   });
 
-  // Create a thumbnail canvas
   const thumbnailCanvas = document.createElement('canvas');
   const aspectRatio = canvas.height / canvas.width;
   thumbnailCanvas.width = width;
@@ -247,6 +243,18 @@ export function printCV(elementId: string): void {
   const element = document.getElementById(elementId);
   if (!element) return;
 
+  // Cloner l'élément pour modification
+  const clonedElement = element.cloneNode(true) as HTMLElement;
+  
+  // Forcer les styles pour l'impression
+  clonedElement.style.width = '210mm';
+  clonedElement.style.minHeight = '297mm';
+  clonedElement.style.maxWidth = '210mm';
+  clonedElement.style.margin = '0';
+  clonedElement.style.padding = '0';
+  clonedElement.style.transform = 'none';
+  clonedElement.style.boxShadow = 'none';
+
   const styles = Array.from(document.styleSheets)
     .map((sheet) => {
       try {
@@ -266,6 +274,15 @@ export function printCV(elementId: string): void {
         <title>CV - Impression</title>
         <style>
           ${styles}
+          @page {
+            size: A4 portrait;
+            margin: 0;
+          }
+          body { 
+            margin: 0; 
+            padding: 0;
+            background: white;
+          }
           @media print {
             body { margin: 0; }
             .no-print { display: none !important; }
@@ -273,13 +290,13 @@ export function printCV(elementId: string): void {
         </style>
       </head>
       <body>
-        ${element.outerHTML}
+        ${clonedElement.outerHTML}
         <script>
           window.onload = function() {
             setTimeout(function() {
               window.print();
               window.close();
-            }, 500);
+            }, 1000);
           };
         </script>
       </body>

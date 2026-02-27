@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight, ArrowLeft, Bold, Italic, Underline, Strikethrough, List, ListOrdered, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -20,6 +21,7 @@ export function ProfileForm({
   onBack,
   onSkip,
 }: ProfileFormProps) {
+  const { t } = useTranslation();
   const [charCount, setCharCount] = useState(profile.length);
 
   const handleChange = (value: string) => {
@@ -28,11 +30,10 @@ export function ProfileForm({
   };
 
   const getAISuggestions = async (): Promise<string[]> => {
-    // In a real app, this would call an AI API
     return [
       generateProfileSuggestion('Développeur Web', 3, ['React', 'TypeScript', 'Node.js']),
       generateProfileSuggestion('Chef de Projet', 5, ['Agile', 'Scrum', 'Gestion d\'équipe']),
-      'Professionnel passionné avec une solide expérience dans mon domaine. Je combine expertise technique et soft skills pour mener à bien les projets qui me sont confiés.',
+      t('profile.sampleText'),
     ];
   };
 
@@ -83,7 +84,6 @@ export function ProfileForm({
     const newText = profile.substring(0, start) + formattedText + profile.substring(end);
     handleChange(newText);
 
-    // Restore focus and selection
     setTimeout(() => {
       textarea.focus();
       textarea.setSelectionRange(start + formattedText.length, start + formattedText.length);
@@ -93,17 +93,17 @@ export function ProfileForm({
   return (
     <div className="max-w-2xl">
       <h2 className="text-3xl font-bold text-gray-800 mb-2">
-        <span className="text-[#2196F3]">Rédigez</span> votre profil professionnel
+        <span className="text-[#2196F3]">{t('profile.titleHighlight')}</span> {t('profile.title')}
       </h2>
       <p className="text-gray-500 mb-8">
-        Écrivez 2-4 courtes lignes sur votre travail, vos réussites et vos compétences.
+        {t('profile.subtitle')}
       </p>
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label className="text-xs uppercase text-gray-500">À PROPOS DE MOI</Label>
+          <Label className="text-xs uppercase text-gray-500">{t('profile.aboutMe')}</Label>
           <span className={`text-xs ${charCount > 500 ? 'text-orange-500' : 'text-gray-400'}`}>
-            {charCount} caractères
+            {charCount} {t('profile.characters')}
           </span>
         </div>
         <div className="border border-gray-200 rounded-lg mt-1">
@@ -111,28 +111,28 @@ export function ProfileForm({
             <button 
               onClick={() => insertFormatting('bold')}
               className="p-1 hover:bg-gray-200 rounded transition-colors"
-              title="Gras"
+              title={t('profile.formatting.bold')}
             >
               <Bold className="w-4 h-4" />
             </button>
             <button 
               onClick={() => insertFormatting('italic')}
               className="p-1 hover:bg-gray-200 rounded transition-colors"
-              title="Italique"
+              title={t('profile.formatting.italic')}
             >
               <Italic className="w-4 h-4" />
             </button>
             <button 
               onClick={() => insertFormatting('underline')}
               className="p-1 hover:bg-gray-200 rounded transition-colors"
-              title="Souligné"
+              title={t('profile.formatting.underline')}
             >
               <Underline className="w-4 h-4" />
             </button>
             <button 
               onClick={() => insertFormatting('strikethrough')}
               className="p-1 hover:bg-gray-200 rounded transition-colors"
-              title="Barré"
+              title={t('profile.formatting.strikethrough')}
             >
               <Strikethrough className="w-4 h-4" />
             </button>
@@ -140,21 +140,21 @@ export function ProfileForm({
             <button 
               onClick={() => insertFormatting('list')}
               className="p-1 hover:bg-gray-200 rounded transition-colors"
-              title="Liste à puces"
+              title={t('profile.formatting.list')}
             >
               <List className="w-4 h-4" />
             </button>
             <button 
               onClick={() => insertFormatting('ordered-list')}
               className="p-1 hover:bg-gray-200 rounded transition-colors"
-              title="Liste numérotée"
+              title={t('profile.formatting.orderedList')}
             >
               <ListOrdered className="w-4 h-4" />
             </button>
             <button 
               onClick={() => insertFormatting('link')}
               className="p-1 hover:bg-gray-200 rounded transition-colors"
-              title="Lien"
+              title={t('profile.formatting.link')}
             >
               <Link className="w-4 h-4" />
             </button>
@@ -163,7 +163,7 @@ export function ProfileForm({
             id="profile-textarea"
             value={profile}
             onChange={(e) => handleChange(e.target.value)}
-            placeholder="Je suis un chef de projet expérimenté et je cherche à réussir dans un nouveau poste."
+            placeholder={t('profile.placeholder')}
             className="w-full p-3 min-h-[150px] resize-none outline-none"
             maxLength={1000}
           />
@@ -173,11 +173,11 @@ export function ProfileForm({
           <AISuggestionButton
             onSuggest={getAISuggestions}
             onApply={applySuggestion}
-            buttonText="Générer avec l'IA"
-            dialogTitle="Suggestions de profil"
+            buttonText={t('profile.aiButton')}
+            dialogTitle={t('profile.aiTitle')}
           />
           <span className="text-xs text-gray-400">
-            Maximum 1000 caractères
+            {t('profile.maxCharacters')}
           </span>
         </div>
       </div>
@@ -189,13 +189,13 @@ export function ProfileForm({
           className="flex items-center gap-2 text-gray-500"
         >
           <ArrowLeft className="w-4 h-4" />
-          Revenir en arrière
+          {t('nav.back')}
         </Button>
         <Button
           onClick={handleNext}
           className="bg-[#2196F3] hover:bg-[#1976D2] text-white px-6 py-2 rounded flex items-center gap-2"
         >
-          Aller à Terminez-le
+          {t('profile.nextStep')}
           <ArrowRight className="w-4 h-4" />
         </Button>
       </div>

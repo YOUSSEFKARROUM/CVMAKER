@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -11,24 +11,40 @@ export interface Toast {
 
 export function useToast() {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+
+  const removeToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+    // Nettoyer le timer s'il existe
+    const timer = timersRef.current.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      timersRef.current.delete(id);
+    }
+  }, []);
 
   const addToast = useCallback((message: string, type: ToastType = 'info', duration: number = 3000) => {
-    const id = Date.now().toString();
+    const id = crypto.randomUUID();
     const toast: Toast = { id, message, type, duration };
     
     setToasts((prev) => [...prev, toast]);
 
     if (duration > 0) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         removeToast(id);
       }, duration);
+      timersRef.current.set(id, timer);
     }
 
     return id;
-  }, []);
+  }, [removeToast]);
 
-  const removeToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+  // Nettoyer tous les timers au démontage
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach((timer) => clearTimeout(timer));
+      timersRef.current.clear();
+    };
   }, []);
 
   const success = useCallback((message: string, duration?: number) => {

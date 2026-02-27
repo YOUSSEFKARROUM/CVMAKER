@@ -1,73 +1,117 @@
-# React + TypeScript + Vite
+# CV Maker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Application de création de CV moderne et professionnelle.
 
-Currently, two official plugins are available:
+## ✨ Fonctionnalités
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🎨 **10+ Templates professionnels**
+- 📝 **Éditeur intuitif** avec sections modulaires
+- 🌍 **Multilingue** (Français/Anglais)
+- 💾 **Stockage local** (fonctionne offline)
+- 🔐 **Authentification** via Keycloak (optionnel)
+- 📱 **Responsive** (mobile/desktop)
+- 🎯 **Export PDF** haute qualité
 
-## React Compiler
+## 🚀 Démarrage rapide
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Mode Local (Recommandé pour tester)
 
-## Expanding the ESLint configuration
+Aucune configuration requise !
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+L'application fonctionne immédiatement avec un utilisateur local.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Avec Keycloak
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. Configurez Keycloak (voir `KEYCLOAK_SETUP.md`)
+2. Mettez à jour `.env` :
+```env
+VITE_LOCAL_MODE=false
+VITE_KEYCLOAK_URL=http://localhost:8080/auth
+VITE_KEYCLOAK_REALM=cv-maker
+VITE_KEYCLOAK_CLIENT_ID=cv-maker-client
 ```
+3. Redémarrez :
+```bash
+npm run dev
+```
+
+## 📖 Documentation
+
+- [Configuration Keycloak](KEYCLOAK_SETUP.md) - Guide complet Keycloak
+- [Migration Firebase → Keycloak](MIGRATION_FIREBASE_TO_KEYCLOAK.md) - Historique des changements
+- [Configuration Firebase (obsolète)](FIREBASE_SETUP.md) - Ancienne config Firebase
+
+## 🏗️ Technologies
+
+- **Frontend**: React 18 + TypeScript
+- **Build**: Vite 7
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Auth**: Keycloak (optionnel) ou Mode Local
+- **Storage**: localStorage
+- **PDF**: jsPDF + html2canvas
+- **i18n**: i18next
+
+## 📂 Structure du projet
+
+```
+src/
+├── components/        # Composants React
+│   ├── ui/           # Composants UI (shadcn)
+│   ├── templates/    # Templates de CV
+│   └── ...
+├── hooks/            # Custom hooks
+│   ├── useAuth.ts    # Authentification
+│   ├── useCloudCV.ts # Gestion des CVs
+│   └── ...
+├── keycloak/         # Configuration Keycloak
+│   ├── config.ts
+│   └── KeycloakProvider.tsx
+├── sections/         # Sections du formulaire
+├── i18n/            # Traductions
+└── types/           # Types TypeScript
+```
+
+## 🛠️ Scripts disponibles
+
+```bash
+npm run dev      # Développement
+npm run build    # Build production
+npm run preview  # Preview production
+npm test         # Tests
+```
+
+## 🌐 Variables d'environnement
+
+```env
+# Mode Local
+VITE_LOCAL_MODE=true
+
+# Keycloak (si mode local désactivé)
+VITE_KEYCLOAK_URL=http://localhost:8080/auth
+VITE_KEYCLOAK_REALM=cv-maker
+VITE_KEYCLOAK_CLIENT_ID=cv-maker-client
+```
+
+## 🔄 Migration depuis Firebase
+
+Le projet a migré de Firebase à Keycloak + localStorage. Voir :
+- [MIGRATION_FIREBASE_TO_KEYCLOAK.md](MIGRATION_FIREBASE_TO_KEYCLOAK.md)
+
+## 📝 License
+
+MIT
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues !
+
+1. Fork le projet
+2. Créez une branche (`git checkout -b feature/AmazingFeature`)
+3. Commit (`git commit -m 'Add some AmazingFeature'`)
+4. Push (`git push origin feature/AmazingFeature`)
+5. Ouvrez une Pull Request

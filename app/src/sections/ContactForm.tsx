@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight, Check, MapPin, Phone, Mail, Globe, Linkedin, Github, Calendar, Flag, Car, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +29,7 @@ export function ContactForm({
   onNext,
   onPhotoChange,
 }: ContactFormProps) {
+  const { t } = useTranslation();
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
 
@@ -68,33 +70,13 @@ export function ContactForm({
     return touched[field] || errors[field];
   };
 
-  const requiredFields = ['firstName', 'lastName', 'email'];
-  const completedRequiredFields = requiredFields.filter(field => 
-    contact[field as keyof ContactInfo]?.trim()
-  ).length;
-  const progress = Math.round((completedRequiredFields / requiredFields.length) * 100);
-
   return (
     <div className="max-w-2xl">
-      {/* Progress */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-gray-600">Progression</span>
-          <span className="text-sm font-medium text-[#2196F3]">{progress}%</span>
-        </div>
-        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-[#2196F3] transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-
       <h2 className="text-3xl font-bold text-gray-800 mb-2">
-        Vos informations de <span className="text-[#2196F3]">contact</span>
+        {t('contact.title')}
       </h2>
       <p className="text-gray-500 mb-8">
-        Ces informations permettront aux recruteurs de vous contacter facilement.
+        {t('contact.subtitle')}
       </p>
 
       {/* Photo Upload */}
@@ -113,14 +95,14 @@ export function ContactForm({
           <div className="relative">
             <Label htmlFor="firstName" className="text-xs uppercase text-gray-500 flex items-center gap-1">
               <User className="w-3 h-3" />
-              PRÉNOM <span className="text-red-500">*</span>
+              {t('contact.firstName')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="firstName"
               value={contact.firstName}
               onChange={(e) => handleChange('firstName', e.target.value)}
               onBlur={() => handleBlur('firstName')}
-              placeholder="Jean"
+              placeholder={t('contact.placeholders.firstName')}
               className={`mt-1 ${
                 getFieldError('firstName') && isFieldTouched('firstName')
                   ? 'border-red-500 focus-visible:ring-red-500'
@@ -142,14 +124,14 @@ export function ContactForm({
           <div className="relative">
             <Label htmlFor="lastName" className="text-xs uppercase text-gray-500 flex items-center gap-1">
               <User className="w-3 h-3" />
-              NOM <span className="text-red-500">*</span>
+              {t('contact.lastName')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="lastName"
               value={contact.lastName}
               onChange={(e) => handleChange('lastName', e.target.value)}
               onBlur={() => handleBlur('lastName')}
-              placeholder="Dupont"
+              placeholder={t('contact.placeholders.lastName')}
               className={`mt-1 ${
                 getFieldError('lastName') && isFieldTouched('lastName')
                   ? 'border-red-500 focus-visible:ring-red-500'
@@ -174,8 +156,8 @@ export function ContactForm({
           value={contact.jobTitle || ''}
           onChange={(value) => handleChange('jobTitle', value)}
           suggestions={commonJobTitles}
-          label="INTITULÉ DU POSTE"
-          placeholder="Développeur Web Full Stack"
+          label={t('contact.jobTitle')}
+          placeholder={t('contact.placeholders.jobTitle')}
           className="relative"
         />
 
@@ -184,26 +166,26 @@ export function ContactForm({
           <div className="relative">
             <Label htmlFor="city" className="text-xs uppercase text-gray-500 flex items-center gap-1">
               <MapPin className="w-3 h-3" />
-              VILLE
+              {t('contact.city')}
             </Label>
             <Input
               id="city"
               value={contact.city}
               onChange={(e) => handleChange('city', e.target.value)}
-              placeholder="Paris"
+              placeholder={t('contact.placeholders.city')}
               className={`mt-1 ${isFieldValid('city') ? 'border-green-500' : ''}`}
             />
           </div>
 
           <div className="relative">
             <Label htmlFor="postalCode" className="text-xs uppercase text-gray-500">
-              CODE POSTAL
+              {t('contact.postalCode')}
             </Label>
             <Input
               id="postalCode"
               value={contact.postalCode}
               onChange={(e) => handleChange('postalCode', e.target.value)}
-              placeholder="75001"
+              placeholder={t('contact.placeholders.postalCode')}
               className={`mt-1 ${isFieldValid('postalCode') ? 'border-green-500' : ''}`}
             />
           </div>
@@ -214,13 +196,13 @@ export function ContactForm({
           <div className="relative">
             <Label htmlFor="phone" className="text-xs uppercase text-gray-500 flex items-center gap-1">
               <Phone className="w-3 h-3" />
-              TÉLÉPHONE
+              {t('contact.phone')}
             </Label>
             <Input
               id="phone"
               value={contact.phone}
               onChange={(e) => handleChange('phone', e.target.value)}
-              placeholder="+33 6 12 34 56 78"
+              placeholder={t('contact.placeholders.phone')}
               className={`mt-1 ${isFieldValid('phone') ? 'border-green-500' : ''}`}
             />
           </div>
@@ -228,7 +210,7 @@ export function ContactForm({
           <div className="relative">
             <Label htmlFor="email" className="text-xs uppercase text-gray-500 flex items-center gap-1">
               <Mail className="w-3 h-3" />
-              EMAIL <span className="text-red-500">*</span>
+              {t('contact.email')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="email"
@@ -236,7 +218,7 @@ export function ContactForm({
               value={contact.email}
               onChange={(e) => handleChange('email', e.target.value)}
               onBlur={() => handleBlur('email')}
-              placeholder="jean.dupont@email.com"
+              placeholder={t('contact.placeholders.email')}
               className={`mt-1 ${
                 getFieldError('email') && isFieldTouched('email')
                   ? 'border-red-500 focus-visible:ring-red-500'
@@ -261,7 +243,7 @@ export function ContactForm({
           onClick={() => setShowDetails(!showDetails)}
           className="text-[#2196F3] font-medium hover:underline flex items-center gap-1"
         >
-          {showDetails ? '− Masquer' : '+ Ajouter'} plus de détails
+          {showDetails ? t('contact.hideDetails') : t('contact.addDetails')}
         </button>
 
         {/* Additional Details */}
@@ -272,13 +254,13 @@ export function ContactForm({
               <div>
                 <Label htmlFor="linkedin" className="text-xs uppercase text-gray-500 flex items-center gap-1">
                   <Linkedin className="w-3 h-3" />
-                  LINKEDIN
+                  {t('contact.linkedin')}
                 </Label>
                 <Input
                   id="linkedin"
                   value={contact.linkedin || ''}
                   onChange={(e) => handleChange('linkedin', e.target.value)}
-                  placeholder="linkedin.com/in/jeandupont"
+                  placeholder={t('contact.placeholders.linkedin')}
                   className="mt-1"
                 />
               </div>
@@ -286,13 +268,13 @@ export function ContactForm({
               <div>
                 <Label htmlFor="portfolio" className="text-xs uppercase text-gray-500 flex items-center gap-1">
                   <Globe className="w-3 h-3" />
-                  PORTFOLIO / SITE
+                  {t('contact.portfolio')}
                 </Label>
                 <Input
                   id="portfolio"
                   value={contact.portfolio || ''}
                   onChange={(e) => handleChange('portfolio', e.target.value)}
-                  placeholder="www.jeandupont.com"
+                  placeholder={t('contact.placeholders.portfolio')}
                   className="mt-1"
                 />
               </div>
@@ -302,13 +284,13 @@ export function ContactForm({
               <div>
                 <Label htmlFor="github" className="text-xs uppercase text-gray-500 flex items-center gap-1">
                   <Github className="w-3 h-3" />
-                  GITHUB
+                  {t('contact.github')}
                 </Label>
                 <Input
                   id="github"
                   value={contact.github || ''}
                   onChange={(e) => handleChange('github', e.target.value)}
-                  placeholder="github.com/jeandupont"
+                  placeholder={t('contact.placeholders.github')}
                   className="mt-1"
                 />
               </div>
@@ -316,13 +298,13 @@ export function ContactForm({
               <div>
                 <Label htmlFor="nationality" className="text-xs uppercase text-gray-500 flex items-center gap-1">
                   <Flag className="w-3 h-3" />
-                  NATIONALITÉ
+                  {t('contact.nationality')}
                 </Label>
                 <Input
                   id="nationality"
                   value={contact.nationality || ''}
                   onChange={(e) => handleChange('nationality', e.target.value)}
-                  placeholder="Française"
+                  placeholder={t('contact.placeholders.nationality')}
                   className="mt-1"
                 />
               </div>
@@ -332,7 +314,7 @@ export function ContactForm({
               <div>
                 <Label htmlFor="birthDate" className="text-xs uppercase text-gray-500 flex items-center gap-1">
                   <Calendar className="w-3 h-3" />
-                  DATE DE NAISSANCE
+                  {t('contact.birthDate')}
                 </Label>
                 <Input
                   id="birthDate"
@@ -346,13 +328,13 @@ export function ContactForm({
               <div>
                 <Label htmlFor="drivingLicense" className="text-xs uppercase text-gray-500 flex items-center gap-1">
                   <Car className="w-3 h-3" />
-                  PERMIS DE CONDUIRE
+                  {t('contact.drivingLicense')}
                 </Label>
                 <Input
                   id="drivingLicense"
                   value={contact.drivingLicense || ''}
                   onChange={(e) => handleChange('drivingLicense', e.target.value)}
-                  placeholder="B, A2"
+                  placeholder={t('contact.placeholders.drivingLicense')}
                   className="mt-1"
                 />
               </div>
@@ -360,13 +342,13 @@ export function ContactForm({
 
             <div>
               <Label htmlFor="country" className="text-xs uppercase text-gray-500">
-                PAYS
+                {t('contact.country')}
               </Label>
               <Input
                 id="country"
                 value={contact.country || ''}
                 onChange={(e) => handleChange('country', e.target.value)}
-                placeholder="France"
+                placeholder={t('contact.placeholders.country')}
                 className="mt-1"
               />
             </div>
@@ -379,7 +361,7 @@ export function ContactForm({
             onClick={onNext}
             className="bg-[#2196F3] hover:bg-[#1976D2] text-white px-6 py-2 rounded flex items-center gap-2"
           >
-            Continuer
+            {t('nav.next')}
             <ArrowRight className="w-4 h-4" />
           </Button>
         </div>

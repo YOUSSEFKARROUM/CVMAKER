@@ -1,0 +1,528 @@
+/* ============================================
+   CV MAKER - KEYCLOAK THEME
+   Covers: login.ftl + register.ftl
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  min-height: 100vh !important;
+  background: #f0f2f8 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 30px 20px !important;
+}
+
+/* ============================================
+   MASQUER ÉLÉMENTS KEYCLOAK NON DÉSIRÉS
+   ============================================ */
+
+#kc-header,
+#kc-header-wrapper,
+#kc-info-message,
+.kc-login-tooltip,
+#kc-locale-dropdown,
+.alert-info.pf-m-info {
+  display: none !important;
+}
+
+/* ============================================
+   CONTENEUR PRINCIPAL - CARD MODALE
+   ============================================ */
+
+.login-pf-page {
+  width: 100% !important;
+  max-width: 960px !important;
+  background: white !important;
+  border-radius: 28px !important;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.15) !important;
+  display: flex !important;
+  overflow: hidden !important;
+  position: relative !important;
+  min-height: 560px !important;
+  animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ============================================
+   PANNEAU GAUCHE - COMMUN LOGIN + REGISTER
+   ============================================ */
+
+.login-pf-header {
+  width: 42% !important;
+  flex-shrink: 0 !important;
+  background: linear-gradient(160deg, #7c3aed 0%, #9333ea 40%, #ec4899 100%) !important;
+  padding: 44px 36px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Cercle décoratif haut */
+.login-pf-header::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -90px !important;
+  right: -90px !important;
+  width: 280px !important;
+  height: 280px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  pointer-events: none !important;
+}
+
+/* Cercle décoratif bas */
+.login-pf-header::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: -70px !important;
+  left: -70px !important;
+  width: 240px !important;
+  height: 240px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  pointer-events: none !important;
+}
+
+/* Grid de points décoratifs */
+.login-pf-header .dots-bg {
+  position: absolute !important;
+  inset: 0 !important;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.18) 1.5px, transparent 1.5px) !important;
+  background-size: 28px 28px !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+/* Contenu du panneau gauche au-dessus des décos */
+.login-pf-header > * {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Logo CV */
+.cv-logo {
+  width: 54px !important;
+  height: 54px !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  margin-bottom: 28px !important;
+  backdrop-filter: blur(8px) !important;
+  letter-spacing: -0.5px !important;
+}
+
+/* Titre app */
+.cv-app-title {
+  color: white !important;
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  margin-bottom: 8px !important;
+}
+
+/* Sous-titre app */
+.cv-app-subtitle {
+  color: rgba(255, 255, 255, 0.78) !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  margin-bottom: 30px !important;
+}
+
+/* Liste de features */
+.cv-features {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+.cv-feature-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-radius: 14px !important;
+  padding: 14px 16px !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  transition: background 0.2s !important;
+}
+
+.cv-feature-item:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.cv-feature-icon {
+  width: 34px !important;
+  height: 34px !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  color: white !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+}
+
+.cv-feature-label {
+  color: white !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  display: block !important;
+}
+
+.cv-feature-desc {
+  color: rgba(255, 255, 255, 0.68) !important;
+  font-size: 12px !important;
+  display: block !important;
+}
+
+/* Copyright bas du panneau gauche */
+.cv-footer {
+  color: rgba(255, 255, 255, 0.42) !important;
+  font-size: 12px !important;
+  margin-top: 24px !important;
+}
+
+/* ============================================
+   PANNEAU DROIT - COMMUN
+   ============================================ */
+
+#kc-content {
+  flex: 1 !important;
+  padding: 50px 48px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  position: relative !important;
+  overflow-y: auto !important;
+}
+
+/* Bouton × fermer */
+.kc-close-btn {
+  position: absolute !important;
+  top: 22px !important;
+  right: 28px !important;
+  font-size: 26px !important;
+  color: #9ca3af !important;
+  cursor: pointer !important;
+  font-weight: 300 !important;
+  line-height: 1 !important;
+  background: none !important;
+  border: none !important;
+  transition: color 0.2s !important;
+}
+
+.kc-close-btn:hover {
+  color: #4b5563 !important;
+}
+
+/* Titre du formulaire */
+.kc-form-title {
+  font-size: 30px !important;
+  font-weight: 800 !important;
+  color: #111827 !important;
+  text-align: center !important;
+  margin-bottom: 8px !important;
+}
+
+/* Sous-titre formulaire */
+.kc-form-subtitle {
+  text-align: center !important;
+  color: #6b7280 !important;
+  font-size: 14px !important;
+  margin-bottom: 32px !important;
+}
+
+#kc-content-wrapper {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+.card-pf {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* ============================================
+   FORMULAIRE - CHAMPS
+   ============================================ */
+
+.form-group {
+  margin-bottom: 18px !important;
+}
+
+.control-label,
+label {
+  display: block !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #374151 !important;
+  margin-bottom: 8px !important;
+}
+
+/* Wrapper icône + input */
+.input-group {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Tous les inputs */
+.form-control,
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100% !important;
+  padding: 14px 18px 14px 46px !important;
+  border: 2px solid #e8eaf0 !important;
+  border-radius: 14px !important;
+  font-size: 15px !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  color: #1f2937 !important;
+  background: #f5f7ff !important;
+  outline: none !important;
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s !important;
+}
+
+.form-control:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border-color: #7c3aed !important;
+  background: white !important;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1) !important;
+}
+
+/* Icône à gauche dans le champ */
+.input-icon-left {
+  position: absolute !important;
+  left: 15px !important;
+  font-size: 15px !important;
+  color: #9ca3af !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+}
+
+/* Icône œil à droite (mot de passe) */
+.input-group-addon,
+.password-toggle {
+  position: absolute !important;
+  right: 14px !important;
+  background: transparent !important;
+  border: none !important;
+  color: #9ca3af !important;
+  cursor: pointer !important;
+  font-size: 18px !important;
+  padding: 4px !important;
+  transition: color 0.2s !important;
+  z-index: 5 !important;
+}
+
+.input-group-addon:hover,
+.password-toggle:hover {
+  color: #7c3aed !important;
+}
+
+/* Champ sans icône gauche (ex: username) */
+input.no-icon {
+  padding-left: 18px !important;
+}
+
+/* ============================================
+   BOUTON PRINCIPAL (Login + Register)
+   ============================================ */
+
+#kc-form-buttons,
+.kc-btn-wrapper {
+  margin-top: 24px !important;
+}
+
+.btn-primary,
+input[type="submit"],
+button[type="submit"] {
+  width: 100% !important;
+  padding: 16px !important;
+  background: linear-gradient(135deg, #6d28d9 0%, #9333ea 50%, #ec4899 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 14px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  cursor: pointer !important;
+  transition: transform 0.25s, box-shadow 0.25s !important;
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.35) !important;
+  letter-spacing: 0.3px !important;
+}
+
+.btn-primary:hover,
+input[type="submit"]:hover,
+button[type="submit"]:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 28px rgba(124, 58, 237, 0.45) !important;
+}
+
+.btn-primary:active,
+input[type="submit"]:active,
+button[type="submit"]:active {
+  transform: translateY(0) !important;
+}
+
+/* ============================================
+   LIENS BAS DE PAGE
+   ============================================ */
+
+.kc-links {
+  text-align: center !important;
+  margin-top: 20px !important;
+}
+
+.kc-links p {
+  color: #6b7280 !important;
+  font-size: 14px !important;
+  margin-bottom: 8px !important;
+}
+
+.kc-links a,
+#kc-registration a,
+#kc-form-options a {
+  color: #7c3aed !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  transition: color 0.2s !important;
+}
+
+.kc-links a:hover,
+#kc-registration a:hover,
+#kc-form-options a:hover {
+  color: #6d28d9 !important;
+  text-decoration: underline !important;
+}
+
+#kc-registration {
+  text-align: center !important;
+  margin-top: 20px !important;
+  font-size: 14px !important;
+  color: #6b7280 !important;
+}
+
+/* Lien mot de passe oublié */
+.forgot-link {
+  display: block !important;
+  text-align: center !important;
+  margin-top: 12px !important;
+  color: #9ca3af !important;
+  font-size: 14px !important;
+  text-decoration: none !important;
+  transition: color 0.2s !important;
+}
+
+.forgot-link:hover {
+  color: #7c3aed !important;
+}
+
+/* ============================================
+   ALERTES / ERREURS
+   ============================================ */
+
+.alert {
+  padding: 13px 16px !important;
+  border-radius: 12px !important;
+  margin-bottom: 20px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+.alert-error {
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fecaca !important;
+}
+
+.alert-success {
+  background: #f0fdf4 !important;
+  color: #16a34a !important;
+  border: 1px solid #86efac !important;
+}
+
+.alert-warning {
+  background: #fffbeb !important;
+  color: #d97706 !important;
+  border: 1px solid #fde68a !important;
+}
+
+/* Message d'erreur champ individuel */
+.has-error .form-control,
+.has-error input {
+  border-color: #f87171 !important;
+  background: #fff5f5 !important;
+}
+
+.help-block {
+  color: #dc2626 !important;
+  font-size: 12px !important;
+  margin-top: 5px !important;
+  display: block !important;
+}
+
+/* ============================================
+   RESPONSIVE MOBILE
+   ============================================ */
+
+@media (max-width: 720px) {
+  .login-pf-page {
+    flex-direction: column !important;
+    border-radius: 20px !important;
+    min-height: auto !important;
+  }
+
+  .login-pf-header {
+    width: 100% !important;
+    padding: 30px 28px !important;
+    border-radius: 20px 20px 0 0 !important;
+  }
+
+  .cv-features {
+    display: none !important;
+  }
+
+  #kc-content {
+    padding: 36px 28px 40px !important;
+  }
+
+  .kc-form-title {
+    font-size: 26px !important;
+  }
+}
