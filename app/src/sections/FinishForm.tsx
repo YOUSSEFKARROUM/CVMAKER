@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, ArrowLeft, LayoutGrid, User, Check, RotateCcw, FileJson } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -51,7 +51,7 @@ const bodyFonts = [
 
 // Template Preview Component
 function TemplatePreview({ templateId }: { templateId: string }) {
-  const previews: Record<string, JSX.Element> = {
+  const previews: Record<string, ReactElement> = {
     budapest: (
       <div className="h-full flex">
         <div className="w-1/3 bg-emerald-500 p-2">
@@ -296,7 +296,6 @@ export function FinishForm({
   onExport,
 }: FinishFormProps) {
   const { t } = useTranslation();
-  const [showTemplateDropdown, setShowTemplateDropdown] = useState(false);
   const [showTitleFontDropdown, setShowTitleFontDropdown] = useState(false);
   const [showBodyFontDropdown, setShowBodyFontDropdown] = useState(false);
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);

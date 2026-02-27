@@ -3,15 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { 
   FilePlus, 
-  FileJson, 
   Sparkles, 
   Zap, 
   Globe, 
   ChevronRight,
-  Check,
   Star,
-  Users,
-  Award,
   Shield,
   Download,
   Palette,
@@ -32,19 +28,6 @@ interface LandingPageProps {
   onImport: (file: File) => Promise<void>;
   isAuthenticated: boolean;
 }
-
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.2 }
-  }
-};
 
 // Template Preview Components
 function BudapestPreview() {
@@ -311,15 +294,11 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  const handleImportClick = () => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!isAuthenticated) {
       onCreateNew();
       return;
     }
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       await onImport(file);

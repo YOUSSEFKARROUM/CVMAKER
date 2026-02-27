@@ -19,6 +19,9 @@ export interface ContactInfo {
   linkedin?: string;
   portfolio?: string;
   github?: string;
+  website?: string;
+  gender?: string;
+  references?: Reference[];
 }
 
 export interface Experience {
@@ -113,6 +116,7 @@ export interface CVTemplate {
   isNew?: boolean;
   isRecommended?: boolean;
   description?: string;
+  badge?: string;
 }
 
 export interface CVSettings {

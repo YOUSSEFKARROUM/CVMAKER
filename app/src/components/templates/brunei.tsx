@@ -1,17 +1,6 @@
 import { forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Linkedin, 
-  Globe, 
-  Github, 
-  Award, 
-  Folder, 
-  Flag, 
-  Car 
-} from 'lucide-react';
+import { Folder } from 'lucide-react';
 import type { TemplateProps } from './types';
 import { formatDate } from './utils';
 import { SectionTitle, ContactItem } from './components';

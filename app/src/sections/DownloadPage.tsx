@@ -14,25 +14,34 @@ interface DownloadPageProps {
   onHomeClick?: () => void;
 }
 
-const templates = [
-  { id: 'budapest', name: 'Budapest', description: 'Sidebar colorée à gauche', badge: 'Recommandé' },
-  { id: 'chicago', name: 'Chicago', description: 'Header centré classique', badge: 'Recommandé' },
+interface TemplateMeta {
+  id: string;
+  name: string;
+  description: string;
+  badge?: string;
+  isRecommended?: boolean;
+  isNew?: boolean;
+}
+
+const templates: TemplateMeta[] = [
+  { id: 'budapest', name: 'Budapest', description: 'Sidebar colorée à gauche', badge: 'Recommandé', isRecommended: true },
+  { id: 'chicago', name: 'Chicago', description: 'Header centré classique', badge: 'Recommandé', isRecommended: true },
   { id: 'brunei', name: 'Brunei', description: 'Minimaliste élégant' },
   { id: 'vladivostok', name: 'Vladivostok', description: 'Moderne sidebar droite' },
-  { id: 'sydney', name: 'Sydney', description: 'Épuré avec timeline', badge: 'Nouveau' },
+  { id: 'sydney', name: 'Sydney', description: 'Épuré avec timeline', badge: 'Nouveau', isNew: true },
   { id: 'shanghai', name: 'Shanghai', description: 'Professionnel corporate' },
   { id: 'kiev', name: 'Kiev', description: 'Créatif avec grande photo' },
   { id: 'rotterdam', name: 'Rotterdam', description: 'Technique compétences visibles' },
   { id: 'tokyo', name: 'Tokyo', description: 'Compact 2 colonnes' },
-  { id: 'stanford', name: 'Stanford', description: 'Sidebar foncée élégante', badge: 'Nouveau' },
-  { id: 'cambridge', name: 'Cambridge', description: 'Header bleu classique', badge: 'Nouveau' },
-  { id: 'oxford', name: 'Oxford', description: 'Sidebar droite structurée', badge: 'Nouveau' },
-  { id: 'otago', name: 'Otago', description: 'Minimaliste professionnel', badge: 'Nouveau' },
-  { id: 'berkeley', name: 'Berkeley', description: 'Design avec icônes', badge: 'Nouveau' },
-  { id: 'harvard', name: 'Harvard', description: 'Sidebar bleue avec timeline', badge: 'Nouveau' },
-  { id: 'auckland', name: 'Auckland', description: '2 colonnes équilibrées', badge: 'Nouveau' },
-  { id: 'edinburgh', name: 'Edinburgh', description: 'Header violet moderne', badge: 'Nouveau' },
-  { id: 'princeton', name: 'Princeton', description: 'Classique centré', badge: 'Nouveau' },
+  { id: 'stanford', name: 'Stanford', description: 'Sidebar foncée élégante', badge: 'Nouveau', isNew: true },
+  { id: 'cambridge', name: 'Cambridge', description: 'Header bleu classique', badge: 'Nouveau', isNew: true },
+  { id: 'oxford', name: 'Oxford', description: 'Sidebar droite structurée', badge: 'Nouveau', isNew: true },
+  { id: 'otago', name: 'Otago', description: 'Minimaliste professionnel', badge: 'Nouveau', isNew: true },
+  { id: 'berkeley', name: 'Berkeley', description: 'Design avec icônes', badge: 'Nouveau', isNew: true },
+  { id: 'harvard', name: 'Harvard', description: 'Sidebar bleue avec timeline', badge: 'Nouveau', isNew: true },
+  { id: 'auckland', name: 'Auckland', description: '2 colonnes équilibrées', badge: 'Nouveau', isNew: true },
+  { id: 'edinburgh', name: 'Edinburgh', description: 'Header violet moderne', badge: 'Nouveau', isNew: true },
+  { id: 'princeton', name: 'Princeton', description: 'Classique centré', badge: 'Nouveau', isNew: true },
 ];
 
 

@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Linkedin, Globe, Github, Award, Folder, Flag, Car, Calendar } from 'lucide-react';
+import { Award, Folder, Calendar } from 'lucide-react';
 import type { TemplateProps } from './types';
 import { formatDate, getInitials } from './utils';
 import { SectionTitle, ContactItem } from './components';

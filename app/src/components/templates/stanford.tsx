@@ -5,7 +5,7 @@ import { getInitials, getSkillLevelWidth, formatDate } from './utils';
 
 export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
-    const { contact, experiences, educations, skills, profile, languages, interests, certifications, projects } = cvData;
+    const { contact, experiences, educations, skills, profile, languages, interests, certifications } = cvData;
 
     // Helper function to get language level text
     const getLanguageLevelText = (level: string) => {

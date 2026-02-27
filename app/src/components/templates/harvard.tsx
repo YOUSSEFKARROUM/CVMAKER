@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { MapPin, Phone, Mail, Linkedin, Globe, Github, Award, BookOpen, Heart, Star, Square, GraduationCap, Briefcase, CheckCircle, User, Lightbulb, MessageSquare } from 'lucide-react';
+import { MapPin, Phone, Mail, Linkedin, Globe, Github, Award, Star, Square, GraduationCap, Briefcase, CheckCircle, User, Lightbulb, MessageSquare } from 'lucide-react';
 import type { TemplateProps } from './types';
 import { getInitials, formatDate } from './utils';
 
@@ -81,7 +81,7 @@ const TimelineItem = ({
 
 export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
-    const { contact, experiences, educations, skills, profile, languages, interests, certifications, projects } = cvData;
+    const { contact, experiences, educations, skills, profile, languages, interests, certifications } = cvData;
 
     return (
       <div 

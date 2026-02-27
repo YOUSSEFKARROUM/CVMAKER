@@ -1,18 +1,6 @@
 import { forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Award, 
-  Folder,
-  Linkedin,
-  Globe,
-  Github,
-  Flag,
-  Car,
-  Calendar
-} from 'lucide-react';
+import { Award, Folder } from 'lucide-react';
 import type { TemplateProps } from './types';
 import { getSkillLevelWidth, formatDate } from './utils';
 import { SectionTitle } from './components/SectionTitle';

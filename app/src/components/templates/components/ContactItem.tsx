@@ -14,7 +14,7 @@ import {
 
 interface ContactItemProps {
   icon: 'email' | 'phone' | 'location' | 'linkedin' | 'portfolio' | 'github' | 'nationality' | 'driving' | 'birthdate';
-  value: string;
+  value?: string;
   variant?: 'default' | 'sidebar' | 'inline';
   className?: string;
 }

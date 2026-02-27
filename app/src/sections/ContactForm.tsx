@@ -59,7 +59,10 @@ export function ContactForm({
 
   const isFieldValid = (field: keyof ContactInfo) => {
     const value = contact[field];
-    return value && value?.trim() !== '' && !localErrors[field];
+    if (typeof value === 'string') {
+      return value.trim() !== '' && !localErrors[field];
+    }
+    return Boolean(value) && !localErrors[field];
   };
 
   const getFieldError = (field: string) => {
