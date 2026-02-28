@@ -82,9 +82,11 @@ app.post('/auth/register', async (req, res) => {
       body: JSON.stringify({
         username: email,
         email,
+        emailVerified: true,
         firstName: displayName.split(' ')[0],
         lastName: displayName.split(' ').slice(1).join(' ') || '',
         enabled: true,
+        requiredActions: [],
         credentials: [
           {
             type: 'password',
@@ -97,10 +99,29 @@ app.post('/auth/register', async (req, res) => {
 
     if (response.status !== 201 && !response.ok) {
       const text = await response.text().catch(() => '');
-      return res.status(400).json({
-        error: 'user_create_failed',
-        message: 'Erreur lors de la création du compte',
-        details: text,
+
+      let httpStatus = 400;
+      let errorCode = 'user_create_failed';
+      let message = 'Erreur lors de la création du compte';
+      let details = text;
+
+      try {
+        const parsed = JSON.parse(text);
+        details = parsed;
+
+        if (parsed.errorMessage && parsed.errorMessage.includes('User exists with same email')) {
+          httpStatus = 409;
+          errorCode = 'email_already_exists';
+          message = 'Un compte avec cet email existe déjà.';
+        }
+      } catch {
+        // texte brut, on laisse les valeurs par défaut
+      }
+
+      return res.status(httpStatus).json({
+        error: errorCode,
+        message,
+        details,
       });
     }
 
