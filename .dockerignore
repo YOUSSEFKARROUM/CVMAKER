@@ -1,0 +1,11 @@
+# Exclure tout sauf app/ (le Dockerfile ne copie que app/)
+**/*
+!app/
+!app/**
+
+# Exclusions supplémentaires dans app/
+app/node_modules
+app/dist
+app/.env
+app/.env.*
+!app/.env.example
