@@ -217,7 +217,9 @@ export function KeycloakProvider({ children }: { children: ReactNode }) {
     }
   }, [localMode]);
 
-  // Register direct via API Keycloak Admin
+  const backendUrl = import.meta.env.VITE_BACKEND_URL as string | undefined;
+
+  // Register direct via backend proxy (qui appelle Keycloak Admin côté serveur)
   const registerWithCredentials = useCallback(async (email: string, password: string, displayName: string) => {
     if (localMode) {
       const localUser = {
@@ -235,37 +237,25 @@ export function KeycloakProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       setError(null);
 
-      // Obtenir token admin
-      const adminToken = await getAdminToken();
-      
-      // Créer l'utilisateur
-      const createUserUrl = `${keycloakConfig.url}/admin/realms/${keycloakConfig.realm}/users`;
-      
-      const response = await fetch(createUserUrl, {
+      if (!backendUrl) {
+        throw new Error("Le backend d'authentification n'est pas configuré (VITE_BACKEND_URL manquant).");
+      }
+
+      const response = await fetch(`${backendUrl}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${adminToken}`,
         },
         body: JSON.stringify({
-          username: email,
-          email: email,
-          firstName: displayName.split(' ')[0],
-          lastName: displayName.split(' ').slice(1).join(' ') || '',
-          enabled: true,
-          credentials: [
-            {
-              type: 'password',
-              value: password,
-              temporary: false,
-            },
-          ],
+          email,
+          password,
+          displayName,
         }),
       });
 
-      if (!response.ok && response.status !== 201) {
+      if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.errorMessage || 'Erreur lors de la création du compte');
+        throw new Error(errorData.message || 'Erreur lors de la création du compte');
       }
 
       // Connecter automatiquement
@@ -282,82 +272,33 @@ export function KeycloakProvider({ children }: { children: ReactNode }) {
     }
   }, [localMode]);
 
-  // Fonction utilitaire pour obtenir token admin via JSONP ou proxy
-  const getAdminToken = async (): Promise<string> => {
-    try {
-      // Essayer d'abord avec no-cors (peut ne pas fonctionner pour la réponse)
-      const tokenUrl = `${keycloakConfig.url}/realms/${keycloakConfig.realm}/protocol/openid-connect/token`;
-      
-      const params = new URLSearchParams();
-      params.append('grant_type', 'client_credentials');
-      params.append('client_id', keycloakConfig.adminClientId);
-      params.append('client_secret', keycloakConfig.adminClientSecret);
-
-      const response = await fetch(tokenUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params,
-        // Mode cors explicite
-        mode: 'cors',
-      });
-
-      if (!response.ok) {
-        throw new Error('Token request failed');
-      }
-
-      const data = await response.json();
-      return data.access_token;
-    } catch (err) {
-      console.error('CORS error - veuillez configurer Web Origins dans Keycloak:', err);
-      throw new Error('Erreur CORS. Ajoutez http://localhost:5173 dans Web Origins du client cv-maker-admin dans Keycloak');
-    }
-  };
-
   // Forgot password - API directe
   const forgotPasswordWithEmail = useCallback(async (email: string) => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Obtenir token admin
-      const adminToken = await getAdminToken();
-      
-      // Chercher l'utilisateur par email
-      const searchUrl = `${keycloakConfig.url}/admin/realms/${keycloakConfig.realm}/users?email=${encodeURIComponent(email)}`;
-      
-      const searchResponse = await fetch(searchUrl, {
-        headers: { 'Authorization': `Bearer ${adminToken}` },
-      });
-      
-      const users = await searchResponse.json();
-      
-        if (users.length === 0) {
-        // Ne pas révéler si l'email existe ou pas (sécurité)
-        console.log('Email de réinitialisation envoyé si le compte existe');
+      if (!backendUrl) {
+        // On ne révèle rien, mais on loggue côté client
+        console.warn('[Keycloak] Backend non configuré pour forgot password (VITE_BACKEND_URL manquant)');
         return;
       }
-      
-      const userId = users[0].id;
-      
-      // Envoyer email de réinitialisation
-      const resetUrl = `${keycloakConfig.url}/admin/realms/${keycloakConfig.realm}/users/${userId}/execute-actions-email`;
-      
-      await fetch(resetUrl, {
-        method: 'PUT',
+
+      await fetch(`${backendUrl}/auth/forgot-password`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${adminToken}`,
         },
-        body: JSON.stringify(['UPDATE_PASSWORD']),
+        body: JSON.stringify({ email }),
       });
-      
+
     } catch (err: any) {
       // Ne pas exposer d'erreur (sécurité)
       console.log('Email de réinitialisation envoyé si le compte existe');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [backendUrl]);
 
   const logout = useCallback(async () => {
     if (localMode) {
