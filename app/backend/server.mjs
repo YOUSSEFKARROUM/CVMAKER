@@ -127,25 +127,34 @@ app.post('/auth/register', async (req, res) => {
 
     // Récupérer l'ID du nouvel utilisateur (Keycloak le renvoie dans l'en-tête Location)
     const location = response.headers.get('Location');
-    const userId = location ? location.replace(/\/users\/?/, '').split('/').pop() : null;
+    const userId = location ? location.split('/').filter(Boolean).pop() : null;
 
     if (userId) {
-      // Forcer requiredActions: [] et emailVerified: true pour éviter "Account is not fully set up"
       const userUrl = `${KEYCLOAK_URL}/admin/realms/${KEYCLOAK_REALM}/users/${userId}`;
       const getRes = await fetch(userUrl, { headers: { Authorization: `Bearer ${adminToken}` } });
       if (getRes.ok) {
         const user = await getRes.json();
         user.requiredActions = [];
         user.emailVerified = true;
-        await fetch(userUrl, {
+        // Ne pas renvoyer credentials (GET ne les expose pas, mais on évite tout risque)
+        delete user.credentials;
+        const putRes = await fetch(userUrl, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${adminToken}`,
           },
           body: JSON.stringify(user),
-        }).catch((err) => console.warn('[cv-maker-backend] User update (requiredActions) failed:', err.message));
+        });
+        if (!putRes.ok) {
+          const putBody = await putRes.text().catch(() => '');
+          console.warn('[cv-maker-backend] User update (requiredActions) failed:', putRes.status, putBody);
+        }
+      } else {
+        console.warn('[cv-maker-backend] Could not GET user after create:', getRes.status);
       }
+    } else {
+      console.warn('[cv-maker-backend] No Location header, cannot clear requiredActions for new user');
     }
 
     return res.status(200).json({ ok: true });

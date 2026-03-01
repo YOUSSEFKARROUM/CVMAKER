@@ -202,6 +202,20 @@ L'inscription utilisateur n'est pas activée dans le realm. Pour l'activer :
 4. Activer ✅ **"User registration"**
 5. Cliquer sur **"Save"**
 
+### "Account is not fully set up" (invalid_grant au login)
+
+Keycloak refuse le login tant que l'utilisateur a des **actions requises** (ex. vérifier l'email, changer le mot de passe).
+
+**Pour un utilisateur déjà créé :**
+1. Keycloak Admin → **Users** → ouvrir l'utilisateur (recherche par email).
+2. Onglet **Details** ou **Required user actions** : supprimer toutes les actions listées (Verify email, Update password, etc.) → **Save**.
+
+**Pour éviter le problème pour les nouveaux comptes :**
+1. Keycloak Admin → **Realm settings** (realm `cv-maker`) → onglet **Login** (ou **User registration**).
+2. Si une option **"Default action"** ou **"Required actions for new users"** existe, vider la liste ou la désactiver → **Save**.
+
+Le backend CV Maker nettoie déjà les actions après chaque inscription ; si le problème persiste, vérifier les logs Railway du backend (message `User update (requiredActions) failed`).
+
 ### "Silent SSO check failed"
 
 C'est normal si vous n'êtes pas déjà authentifié. L'application réessaiera sans silent check.
