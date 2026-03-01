@@ -85,31 +85,94 @@
     "subtitle": "En quelques minutes, créez un CV moderne et professionnel qui mettra en valeur vos compétences",
     "authRequired": "Veuillez vous connecter ou créer un compte pour commencer",
     "createCV": "Créer mon CV",
+    "nav": {
+      "templates": "Modèles",
+      "features": "Fonctionnalités",
+      "testimonials": "Avis",
+      "faq": "FAQ"
+    },
+    "hero": {
+      "title1": "Créez votre CV professionnel",
+      "title2": "en ligne rapidement",
+      "subtitle": "Concevoir un CV impactant n'a jamais été aussi simple. En moins de 15 minutes, vous obtenez un CV professionnel, optimisé et prêt à être téléchargé.",
+      "cta": "Créer un CV",
+      "boost": "Et boostez de {{percent}}% vos chances de décrocher l'emploi de vos rêves !"
+    },
+    "featureCard": {
+      "badge": "Rapide et simple",
+      "title": "Un outil puissant pour créer votre CV en quelques minutes",
+      "description": "Avec notre puissant outil de création de CV en ligne, vous obtenez en quelques minutes un CV professionnel et personnalisé qui vous démarque. Choisissez parmi nos 10+ modèles de CV soigneusement conçus pour répondre à tous les profils.",
+      "15min": "15 min chrono",
+      "free": "100% Gratuit",
+      "pdf": "PDF haute qualité",
+      "aiBadge": "IA Assistée"
+    },
+    "stats": {
+      "cvsCreated": "CV créés",
+      "rating": "Note moyenne",
+      "templates": "Templates",
+      "free": "Gratuit"
+    },
+    "templatesSection": {
+      "badge": "Nos modèles",
+      "title": "Choisissez parmi nos templates professionnels",
+      "subtitle": "Des designs modernes et adaptés à tous les secteurs d'activité",
+      "users": "utilisateurs",
+      "useTemplate": "Utiliser ce template",
+      "viewAll": "Voir tous les templates"
+    },
+    "howItWorks": {
+      "badge": "Comment ça marche",
+      "title": "Trois étapes simples",
+      "step1Title": "Remplissez",
+      "step1Desc": "Vos informations en quelques minutes avec notre interface intuitive",
+      "step2Title": "Personnalisez",
+      "step2Desc": "Choisissez votre template préféré et adaptez les couleurs",
+      "step3Title": "Téléchargez",
+      "step3Desc": "Votre CV en PDF professionnel, prêt à être envoyé"
+    },
+    "featuresSection": {
+      "badge": "Fonctionnalités",
+      "title": "Tout ce qu'il vous faut",
+      "subtitle": "Une suite complète d'outils pour créer le CV parfait sans effort"
+    },
     "features": {
-      "ai": {
-        "title": "Assistance IA",
-        "description": "Obtenez des suggestions intelligentes pour améliorer votre CV"
-      },
-      "fast": {
-        "title": "Ultra Rapide",
-        "description": "Créez votre CV professionnel en seulement 10 minutes"
-      },
-      "preview": {
-        "title": "Aperçu en Direct",
-        "description": "Voyez les modifications en temps réel pendant l'édition"
-      },
-      "export": {
-        "title": "Export PDF",
-        "description": "Téléchargez votre CV en haute qualité au format PDF"
-      },
-      "lang": {
-        "title": "Multilingue",
-        "description": "Créez votre CV dans plusieurs langues facilement"
-      },
-      "privacy": {
-        "title": "Confidentialité",
-        "description": "Vos données restent sur votre appareil, toujours sécurisées"
-      }
+      "ai": { "title": "Assistance IA", "description": "Obtenez des suggestions intelligentes pour améliorer votre CV" },
+      "fast": { "title": "Ultra Rapide", "description": "Créez votre CV professionnel en seulement 10 minutes" },
+      "preview": { "title": "Aperçu en Direct", "description": "Voyez les modifications en temps réel pendant l'édition" },
+      "export": { "title": "Export PDF", "description": "Téléchargez votre CV en haute qualité au format PDF" },
+      "lang": { "title": "Multilingue", "description": "Créez votre CV dans plusieurs langues facilement" },
+      "privacy": { "title": "Confidentialité", "description": "Vos données restent sur votre appareil, toujours sécurisées" }
+    },
+    "testimonialsSection": {
+      "badge": "Témoignages",
+      "title": "Ce que disent nos utilisateurs",
+      "subtitle": "Rejoignez des milliers de personnes qui ont transformé leur carrière"
+    },
+    "testimonial1": { "name": "Sophie Martin", "role": "Chef de projet", "content": "J'ai décroché 3 entretiens en une semaine grâce à mon nouveau CV. L'outil est incroyablement simple à utiliser." },
+    "testimonial2": { "name": "Karim Benali", "role": "Développeur Full Stack", "content": "Les templates sont modernes et professionnels. En 10 minutes, j'avais un CV parfait pour postuler aux startups." },
+    "testimonial3": { "name": "Emma Dubois", "role": "Marketing Manager", "content": "Le meilleur outil de création de CV que j'ai utilisé. Gratuit, rapide et les résultats sont impeccables." },
+    "faqSection": {
+      "badge": "FAQ",
+      "title": "Questions fréquentes",
+      "subtitle": "Tout ce que vous devez savoir sur CV Maker"
+    },
+    "faq1": { "question": "Est-ce que CV Maker est vraiment gratuit ?", "answer": "Oui, CV Maker est 100% gratuit. Vous pouvez créer, modifier et télécharger votre CV en PDF sans aucun coût." },
+    "faq2": { "question": "Puis-je modifier mon CV après l'avoir créé ?", "answer": "Absolument ! Vos CV sont sauvegardés automatiquement et vous pouvez les modifier à tout moment." },
+    "faq3": { "question": "Les templates sont-ils compatibles ATS ?", "answer": "Oui, tous nos templates sont optimisés pour passer les systèmes de suivi des candidatures (ATS) utilisés par les recruteurs." },
+    "faq4": { "question": "Puis-je créer plusieurs versions de mon CV ?", "answer": "Oui, vous pouvez créer autant de CV que vous le souhaitez et les personnaliser pour chaque candidature." },
+    "cta": {
+      "title": "Prêt à créer votre CV ?",
+      "subtitle": "Rejoignez plus de 50,000 utilisateurs qui ont déjà créé leur CV professionnel avec notre outil.",
+      "button": "Commencer gratuitement"
+    },
+    "footer": {
+      "tagline": "Créez votre CV professionnel en quelques minutes. Gratuit, rapide et sans inscription obligatoire.",
+      "navigation": "Navigation",
+      "legal": "Légal",
+      "legalLinks": { "mentions": "Mentions légales", "privacy": "Confidentialité", "terms": "Conditions d'utilisation" },
+      "copyright": "© 2026 CV Maker. Tous droits réservés.",
+      "madeWith": "Fait avec ❤️ pour les chercheurs d'emploi"
     }
   },
   "steps": {
@@ -123,7 +186,6 @@
     "interests": "Intérêts",
     "profile": "Profil",
     "finish": "Finaliser",
-    "download": "Télécharger",
     "download": "Télécharger"
   },
   "contact": {
@@ -427,7 +489,8 @@
     "registerLink": "S'inscrire",
     "loginLink": "Se connecter",
     "forgotLink": "Mot de passe oublié ?",
-    "backToLogin": "Retour à la connexion"
+    "backToLogin": "Retour à la connexion",
+    "serviceUnavailable": "Le service est temporairement indisponible. Veuillez réessayer plus tard."
   },
   "cloud": {
     "save": "Sauvegarder",

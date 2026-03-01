@@ -245,48 +245,8 @@ const templates = [
   { name: 'Princeton', color: 'from-slate-700 to-gray-800', users: '8K+', Preview: PrincetonPreview },
 ];
 
-const testimonials = [
-  {
-    name: 'Sophie Martin',
-    role: 'Chef de projet',
-    content: 'J\'ai décroché 3 entretiens en une semaine grâce à mon nouveau CV. L\'outil est incroyablement simple à utiliser.',
-    rating: 5,
-    avatar: 'SM'
-  },
-  {
-    name: 'Karim Benali',
-    role: 'Développeur Full Stack',
-    content: 'Les templates sont modernes et professionnels. En 10 minutes, j\'avais un CV parfait pour postuler aux startups.',
-    rating: 5,
-    avatar: 'KB'
-  },
-  {
-    name: 'Emma Dubois',
-    role: 'Marketing Manager',
-    content: 'Le meilleur outil de création de CV que j\'ai utilisé. Gratuit, rapide et les résultats sont impeccables.',
-    rating: 5,
-    avatar: 'ED'
-  }
-];
-
-const faqs = [
-  {
-    question: 'Est-ce que CV Maker est vraiment gratuit ?',
-    answer: 'Oui, CV Maker est 100% gratuit. Vous pouvez créer, modifier et télécharger votre CV en PDF sans aucun coût.'
-  },
-  {
-    question: 'Puis-je modifier mon CV après l\'avoir créé ?',
-    answer: 'Absolument ! Vos CV sont sauvegardés automatiquement et vous pouvez les modifier à tout moment.'
-  },
-  {
-    question: 'Les templates sont-ils compatibles ATS ?',
-    answer: 'Oui, tous nos templates sont optimisés pour passer les systèmes de suivi des candidatures (ATS) utilisés par les recruteurs.'
-  },
-  {
-    question: 'Puis-je créer plusieurs versions de mon CV ?',
-    answer: 'Oui, vous pouvez créer autant de CV que vous le souhaitez et les personnaliser pour chaque candidature.'
-  }
-];
+const TESTIMONIAL_KEYS = ['testimonial1', 'testimonial2', 'testimonial3'] as const;
+const FAQ_KEYS = ['faq1', 'faq2', 'faq3', 'faq4'] as const;
 
 export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingPageProps) {
   const { t } = useTranslation();
@@ -328,17 +288,17 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
             
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-8">
-              <button onClick={() => scrollToSection('templates')} className="text-slate-600 hover:text-slate-900 font-medium transition-colors">
-                Modèles
+              <button onClick={() => scrollToSection('templates')} className="text-slate-600 hover:text-slate-900 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded">
+                {t('landing.nav.templates')}
               </button>
-              <button onClick={() => scrollToSection('features')} className="text-slate-600 hover:text-slate-900 font-medium transition-colors">
-                Fonctionnalités
+              <button onClick={() => scrollToSection('features')} className="text-slate-600 hover:text-slate-900 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded">
+                {t('landing.nav.features')}
               </button>
-              <button onClick={() => scrollToSection('testimonials')} className="text-slate-600 hover:text-slate-900 font-medium transition-colors">
-                Avis
+              <button onClick={() => scrollToSection('testimonials')} className="text-slate-600 hover:text-slate-900 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded">
+                {t('landing.nav.testimonials')}
               </button>
-              <button onClick={() => scrollToSection('faq')} className="text-slate-600 hover:text-slate-900 font-medium transition-colors">
-                FAQ
+              <button onClick={() => scrollToSection('faq')} className="text-slate-600 hover:text-slate-900 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded">
+                {t('landing.nav.faq')}
               </button>
             </div>
 
@@ -347,16 +307,18 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
                 onClick={onCreateNew}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition-colors"
+                className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-emerald-500"
               >
-                Créer un CV
+                {t('landing.createCV')}
               </motion.button>
             </div>
 
             {/* Mobile Menu Button */}
-            <button 
-              className="lg:hidden p-2"
+            <button
+              type="button"
+              className="lg:hidden p-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -371,15 +333,12 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
             className="lg:hidden bg-white border-t border-slate-100 py-4"
           >
             <div className="max-w-7xl mx-auto px-6 space-y-3">
-              <button onClick={() => scrollToSection('templates')} className="block w-full text-left py-2 text-slate-600">Modèles</button>
-              <button onClick={() => scrollToSection('features')} className="block w-full text-left py-2 text-slate-600">Fonctionnalités</button>
-              <button onClick={() => scrollToSection('testimonials')} className="block w-full text-left py-2 text-slate-600">Avis</button>
-              <button onClick={() => scrollToSection('faq')} className="block w-full text-left py-2 text-slate-600">FAQ</button>
-              <button 
-                onClick={onCreateNew}
-                className="w-full py-3 bg-emerald-500 text-white font-semibold rounded-xl mt-4"
-              >
-                Créer un CV
+              <button onClick={() => scrollToSection('templates')} className="block w-full text-left py-2 text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.nav.templates')}</button>
+              <button onClick={() => scrollToSection('features')} className="block w-full text-left py-2 text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.nav.features')}</button>
+              <button onClick={() => scrollToSection('testimonials')} className="block w-full text-left py-2 text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.nav.testimonials')}</button>
+              <button onClick={() => scrollToSection('faq')} className="block w-full text-left py-2 text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.nav.faq')}</button>
+              <button onClick={onCreateNew} className="w-full py-3 bg-emerald-500 text-white font-semibold rounded-xl mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-emerald-500">
+                {t('landing.createCV')}
               </button>
             </div>
           </motion.div>
@@ -420,9 +379,9 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
             transition={{ duration: 0.6 }}
             className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight"
           >
-            Créez votre CV professionnel
+            {t('landing.hero.title1')}
             <br />
-            en ligne rapidement
+            {t('landing.hero.title2')}
           </motion.h1>
 
           <motion.p
@@ -431,9 +390,7 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-lg sm:text-xl text-emerald-50 mb-10 max-w-3xl mx-auto leading-relaxed"
           >
-            Concevoir un CV impactant n'a jamais été aussi simple. 
-            En moins de 15 minutes, vous obtenez un CV professionnel, 
-            optimisé et prêt à être téléchargé.
+            {t('landing.hero.subtitle')}
           </motion.p>
 
           <motion.div
@@ -445,10 +402,10 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
               onClick={onCreateNew}
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center gap-3 px-10 py-5 bg-violet-600 hover:bg-violet-700 text-white text-lg font-semibold rounded-xl shadow-2xl shadow-violet-600/30 transition-all"
+              className="inline-flex items-center gap-3 px-10 py-5 bg-violet-600 hover:bg-violet-700 text-white text-lg font-semibold rounded-xl shadow-2xl shadow-violet-600/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-violet-600"
             >
               <FilePlus className="w-6 h-6" />
-              Créer un CV
+              {t('landing.hero.cta')}
             </motion.button>
           </motion.div>
 
@@ -458,7 +415,7 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
             transition={{ duration: 0.6, delay: 0.4 }}
             className="mt-8 text-emerald-100 font-medium"
           >
-            Et boostez de <span className="text-white font-bold">65%</span> vos chances de décrocher l'emploi de vos rêves !
+            {t('landing.hero.boost', { percent: '65' })}
           </motion.p>
         </div>
 
@@ -483,32 +440,32 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
               <div>
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-violet-100 text-violet-700 rounded-full text-sm font-medium mb-6">
                   <MousePointerClick className="w-4 h-4" />
-                  Rapide et simple
+                  {t('landing.featureCard.badge')}
                 </div>
                 <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-6">
-                  Un outil puissant pour créer votre CV en quelques minutes
+                  {t('landing.featureCard.title')}
                 </h2>
                 <p className="text-lg text-slate-600 leading-relaxed mb-8">
-                  Avec notre puissant outil de création de CV en ligne, vous obtenez en quelques minutes un CV professionnel et personnalisé qui vous démarque. Choisissez parmi nos 10+ modèles de CV soigneusement conçus pour répondre à tous les profils.
+                  {t('landing.featureCard.description')}
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <div className="flex items-center gap-2 text-slate-700">
                     <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
                       <Clock className="w-5 h-5 text-emerald-600" />
                     </div>
-                    <span className="font-medium">15 min chrono</span>
+                    <span className="font-medium">{t('landing.featureCard.15min')}</span>
                   </div>
                   <div className="flex items-center gap-2 text-slate-700">
                     <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
                       <FileCheck className="w-5 h-5 text-blue-600" />
                     </div>
-                    <span className="font-medium">100% Gratuit</span>
+                    <span className="font-medium">{t('landing.featureCard.free')}</span>
                   </div>
                   <div className="flex items-center gap-2 text-slate-700">
                     <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center">
                       <Download className="w-5 h-5 text-violet-600" />
                     </div>
-                    <span className="font-medium">PDF haute qualité</span>
+                    <span className="font-medium">{t('landing.featureCard.pdf')}</span>
                   </div>
                 </div>
               </div>
@@ -554,7 +511,7 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
                   >
                     <div className="flex items-center gap-1">
                       <Sparkles className="w-4 h-4" />
-                      IA Assistée
+                      {t('landing.featureCard.aiBadge')}
                     </div>
                   </motion.div>
                 </motion.div>
@@ -569,10 +526,10 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { value: '50K+', label: 'CV créés', icon: FilePlus },
-              { value: '4.9/5', label: 'Note moyenne', icon: Star },
-              { value: '10+', label: 'Templates', icon: Palette },
-              { value: '100%', label: 'Gratuit', icon: Shield },
+              { value: '50K+', labelKey: 'landing.stats.cvsCreated', icon: FilePlus },
+              { value: '4.9/5', labelKey: 'landing.stats.rating', icon: Star },
+              { value: '10+', labelKey: 'landing.stats.templates', icon: Palette },
+              { value: '100%', labelKey: 'landing.stats.free', icon: Shield },
             ].map((stat, index) => (
               <motion.div
                 key={index}
@@ -586,7 +543,7 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
                   <stat.icon className="w-7 h-7 text-emerald-500" />
                 </div>
                 <div className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</div>
-                <div className="text-slate-600">{stat.label}</div>
+                <div className="text-slate-600">{t(stat.labelKey)}</div>
               </motion.div>
             ))}
           </div>
@@ -603,13 +560,13 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
             className="text-center mb-16"
           >
             <span className="inline-block px-4 py-1 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium mb-4">
-              Nos modèles
+              {t('landing.templatesSection.badge')}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-              Choisissez parmi nos templates professionnels
+              {t('landing.templatesSection.title')}
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Des designs modernes et adaptés à tous les secteurs d'activité
+              {t('landing.templatesSection.subtitle')}
             </p>
           </motion.div>
 
@@ -638,7 +595,7 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-bold text-slate-900">{template.name}</h3>
-                        <p className="text-sm text-slate-500">{template.users} utilisateurs</p>
+                        <p className="text-sm text-slate-500">{template.users} {t('landing.templatesSection.users')}</p>
                       </div>
                       <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
                         <ArrowRight className="w-5 h-5" />
@@ -650,7 +607,7 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
                   <div className="absolute inset-0 bg-emerald-500/90 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <span className="text-white font-semibold flex items-center gap-2">
                       <Eye className="w-5 h-5" />
-                      Utiliser ce template
+                      {t('landing.templatesSection.useTemplate')}
                     </span>
                   </div>
                 </div>
@@ -663,9 +620,9 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
               onClick={onCreateNew}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
             >
-              Voir tous les templates
+              {t('landing.templatesSection.viewAll')}
               <ChevronRight className="w-5 h-5" />
             </motion.button>
           </div>
@@ -682,18 +639,18 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
             className="text-center mb-16"
           >
             <span className="inline-block px-4 py-1 rounded-full bg-violet-100 text-violet-700 text-sm font-medium mb-4">
-              Comment ça marche
+              {t('landing.howItWorks.badge')}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">
-              Trois étapes simples
+              {t('landing.howItWorks.title')}
             </h2>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { number: '1', title: 'Remplissez', desc: 'Vos informations en quelques minutes avec notre interface intuitive', icon: FilePlus, color: 'bg-emerald-500' },
-              { number: '2', title: 'Personnalisez', desc: 'Choisissez votre template préféré et adaptez les couleurs', icon: Palette, color: 'bg-violet-500' },
-              { number: '3', title: 'Téléchargez', desc: 'Votre CV en PDF professionnel, prêt à être envoyé', icon: Download, color: 'bg-blue-500' },
+              { number: '1', titleKey: 'landing.howItWorks.step1Title', descKey: 'landing.howItWorks.step1Desc', icon: FilePlus, color: 'bg-emerald-500' },
+              { number: '2', titleKey: 'landing.howItWorks.step2Title', descKey: 'landing.howItWorks.step2Desc', icon: Palette, color: 'bg-violet-500' },
+              { number: '3', titleKey: 'landing.howItWorks.step3Title', descKey: 'landing.howItWorks.step3Desc', icon: Download, color: 'bg-blue-500' },
             ].map((step, index) => (
               <motion.div
                 key={index}
@@ -710,8 +667,8 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
                   <div className="text-5xl font-bold text-slate-100 absolute top-6 right-6">
                     {step.number}
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-3">{step.title}</h3>
-                  <p className="text-slate-600">{step.desc}</p>
+                  <h3 className="text-xl font-bold text-slate-900 mb-3">{t(step.titleKey)}</h3>
+                  <p className="text-slate-600">{t(step.descKey)}</p>
                 </div>
                 {index < 2 && (
                   <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-emerald-500 to-violet-500" />
@@ -732,13 +689,13 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
             className="text-center mb-16"
           >
             <span className="inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium mb-4">
-              Fonctionnalités
+              {t('landing.featuresSection.badge')}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-              Tout ce qu'il vous faut
+              {t('landing.featuresSection.title')}
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Une suite complète d'outils pour créer le CV parfait sans effort
+              {t('landing.featuresSection.subtitle')}
             </p>
           </motion.div>
 
@@ -785,46 +742,41 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
             className="text-center mb-16"
           >
             <span className="inline-block px-4 py-1 rounded-full bg-amber-100 text-amber-700 text-sm font-medium mb-4">
-              Témoignages
+              {t('landing.testimonialsSection.badge')}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-              Ce que disent nos utilisateurs
+              {t('landing.testimonialsSection.title')}
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Rejoignez des milliers de personnes qui ont transformé leur carrière
+              {t('landing.testimonialsSection.subtitle')}
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
+            {TESTIMONIAL_KEYS.map((key, index) => (
               <motion.div
-                key={index}
+                key={key}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
                 className="bg-white rounded-3xl p-8 shadow-lg border border-slate-100"
               >
-                {/* Rating */}
                 <div className="flex gap-1 mb-6">
-                  {[...Array(testimonial.rating)].map((_, i) => (
+                  {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
                   ))}
                 </div>
-                
-                {/* Quote */}
                 <p className="text-slate-700 mb-6 leading-relaxed">
-                  "{testimonial.content}"
+                  "{t(`landing.${key}.content`)}"
                 </p>
-                
-                {/* Author */}
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold">
-                    {testimonial.avatar}
+                    {t(`landing.${key}.name`).slice(0, 2).toUpperCase()}
                   </div>
                   <div>
-                    <div className="font-semibold text-slate-900">{testimonial.name}</div>
-                    <div className="text-sm text-slate-500">{testimonial.role}</div>
+                    <div className="font-semibold text-slate-900">{t(`landing.${key}.name`)}</div>
+                    <div className="text-sm text-slate-500">{t(`landing.${key}.role`)}</div>
                   </div>
                 </div>
               </motion.div>
@@ -843,20 +795,20 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
             className="text-center mb-16"
           >
             <span className="inline-block px-4 py-1 rounded-full bg-slate-100 text-slate-700 text-sm font-medium mb-4">
-              FAQ
+              {t('landing.faqSection.badge')}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-              Questions fréquentes
+              {t('landing.faqSection.title')}
             </h2>
             <p className="text-lg text-slate-600">
-              Tout ce que vous devez savoir sur CV Maker
+              {t('landing.faqSection.subtitle')}
             </p>
           </motion.div>
 
           <div className="space-y-4">
-            {faqs.map((faq, index) => (
+            {FAQ_KEYS.map((key, index) => (
               <motion.div
-                key={index}
+                key={key}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -864,12 +816,13 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
                 className="bg-white rounded-2xl border border-slate-200 overflow-hidden"
               >
                 <button
+                  type="button"
                   onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                  className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-50 transition-colors"
+                  className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-inset"
                 >
-                  <span className="font-semibold text-slate-900 pr-8">{faq.question}</span>
-                  <ChevronDown 
-                    className={`w-5 h-5 text-slate-500 flex-shrink-0 transition-transform ${openFaq === index ? 'rotate-180' : ''}`} 
+                  <span className="font-semibold text-slate-900 pr-8">{t(`landing.${key}.question`)}</span>
+                  <ChevronDown
+                    className={`w-5 h-5 text-slate-500 flex-shrink-0 transition-transform ${openFaq === index ? 'rotate-180' : ''}`}
                   />
                 </button>
                 {openFaq === index && (
@@ -879,7 +832,7 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
                     exit={{ height: 0, opacity: 0 }}
                     className="px-6 pb-6"
                   >
-                    <p className="text-slate-600 leading-relaxed">{faq.answer}</p>
+                    <p className="text-slate-600 leading-relaxed">{t(`landing.${key}.answer`)}</p>
                   </motion.div>
                 )}
               </motion.div>
@@ -906,35 +859,35 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
             </div>
             
             <div className="relative z-10">
-              <motion.h2 
+              <motion.h2
                 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
               >
-                Prêt à créer votre CV ?
+                {t('landing.cta.title')}
               </motion.h2>
-              <motion.p 
+              <motion.p
                 className="text-lg text-emerald-100 mb-8 max-w-2xl mx-auto"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
               >
-                Rejoignez plus de 50,000 utilisateurs qui ont déjà créé leur CV professionnel avec notre outil.
+                {t('landing.cta.subtitle')}
               </motion.p>
               <motion.button
                 onClick={onCreateNew}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-3 px-10 py-5 bg-white text-emerald-600 font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-shadow"
+                className="inline-flex items-center gap-3 px-10 py-5 bg-white text-emerald-600 font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
               >
                 <FilePlus className="w-6 h-6" />
-                <span>Commencer gratuitement</span>
+                <span>{t('landing.cta.button')}</span>
                 <ChevronRight className="w-5 h-5" />
               </motion.button>
             </div>
@@ -949,42 +902,35 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
             <div className="md:col-span-2">
               <Logo size="md" showText={true} animated={false} className="mb-6" />
               <p className="text-slate-400 mb-6 max-w-md">
-                Créez votre CV professionnel en quelques minutes. Gratuit, rapide et sans inscription obligatoire.
+                {t('landing.footer.tagline')}
               </p>
               <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-emerald-500 transition-colors cursor-pointer">
+                <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-emerald-500 transition-colors cursor-pointer focus-within:ring-2 focus-within:ring-emerald-500 focus-within:ring-offset-2 focus-within:ring-offset-slate-900" tabIndex={0} role="button">
                   <Globe className="w-5 h-5" />
                 </div>
               </div>
             </div>
-            
             <div>
-              <h4 className="font-semibold mb-4">Navigation</h4>
+              <h4 className="font-semibold mb-4">{t('landing.footer.navigation')}</h4>
               <ul className="space-y-3 text-slate-400">
-                <li><button onClick={() => scrollToSection('templates')} className="hover:text-white transition-colors">Modèles</button></li>
-                <li><button onClick={() => scrollToSection('features')} className="hover:text-white transition-colors">Fonctionnalités</button></li>
-                <li><button onClick={() => scrollToSection('testimonials')} className="hover:text-white transition-colors">Avis</button></li>
-                <li><button onClick={() => scrollToSection('faq')} className="hover:text-white transition-colors">FAQ</button></li>
+                <li><button type="button" onClick={() => scrollToSection('templates')} className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.nav.templates')}</button></li>
+                <li><button type="button" onClick={() => scrollToSection('features')} className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.nav.features')}</button></li>
+                <li><button type="button" onClick={() => scrollToSection('testimonials')} className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.nav.testimonials')}</button></li>
+                <li><button type="button" onClick={() => scrollToSection('faq')} className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.nav.faq')}</button></li>
               </ul>
             </div>
-            
             <div>
-              <h4 className="font-semibold mb-4">Légal</h4>
+              <h4 className="font-semibold mb-4">{t('landing.footer.legal')}</h4>
               <ul className="space-y-3 text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">Mentions légales</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Confidentialité</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Conditions d'utilisation</a></li>
+                <li><a href="#" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.footer.legalLinks.mentions')}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.footer.legalLinks.privacy')}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.footer.legalLinks.terms')}</a></li>
               </ul>
             </div>
           </div>
-          
           <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-slate-400 text-sm">
-              © 2026 CV Maker. Tous droits réservés.
-            </p>
-            <p className="text-slate-500 text-sm">
-              Fait avec ❤️ pour les chercheurs d'emploi
-            </p>
+            <p className="text-slate-400 text-sm">{t('landing.footer.copyright')}</p>
+            <p className="text-slate-500 text-sm">{t('landing.footer.madeWith')}</p>
           </div>
         </div>
       </footer>

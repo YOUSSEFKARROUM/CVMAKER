@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import Keycloak from 'keycloak-js';
 import { keycloakConfig, isKeycloakConfigured, isLocalModeEnabled } from './config';
+import i18n from '../i18n';
 
 export interface AuthError {
   code: string;
@@ -254,17 +255,25 @@ export function KeycloakProvider({ children }: { children: ReactNode }) {
       });
 
       if (!response.ok) {
+        const isServerError = response.status >= 500;
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Erreur lors de la création du compte');
+        const message = isServerError
+          ? i18n.t('auth.serviceUnavailable')
+          : (errorData.message || 'Erreur lors de la création du compte');
+        throw new Error(message);
       }
 
       // Connecter automatiquement
       await loginWithCredentials(email, password);
       
     } catch (err: any) {
+      const isNetworkOrTimeout = err?.name === 'TypeError' || err?.message?.includes('fetch') || err?.message?.includes('network');
+      const message = isNetworkOrTimeout
+        ? i18n.t('auth.serviceUnavailable')
+        : (err?.message || 'Erreur lors de l\'inscription');
       setError({
         code: 'register-error',
-        message: err.message || 'Erreur lors de l\'inscription',
+        message,
       });
       throw err;
     } finally {
@@ -284,17 +293,24 @@ export function KeycloakProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      await fetch(`${backendUrl}/auth/forgot-password`, {
+      const response = await fetch(`${backendUrl}/auth/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email }),
       });
-
+      if (response.status >= 500) {
+        setError({
+          code: 'forgot-error',
+          message: i18n.t('auth.serviceUnavailable'),
+        });
+      }
     } catch (err: any) {
-      // Ne pas exposer d'erreur (sécurité)
-      console.log('Email de réinitialisation envoyé si le compte existe');
+      setError({
+        code: 'forgot-error',
+        message: i18n.t('auth.serviceUnavailable'),
+      });
     } finally {
       setIsLoading(false);
     }
