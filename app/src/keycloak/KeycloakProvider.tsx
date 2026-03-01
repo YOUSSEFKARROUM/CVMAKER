@@ -187,7 +187,22 @@ export function KeycloakProvider({ children }: { children: ReactNode }) {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error_description || 'Identifiants incorrects');
+        const description = errorData.error_description || 'Identifiants incorrects';
+
+        // Cas particulier Keycloak : "Account is not fully set up"
+        // Dans ce cas on bascule sur le flow standard avec redirection,
+        // qui permet à l'utilisateur de finaliser son compte côté Keycloak.
+        if (description.includes('Account is not fully set up') && keycloak) {
+          console.warn('[Keycloak] Account not fully set up, falling back to redirect login flow');
+          try {
+            await keycloak.login({ loginHint: email });
+            return;
+          } catch (loginErr: any) {
+            throw new Error(loginErr?.message || description);
+          }
+        }
+
+        throw new Error(description);
       }
 
       const data = await response.json();
@@ -216,7 +231,7 @@ export function KeycloakProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, [localMode]);
+  }, [localMode, keycloak]);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL as string | undefined;
 
