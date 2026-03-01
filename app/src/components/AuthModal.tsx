@@ -192,7 +192,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
           </div>
 
           <div className="relative z-10 text-white/60 text-xs">
-            © 2024 CV Maker
+            © 2026 CV Maker
           </div>
         </div>
 

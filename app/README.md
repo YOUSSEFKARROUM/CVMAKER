@@ -48,7 +48,7 @@ npm run dev
 
 ## 🏗️ Technologies
 
-- **Frontend**: React 18 + TypeScript
+- **Frontend**: React 19 + TypeScript
 - **Build**: Vite 7
 - **Styling**: Tailwind CSS + shadcn/ui
 - **Auth**: Keycloak (optionnel) ou Mode Local
@@ -65,8 +65,8 @@ src/
 │   ├── templates/    # Templates de CV
 │   └── ...
 ├── hooks/            # Custom hooks
-│   ├── useAuth.ts    # Authentification
-│   ├── useCloudCV.ts # Gestion des CVs
+│   ├── useAuth.ts    # Authentification (Keycloak)
+│   ├── useCloudCV.ts # CV sauvegardés (localStorage par utilisateur)
 │   └── ...
 ├── keycloak/         # Configuration Keycloak
 │   ├── config.ts
@@ -87,14 +87,17 @@ npm test         # Tests
 
 ## 🌐 Variables d'environnement
 
-```env
-# Mode Local
-VITE_LOCAL_MODE=true
+Voir **`.env.example`** pour la liste complète. Résumé :
 
-# Keycloak (si mode local désactivé)
-VITE_KEYCLOAK_URL=http://localhost:8080/auth
-VITE_KEYCLOAK_REALM=cv-maker
-VITE_KEYCLOAK_CLIENT_ID=cv-maker-client
+- **Frontend** (préfixe `VITE_`) : `VITE_LOCAL_MODE`, `VITE_KEYCLOAK_*`, `VITE_BACKEND_URL`, etc.
+- **Backend** (dans `app/backend`) : `KEYCLOAK_URL`, `KEYCLOAK_ADMIN_CLIENT_ID`, `KEYCLOAK_ADMIN_CLIENT_SECRET`, `ALLOWED_ORIGINS`. Voir la section Backend dans `.env.example`.
+
+Pour lancer le **backend** (proxy Keycloak) en local :
+```bash
+cd app/backend
+npm install
+# Définir KEYCLOAK_URL, KEYCLOAK_ADMIN_CLIENT_ID, KEYCLOAK_ADMIN_CLIENT_SECRET, ALLOWED_ORIGINS (ou .env)
+npm start
 ```
 
 ## 🔄 Migration depuis Firebase

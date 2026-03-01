@@ -68,35 +68,25 @@ interface SidebarTabsProps {
 }
 
 function SidebarTabs({ activeTab, onChange }: SidebarTabsProps) {
+  const activeClass = 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-500 dark:text-indigo-400';
+  const inactiveClass = 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800';
   return (
-    <div className="flex border-b">
+    <div className="flex border-b border-slate-200 dark:border-slate-700">
       <button
         onClick={() => onChange('template')}
-        className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
-          activeTab === 'template'
-            ? 'border-b-2 border-[#2196F3] text-[#2196F3]'
-            : 'text-gray-600 hover:bg-gray-50'
-        }`}
+        className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${activeTab === 'template' ? activeClass : inactiveClass}`}
       >
         Template
       </button>
       <button
         onClick={() => onChange('colors')}
-        className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
-          activeTab === 'colors'
-            ? 'border-b-2 border-[#2196F3] text-[#2196F3]'
-            : 'text-gray-600 hover:bg-gray-50'
-        }`}
+        className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${activeTab === 'colors' ? activeClass : inactiveClass}`}
       >
         Couleurs
       </button>
       <button
         onClick={() => onChange('fonts')}
-        className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
-          activeTab === 'fonts'
-            ? 'border-b-2 border-[#2196F3] text-[#2196F3]'
-            : 'text-gray-600 hover:bg-gray-50'
-        }`}
+        className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${activeTab === 'fonts' ? activeClass : inactiveClass}`}
       >
         Polices
       </button>
@@ -120,8 +110,8 @@ function TemplateTab({ selectedTemplate, onChangeTemplate }: TemplateTabProps) {
             onClick={() => onChangeTemplate(template.id)}
             className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
               selectedTemplate === template.id
-                ? 'border-[#2196F3] bg-blue-50'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/30 dark:border-indigo-500'
+                : 'border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500'
             }`}
           >
             <div className="flex items-start justify-between mb-2">
@@ -141,7 +131,7 @@ function TemplateTab({ selectedTemplate, onChangeTemplate }: TemplateTabProps) {
             </div>
             <p className="text-sm text-gray-500">{template.description}</p>
             {selectedTemplate === template.id && (
-              <div className="mt-2 flex items-center gap-1 text-[#2196F3] text-sm">
+              <div className="mt-2 flex items-center gap-1 text-indigo-600 dark:text-indigo-400 text-sm">
                 <Check className="w-4 h-4" />
                 <span>Sélectionné</span>
               </div>
@@ -170,7 +160,7 @@ function ColorsTab({ selectedColor, onChangeColor }: ColorsTabProps) {
               onClick={() => onChangeColor(color)}
               className={`w-12 h-12 rounded-lg transition-all ${
                 selectedColor === color
-                  ? 'ring-2 ring-offset-2 ring-[#2196F3] scale-110'
+                  ? 'ring-2 ring-offset-2 ring-indigo-600 dark:ring-indigo-500 scale-110'
                   : 'hover:scale-105'
               }`}
               style={{ backgroundColor: color }}
@@ -183,8 +173,8 @@ function ColorsTab({ selectedColor, onChangeColor }: ColorsTabProps) {
         </div>
       </div>
 
-      <div className="p-4 bg-blue-50 rounded-lg">
-        <p className="text-sm text-blue-800">
+      <div className="p-4 bg-indigo-50 dark:bg-indigo-950/30 rounded-lg">
+        <p className="text-sm text-indigo-800 dark:text-indigo-200">
           <strong>Conseil :</strong> Choisissez une couleur qui correspond à votre secteur d'activité.
           Le bleu convient bien aux domaines techniques, le vert à l'environnement, etc.
         </p>
@@ -212,8 +202,8 @@ function FontsTab({ titleFont, bodyFont, onChangeTitleFont, onChangeBodyFont }: 
               onClick={() => onChangeTitleFont(font)}
               className={`w-full px-4 py-3 rounded-lg border text-left transition-colors ${
                 titleFont === font
-                  ? 'border-[#2196F3] bg-blue-50 text-[#2196F3]'
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400'
+                  : 'border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500'
               }`}
             >
               <span style={{ fontFamily: font, fontSize: '1.25rem' }}>
@@ -233,8 +223,8 @@ function FontsTab({ titleFont, bodyFont, onChangeTitleFont, onChangeBodyFont }: 
               onClick={() => onChangeBodyFont(font)}
               className={`w-full px-4 py-3 rounded-lg border text-left transition-colors ${
                 bodyFont === font
-                  ? 'border-[#2196F3] bg-blue-50 text-[#2196F3]'
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400'
+                  : 'border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500'
               }`}
             >
               <span style={{ fontFamily: font }}>
@@ -301,7 +291,7 @@ export function DownloadPage({
             <Home className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
-            <FileText className="w-6 h-6 text-[#2196F3]" />
+            <FileText className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
             <span className="text-xl font-semibold">Finaliser votre CV</span>
           </div>
         </div>
@@ -309,7 +299,7 @@ export function DownloadPage({
         <div className="flex items-center gap-3">
           <Button
             onClick={() => setIsExportModalOpen(true)}
-            className="bg-[#2196F3] hover:bg-[#1976D2]"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white"
             disabled={!resolvedPreviewElement}
           >
             <Download className="w-4 h-4 mr-2" />

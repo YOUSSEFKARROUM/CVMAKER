@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { exportCVToPDF, exportToImage, downloadImage, printCV } from '../utils/pdfExport';
 import { useToast } from '../hooks/useToast';
+import { colors } from '../styles/design-system';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -71,32 +72,36 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
 
   if (!isOpen) return null;
 
+  const accentStyle = { color: colors.primary[600] };
+  const borderAccentStyle = { borderColor: colors.primary[500] };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <Download className="w-5 h-5 text-[#2196F3]" />
+        <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
+          <h2 className="text-xl font-semibold flex items-center gap-2 text-slate-900 dark:text-slate-100">
+            <Download className="w-5 h-5" style={accentStyle} />
             Exporter votre CV
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 text-slate-500" />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b">
+        <div className="flex border-b border-slate-200 dark:border-slate-700">
           <button
             onClick={() => setActiveTab('pdf')}
             className={`flex-1 py-3 px-4 flex items-center justify-center gap-2 transition-colors ${
               activeTab === 'pdf'
-                ? 'border-b-2 border-[#2196F3] text-[#2196F3]'
-                : 'text-gray-600 hover:bg-gray-50'
+                ? 'border-b-2 font-semibold'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
             }`}
+            style={activeTab === 'pdf' ? { ...borderAccentStyle, ...accentStyle } : undefined}
           >
             <FileText className="w-4 h-4" />
             PDF
@@ -105,9 +110,10 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
             onClick={() => setActiveTab('image')}
             className={`flex-1 py-3 px-4 flex items-center justify-center gap-2 transition-colors ${
               activeTab === 'image'
-                ? 'border-b-2 border-[#2196F3] text-[#2196F3]'
-                : 'text-gray-600 hover:bg-gray-50'
+                ? 'border-b-2 font-semibold'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
             }`}
+            style={activeTab === 'image' ? { ...borderAccentStyle, ...accentStyle } : undefined}
           >
             <ImageIcon className="w-4 h-4" />
             Image
@@ -116,9 +122,10 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
             onClick={() => setActiveTab('print')}
             className={`flex-1 py-3 px-4 flex items-center justify-center gap-2 transition-colors ${
               activeTab === 'print'
-                ? 'border-b-2 border-[#2196F3] text-[#2196F3]'
-                : 'text-gray-600 hover:bg-gray-50'
+                ? 'border-b-2 font-semibold'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
             }`}
+            style={activeTab === 'print' ? { ...borderAccentStyle, ...accentStyle } : undefined}
           >
             <Printer className="w-4 h-4" />
             Imprimer
@@ -169,8 +176,8 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
                       onClick={() => setImageFormat(format)}
                       className={`py-2 px-4 rounded-lg border transition-colors uppercase ${
                         imageFormat === format
-                          ? 'border-[#2196F3] bg-blue-50 text-[#2196F3]'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400'
+                          : 'border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500'
                       }`}
                     >
                       {format}
@@ -228,7 +235,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t bg-gray-50 flex justify-end gap-3">
+        <div className="p-4 border-t bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 flex justify-end gap-3">
           <Button variant="outline" onClick={onClose}>
             Annuler
           </Button>
@@ -236,7 +243,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
             <Button
               onClick={handleExportPDF}
               disabled={isExporting}
-              className="bg-[#2196F3] hover:bg-[#1976D2]"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
             >
               {isExporting ? (
                 <>
@@ -255,7 +262,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
             <Button
               onClick={handleExportImage}
               disabled={isExporting}
-              className="bg-[#2196F3] hover:bg-[#1976D2]"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
             >
               {isExporting ? (
                 <>
@@ -271,7 +278,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
             </Button>
           )}
           {activeTab === 'print' && (
-            <Button onClick={handlePrint} className="bg-[#2196F3] hover:bg-[#1976D2]">
+            <Button onClick={handlePrint} className="bg-indigo-600 hover:bg-indigo-700 text-white">
               <Printer className="w-4 h-4 mr-2" />
               Ouvrir l'aperçu
             </Button>

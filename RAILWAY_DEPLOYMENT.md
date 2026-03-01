@@ -91,6 +91,26 @@ Railway → ton service → **Variables** → ajoute les variables suivantes (en
 
 ---
 
+## Backend (service Express)
+
+Si vous déployez le **backend** (proxy Keycloak pour inscription / mot de passe oublié) sur Railway en tant que service séparé :
+
+1. Créer un nouveau service depuis le même repo (ex. `app/backend` comme root directory ou avec un Dockerfile dédié).
+2. Variables d'environnement à définir pour le backend :
+
+| Variable | Description | Exemple |
+|----------|-------------|---------|
+| `KEYCLOAK_URL` | URL du serveur Keycloak | `https://auth.tondomaine.com/auth` |
+| `KEYCLOAK_REALM` | Nom du realm | `cv-maker` |
+| `KEYCLOAK_ADMIN_CLIENT_ID` | Client admin Keycloak | `cv-maker-admin` |
+| `KEYCLOAK_ADMIN_CLIENT_SECRET` | Secret du client admin | *(depuis Keycloak Admin)* |
+| `ALLOWED_ORIGINS` | Origines CORS autorisées (séparées par des virgules) | `https://ton-app.vercel.app,https://ton-app.railway.app` |
+| `PORT` | Port (optionnel, défaut 4000) | `4000` |
+
+3. En production, **ne pas laisser `ALLOWED_ORIGINS` vide** : définir les URLs exactes du frontend (Vercel, Railway, etc.) pour limiter les requêtes cross-origin.
+
+---
+
 ## Test du build Docker en local
 
 ```bash
