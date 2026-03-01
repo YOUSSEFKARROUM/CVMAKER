@@ -231,7 +231,7 @@ export const EdinburghTemplate = forwardRef<HTMLDivElement, TemplateProps>(
           </div>
 
           {/* Main Content ~70% */}
-          <div className="w-[70%] p-6">
+          <div className="w-[70%] min-w-0 p-6">
             {/* Profile */}
             {profile && (
               <div className="mb-6">
@@ -247,17 +247,17 @@ export const EdinburghTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 </h3>
                 <div className="space-y-4">
                   {educations.map((edu) => (
-                    <div key={edu.id}>
-                      <h4 className="font-semibold text-sm text-gray-900">{edu.diploma}</h4>
-                      <p className="text-xs text-gray-600">{edu.school}</p>
+                    <div key={edu.id} className="min-w-0">
+                      <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.diploma}</h4>
+                      <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}</p>
                       {edu.fieldOfStudy && (
-                        <p className="text-xs text-gray-600">{edu.fieldOfStudy}</p>
+                        <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.fieldOfStudy}</p>
                       )}
                       {edu.graduationDate && (
                         <p className="text-xs text-gray-500 mt-1">{formatDate(edu.graduationDate)}</p>
                       )}
                       {edu.description && (
-                        <p className="text-xs text-gray-700 mt-1">{edu.description}</p>
+                        <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
                       )}
                     </div>
                   ))}
@@ -273,15 +273,16 @@ export const EdinburghTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 </h3>
                 <div className="space-y-5">
                   {experiences.map((exp) => (
-                    <div key={exp.id}>
-                      <h4 className="font-semibold text-sm text-gray-900">{exp.jobTitle}</h4>
-                      <p className="text-xs text-gray-600">{exp.employer}{exp.city ? `, ${exp.city}` : ''}</p>
+                    <div key={exp.id} className="min-w-0">
+                      <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.jobTitle}</h4>
+                      <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city ? `, ${exp.city}` : ''}</p>
                       <p className="text-xs text-gray-500 mt-0.5">
                         {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
                       </p>
                       {exp.description && (
                         <div 
-                          className="text-xs text-gray-700 mt-2 leading-relaxed"
+                          className="text-xs text-gray-700 mt-2 leading-relaxed break-words"
+                          style={{ overflowWrap: 'anywhere' }}
                           dangerouslySetInnerHTML={{ 
                             __html: exp.description.replace(/\n/g, '<br/>').replace(/• /g, '&bull; ') 
                           }}

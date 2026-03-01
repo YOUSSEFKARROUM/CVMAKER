@@ -196,7 +196,7 @@ export const ModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         {formatDate(exp.startDate)} - {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
                       </p>
                       {exp.description && (
-                        <p className="text-sm text-gray-700">{exp.description}</p>
+                        <p className="text-sm text-gray-700 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
                       )}
                     </div>
                   ))}

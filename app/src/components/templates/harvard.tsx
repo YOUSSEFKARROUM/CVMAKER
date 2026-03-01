@@ -64,16 +64,16 @@ const TimelineItem = ({
       style={{ backgroundColor: primaryColor }}
     />
     {/* Content */}
-    <div>
+    <div className="min-w-0">
       {(startDate || endDate) && (
         <p className="text-xs text-gray-500 mb-1">
           {startDate && formatDate(startDate)} - {currentlyWorking ? 'Présent' : endDate ? formatDate(endDate) : ''}
         </p>
       )}
-      <h4 className="font-bold text-sm text-gray-900">{title}</h4>
-      <p className="text-xs text-gray-600 mb-1">{subtitle}</p>
+      <h4 className="font-bold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{title}</h4>
+      <p className="text-xs text-gray-600 mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{subtitle}</p>
       {description && (
-        <p className="text-xs text-gray-700 leading-relaxed">{description}</p>
+        <p className="text-xs text-gray-700 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }}>{description}</p>
       )}
     </div>
   </div>
@@ -252,6 +252,7 @@ export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                       startDate={edu.graduationDate}
                       title={edu.diploma}
                       subtitle={`${edu.school}${edu.city ? `, ${edu.city}` : ''}`}
+                      description={edu.description}
                       primaryColor={settings.primaryColor}
                     />
                   ))}

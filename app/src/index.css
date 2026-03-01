@@ -134,9 +134,18 @@
   }
 }
 
-/* CV Preview specific styles */
+/* CV Preview specific styles - évite overflow et troncature du texte */
 [data-cv-preview] {
   @apply bg-white;
+}
+[data-cv-preview] p,
+[data-cv-preview] .break-words {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+[data-cv-preview] .flex-1.min-w-0,
+[data-cv-preview] [class*="min-w-0"] {
+  min-width: 0;
 }
 
 .dark [data-cv-preview] {

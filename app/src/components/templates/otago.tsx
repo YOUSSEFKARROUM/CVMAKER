@@ -59,9 +59,9 @@ export const OtagoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             </div>
           )}
           {contact.email && (
-            <div className="flex items-center gap-1">
-              <Mail className="w-3 h-3" />
-              <span>{contact.email}</span>
+            <div className="flex items-center gap-1 min-w-0">
+              <Mail className="w-3 h-3 flex-shrink-0" />
+              <span className="break-words" style={{ overflowWrap: 'anywhere' }}>{contact.email}</span>
             </div>
           )}
         </div>
@@ -137,12 +137,15 @@ export const OtagoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             </h3>
             <div className="space-y-4">
               {educations.map((edu) => (
-                <div key={edu.id} className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-sm text-gray-900">{edu.diploma}</h4>
-                    <p className="text-sm text-gray-600">{edu.school}{edu.city && `, ${edu.city}`}</p>
+                <div key={edu.id} className="flex justify-between items-start gap-2 min-w-0">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm text-gray-900 break-words">{edu.diploma}</h4>
+                    <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city && `, ${edu.city}`}</p>
+                    {edu.description && (
+                      <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                    )}
                   </div>
-                  <span className="text-xs text-gray-500 whitespace-nowrap ml-4">{formatDate(edu.graduationDate)}</span>
+                  <span className="text-xs text-gray-500 whitespace-nowrap flex-shrink-0">{formatDate(edu.graduationDate)}</span>
                 </div>
               ))}
             </div>
@@ -157,15 +160,15 @@ export const OtagoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             </h3>
             <div className="space-y-5">
               {experiences.map((exp) => (
-                <div key={exp.id} className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-sm text-gray-900">{exp.jobTitle}</h4>
-                    <p className="text-sm text-gray-600">{exp.employer}{exp.city && `, ${exp.city}`}</p>
+                <div key={exp.id} className="flex justify-between items-start gap-2 min-w-0">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm text-gray-900 break-words">{exp.jobTitle}</h4>
+                    <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
                     {exp.description && (
-                      <p className="text-xs text-gray-700 leading-relaxed mt-1">{exp.description}</p>
+                      <p className="text-xs text-gray-700 leading-relaxed mt-1 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
                     )}
                   </div>
-                  <span className="text-xs text-gray-500 whitespace-nowrap ml-4">
+                  <span className="text-xs text-gray-500 whitespace-nowrap flex-shrink-0">
                     {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
                   </span>
                 </div>

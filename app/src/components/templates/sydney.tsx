@@ -110,7 +110,7 @@ export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               />
               <div className="space-y-6">
                 {experiences.map((exp) => (
-                  <div key={exp.id} className="flex gap-4">
+                  <div key={exp.id} className="flex gap-4 min-w-0">
                     <div className="w-24 flex-shrink-0 text-right">
                       <p className="text-sm text-gray-500">
                         {formatDate(exp.startDate)}
@@ -119,10 +119,12 @@ export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                           {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
                       </p>
                     </div>
-                    <div className="flex-1 pb-6 border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
-                      <h4 className="font-semibold text-gray-900">{exp.jobTitle}</h4>
-                      <p className="text-gray-600">{exp.employer}{exp.city && `, ${exp.city}`}</p>
-                      <p className="text-sm text-gray-700 mt-1">{exp.description}</p>
+                    <div className="flex-1 min-w-0 pb-6 border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
+                      <h4 className="font-semibold text-gray-900 break-words">{exp.jobTitle}</h4>
+                      <p className="text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
+                      {exp.description && (
+                        <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -140,13 +142,16 @@ export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               />
               <div className="space-y-4">
                 {educations.map((edu) => (
-                  <div key={edu.id} className="flex gap-4">
+                  <div key={edu.id} className="flex gap-4 min-w-0">
                     <div className="w-24 flex-shrink-0 text-right">
                       <p className="text-sm text-gray-500">{formatDate(edu.graduationDate)}</p>
                     </div>
-                    <div className="flex-1 border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
-                      <h4 className="font-semibold text-gray-900">{edu.diploma}</h4>
-                      <p className="text-gray-600">{edu.school}</p>
+                    <div className="flex-1 min-w-0 border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
+                      <h4 className="font-semibold text-gray-900 break-words">{edu.diploma}</h4>
+                      <p className="text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city ? `, ${edu.city}` : ''}</p>
+                      {edu.description && (
+                        <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                      )}
                     </div>
                   </div>
                 ))}

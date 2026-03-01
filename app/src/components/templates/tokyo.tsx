@@ -94,7 +94,9 @@ export const TokyoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                       <p className="text-xs text-gray-500">
                         {formatDate(exp.startDate)} - {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
                       </p>
-                      <p className="text-xs text-gray-700 mt-1">{exp.description}</p>
+                      {exp.description && (
+                        <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -137,8 +139,11 @@ export const TokyoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                   {educations.map((edu) => (
                     <div key={edu.id}>
                       <h4 className="font-semibold text-sm text-gray-900">{edu.diploma}</h4>
-                      <p className="text-xs text-gray-600">{edu.school}</p>
+                      <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city ? `, ${edu.city}` : ''}</p>
                       <p className="text-xs text-gray-500">{formatDate(edu.graduationDate)}</p>
+                      {edu.description && (
+                        <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                      )}
                     </div>
                   ))}
                 </div>

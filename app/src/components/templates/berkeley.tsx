@@ -50,9 +50,9 @@ export const BerkeleyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
           </div>
           <div className="pl-3 space-y-1 text-sm">
             {contact.email && (
-              <div className="flex">
+              <div className="flex min-w-0">
                 <span className="text-gray-600 w-16 flex-shrink-0">E-mail</span>
-                <span className="text-gray-800">{contact.email}</span>
+                <span className="text-gray-800 break-words" style={{ overflowWrap: 'anywhere' }}>{contact.email}</span>
               </div>
             )}
             {contact.phone && (
@@ -82,12 +82,15 @@ export const BerkeleyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             </div>
             <div className="pl-3 space-y-4">
               {educations.map((edu) => (
-                <div key={edu.id} className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-sm text-gray-900">{edu.diploma}</h4>
-                    <p className="text-sm text-gray-600">{edu.school}</p>
+                <div key={edu.id} className="flex justify-between items-start gap-4">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.diploma}</h4>
+                    <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}</p>
+                    {edu.description && (
+                      <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                    )}
                   </div>
-                  <span className="text-sm text-gray-500 whitespace-nowrap ml-4">
+                  <span className="text-sm text-gray-500 whitespace-nowrap flex-shrink-0">
                     {formatDate(edu.graduationDate)}
                   </span>
                 </div>
@@ -108,22 +111,22 @@ export const BerkeleyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             </div>
             <div className="pl-3 space-y-5">
               {experiences.map((exp) => (
-                <div key={exp.id} className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-sm text-gray-900">{exp.jobTitle}</h4>
-                    <p className="text-sm text-gray-600">{exp.employer}</p>
+                <div key={exp.id} className="flex justify-between items-start gap-4">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.jobTitle}</h4>
+                    <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}</p>
                     {exp.description && (
                       <ul className="mt-2 space-y-1">
                         {exp.description.split('\n').filter(line => line.trim()).map((line, idx) => (
-                          <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
-                            <span className="text-gray-400 mt-1.5">•</span>
+                          <li key={idx} className="text-sm text-gray-700 flex items-start gap-2 break-words" style={{ overflowWrap: 'anywhere' }}>
+                            <span className="text-gray-400 mt-1.5 flex-shrink-0">•</span>
                             <span>{line.trim().replace(/^[•\-\*]\s*/, '')}</span>
                           </li>
                         ))}
                       </ul>
                     )}
                   </div>
-                  <span className="text-sm text-gray-500 whitespace-nowrap ml-4">
+                  <span className="text-sm text-gray-500 whitespace-nowrap flex-shrink-0">
                     {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'aujourd\'hui' : formatDate(exp.endDate)}
                   </span>
                 </div>

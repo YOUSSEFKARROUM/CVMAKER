@@ -73,7 +73,7 @@ export const PrincetonTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             
             {/* E-Adresse e-mail */}
             <div className="text-gray-800 font-normal">E-Adresse e-mail</div>
-            <div className="text-gray-800">{contact.email || '-'}</div>
+            <div className="text-gray-800 break-words min-w-0" style={{ overflowWrap: 'anywhere' }}>{contact.email || '-'}</div>
             
             {/* Date de naissance */}
             <div className="text-gray-800 font-normal">Date de naissance</div>
@@ -102,11 +102,14 @@ export const PrincetonTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             <div className="space-y-4">
               {educations.map((edu) => (
                 <div key={edu.id} className="grid grid-cols-[120px_1fr] gap-4">
-                  <div className="text-sm text-gray-800">
+                  <div className="text-sm text-gray-800 flex-shrink-0">
                     {edu.graduationDate ? formatDate(edu.graduationDate) : '-'}
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-800">{edu.diploma}{edu.school ? `, ${edu.school}` : ''}{edu.city ? `, ${edu.city}` : ''}</p>
+                  <div className="min-w-0">
+                    <p className="text-sm text-gray-800 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.diploma}{edu.school ? `, ${edu.school}` : ''}{edu.city ? `, ${edu.city}` : ''}</p>
+                    {edu.description && (
+                      <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                    )}
                   </div>
                 </div>
               ))}
@@ -123,14 +126,14 @@ export const PrincetonTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             <div className="space-y-5">
               {experiences.map((exp) => (
                 <div key={exp.id} className="grid grid-cols-[120px_1fr] gap-4">
-                  <div className="text-sm text-gray-800">
+                  <div className="text-sm text-gray-800 flex-shrink-0">
                     {formatDateRange(exp.startDate, exp.endDate, exp.currentlyWorking)}
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">{exp.jobTitle}</p>
-                    <p className="text-sm text-gray-700 italic mb-1">{exp.employer}{exp.city ? `, ${exp.city}` : ''}</p>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.jobTitle}</p>
+                    <p className="text-sm text-gray-700 italic mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city ? `, ${exp.city}` : ''}</p>
                     {exp.description && (
-                      <ul className="text-sm text-gray-800 list-disc list-inside space-y-0.5">
+                      <ul className="text-sm text-gray-800 list-disc list-inside space-y-0.5 break-words" style={{ overflowWrap: 'anywhere' }}>
                         {exp.description.split('\n').filter(line => line.trim()).map((line, idx) => (
                           <li key={idx}>{line.trim().replace(/^[-•]\s*/, '')}</li>
                         ))}

@@ -190,9 +190,9 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         <h4 className="font-semibold text-sm text-gray-900">{edu.diploma}</h4>
                         <span className="text-xs text-gray-500">{formatDate(edu.graduationDate)}</span>
                       </div>
-                      <p className="text-xs text-gray-600">{edu.school}{edu.city && `, ${edu.city}`}</p>
+                      <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city && `, ${edu.city}`}</p>
                       {edu.description && (
-                        <p className="text-xs text-gray-700 mt-1">{edu.description}</p>
+                        <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
                       )}
                     </div>
                   ))}
@@ -215,9 +215,9 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                           {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-600 mb-1">{exp.employer}{exp.city && `, ${exp.city}`}</p>
+                      <p className="text-xs text-gray-600 mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
                       {exp.description && (
-                        <p className="text-xs text-gray-700 leading-relaxed">{exp.description}</p>
+                        <p className="text-xs text-gray-700 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
                       )}
                     </div>
                   ))}

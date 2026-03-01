@@ -145,7 +145,7 @@ export const AucklandTemplate = forwardRef<HTMLDivElement, TemplateProps>(
           </div>
 
           {/* Right Column - 65% */}
-          <div className="w-[65%] pl-6 border-l border-gray-200">
+          <div className="w-[65%] min-w-0 pl-6 border-l border-gray-200">
             {/* Profile at top */}
             {profile && (
               <div className="mb-6">
@@ -164,12 +164,15 @@ export const AucklandTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 </h3>
                 <div className="space-y-3">
                   {educations.map((edu) => (
-                    <div key={edu.id}>
-                      <div className="flex justify-between items-start mb-0.5">
-                        <h4 className="font-semibold text-[10.5px] text-gray-900">{edu.diploma}</h4>
-                        <span className="text-[9px] text-gray-600">{formatDate(edu.graduationDate)}</span>
+                    <div key={edu.id} className="min-w-0">
+                      <div className="flex justify-between items-start mb-0.5 gap-2">
+                        <h4 className="font-semibold text-[10.5px] text-gray-900 break-words min-w-0" style={{ overflowWrap: 'anywhere' }}>{edu.diploma}</h4>
+                        <span className="text-[9px] text-gray-600 flex-shrink-0">{formatDate(edu.graduationDate)}</span>
                       </div>
-                      <p className="text-[10px] text-gray-700">{edu.school}{edu.city && `, ${edu.city}`}</p>
+                      <p className="text-[10px] text-gray-700 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city && `, ${edu.city}`}</p>
+                      {edu.description && (
+                        <p className="text-[10px] text-gray-600 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -187,16 +190,16 @@ export const AucklandTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 </h3>
                 <div className="space-y-4">
                   {experiences.map((exp) => (
-                    <div key={exp.id}>
-                      <div className="flex justify-between items-start mb-0.5">
-                        <h4 className="font-semibold text-[10.5px] text-gray-900">{exp.jobTitle}</h4>
-                        <span className="text-[9px] text-gray-600">
+                    <div key={exp.id} className="min-w-0">
+                      <div className="flex justify-between items-start mb-0.5 gap-2">
+                        <h4 className="font-semibold text-[10.5px] text-gray-900 break-words min-w-0" style={{ overflowWrap: 'anywhere' }}>{exp.jobTitle}</h4>
+                        <span className="text-[9px] text-gray-600 flex-shrink-0">
                           {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
                         </span>
                       </div>
-                      <p className="text-[10px] text-gray-700 mb-1.5">{exp.employer}{exp.city && `, ${exp.city}`}</p>
+                      <p className="text-[10px] text-gray-700 mb-1.5 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
                       {exp.description && (
-                        <ul className="text-[10px] text-gray-700 leading-relaxed list-disc list-inside space-y-0.5">
+                        <ul className="text-[10px] text-gray-700 leading-relaxed list-disc list-inside space-y-0.5 break-words" style={{ overflowWrap: 'anywhere' }}>
                           {exp.description.split('\n').map((line, idx) => (
                             line.trim() && <li key={idx}>{line.trim().replace(/^[-•]\s*/, '')}</li>
                           ))}

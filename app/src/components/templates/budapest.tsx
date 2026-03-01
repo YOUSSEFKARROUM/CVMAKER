@@ -207,18 +207,18 @@ export const BudapestTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                   variant="underline" 
                   color={settings.primaryColor}
                 />
-                <div className="space-y-5">
+                <div className="space-y-5 min-w-0">
                   {experiences.map((exp) => (
-                    <div key={exp.id}>
-                      <div className="flex justify-between items-start mb-1">
-                        <h4 className="font-semibold text-gray-900">{exp.jobTitle}</h4>
-                        <span className="text-sm text-gray-500">
+                    <div key={exp.id} className="min-w-0">
+                      <div className="flex justify-between items-start gap-2 mb-1 min-w-0">
+                        <h4 className="font-semibold text-gray-900 break-words min-w-0">{exp.jobTitle}</h4>
+                        <span className="text-sm text-gray-500 flex-shrink-0">
                           {formatDate(exp.startDate)} - {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
                         </span>
                       </div>
-                      <p className="text-gray-600 mb-1">{exp.employer}{exp.city && `, ${exp.city}`}</p>
+                      <p className="text-gray-600 mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
                       {exp.description && (
-                        <p className="text-sm text-gray-700">{exp.description}</p>
+                        <p className="text-sm text-gray-700 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
                       )}
                     </div>
                   ))}
@@ -234,14 +234,17 @@ export const BudapestTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                   variant="underline" 
                   color={settings.primaryColor}
                 />
-                <div className="space-y-4">
+                <div className="space-y-4 min-w-0">
                   {educations.map((edu) => (
-                    <div key={edu.id}>
-                      <div className="flex justify-between items-start mb-1">
-                        <h4 className="font-semibold text-gray-900">{edu.diploma}</h4>
-                        <span className="text-sm text-gray-500">{formatDate(edu.graduationDate)}</span>
+                    <div key={edu.id} className="min-w-0">
+                      <div className="flex justify-between items-start gap-2 mb-1 min-w-0">
+                        <h4 className="font-semibold text-gray-900 break-words min-w-0">{edu.diploma}</h4>
+                        <span className="text-sm text-gray-500 flex-shrink-0">{formatDate(edu.graduationDate)}</span>
                       </div>
-                      <p className="text-gray-600">{edu.school}{edu.city && `, ${edu.city}`}</p>
+                      <p className="text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city && `, ${edu.city}`}</p>
+                      {edu.description && (
+                        <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                      )}
                     </div>
                   ))}
                 </div>

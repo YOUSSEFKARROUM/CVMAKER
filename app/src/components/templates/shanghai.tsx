@@ -199,8 +199,10 @@ export const ShanghaiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                             {formatDate(exp.startDate)} - {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
                           </span>
                         </div>
-                        <p className="text-gray-600 text-sm">{exp.employer}{exp.city && `, ${exp.city}`}</p>
-                        <p className="text-sm text-gray-700 mt-1">{exp.description}</p>
+                        <p className="text-gray-600 text-sm break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
+                        {exp.description && (
+                          <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -222,7 +224,10 @@ export const ShanghaiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                           <h4 className="font-semibold text-gray-900">{edu.diploma}</h4>
                           <span className="text-sm text-gray-500">{formatDate(edu.graduationDate)}</span>
                         </div>
-                        <p className="text-gray-600 text-sm">{edu.school}</p>
+                        <p className="text-gray-600 text-sm break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city ? `, ${edu.city}` : ''}</p>
+                        {edu.description && (
+                          <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                        )}
                       </div>
                     ))}
                   </div>

@@ -58,12 +58,12 @@ export function ContactItem({
   const iconColor = accentColor && variant !== 'sidebar' ? accentColor : undefined;
 
   return (
-    <div className={`${variantStyles[variant]} ${className}`}>
-      <Icon 
-        className={iconStyles[variant]} 
+    <div className={`${variantStyles[variant]} min-w-0 ${className}`}>
+      <Icon
+        className={`${iconStyles[variant]} flex-shrink-0`}
         style={iconColor ? { color: iconColor } : undefined}
       />
-      <span className={variant === 'sidebar' ? 'break-all leading-snug' : 'leading-snug'}>{value}</span>
+      <span className="break-words leading-snug" style={{ overflowWrap: 'anywhere' }}>{value}</span>
     </div>
   );
 }

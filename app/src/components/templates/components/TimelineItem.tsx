@@ -30,7 +30,7 @@ export function TimelineItem({
 
   if (layout === 'split') {
     return (
-      <div className="flex gap-5">
+      <div className="flex gap-5 min-w-0">
         <div className="w-24 flex-shrink-0 text-right pt-0.5">
           {startDate && <p className="text-xs font-medium text-gray-500 tracking-wide">{formatDate(startDate)}</p>}
           {endDate && (
@@ -39,11 +39,11 @@ export function TimelineItem({
             </p>
           )}
         </div>
-        <div className="flex-1 pb-6 relative pl-5 border-l-2" style={{ borderColor: color || '#e5e7eb' }}>
+        <div className="flex-1 min-w-0 pb-6 relative pl-5 border-l-2" style={{ borderColor: color || '#e5e7eb' }}>
           <div className="absolute left-[-5px] top-1.5 w-2 h-2 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: color || '#9ca3af' }} />
-          <h4 className="font-semibold text-gray-900 text-[15px]">{title}</h4>
-          {subtitle && <p className="text-sm text-gray-600 mt-0.5">{subtitle}</p>}
-          {description && <p className="text-sm text-gray-700 mt-1.5 leading-relaxed">{description}</p>}
+          <h4 className="font-semibold text-gray-900 text-[15px] break-words">{title}</h4>
+          {subtitle && <p className="text-sm text-gray-600 mt-0.5 break-words" style={{ overflowWrap: 'anywhere' }}>{subtitle}</p>}
+          {description && <p className="text-sm text-gray-700 mt-1.5 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }}>{description}</p>}
         </div>
       </div>
     );
@@ -51,26 +51,26 @@ export function TimelineItem({
 
   if (layout === 'bordered') {
     return (
-      <div 
-        className="border-l-2 pl-4 py-0.5"
+      <div
+        className="border-l-2 pl-4 py-0.5 min-w-0"
         style={{ borderColor: color || '#e5e7eb' }}
       >
-        <h4 className="font-semibold text-gray-900 text-[15px]">{title}</h4>
-        {subtitle && <p className="text-sm text-gray-600 mt-0.5">{subtitle}</p>}
+        <h4 className="font-semibold text-gray-900 text-[15px] break-words">{title}</h4>
+        {subtitle && <p className="text-sm text-gray-600 mt-0.5 break-words" style={{ overflowWrap: 'anywhere' }}>{subtitle}</p>}
         {dateRange && <p className="text-xs text-gray-500 mb-1">{dateRange}</p>}
-        {description && <p className="text-sm text-gray-700 leading-relaxed">{description}</p>}
+        {description && <p className="text-sm text-gray-700 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }}>{description}</p>}
       </div>
     );
   }
 
   return (
-    <div className="py-0.5">
+    <div className="py-0.5 min-w-0">
       <div className="flex justify-between items-start gap-3">
-        <h4 className="font-semibold text-gray-900 text-[15px]">{title}</h4>
-        {dateRange && <span className="text-xs text-gray-500 whitespace-nowrap">{dateRange}</span>}
+        <h4 className="font-semibold text-gray-900 text-[15px] break-words min-w-0">{title}</h4>
+        {dateRange && <span className="text-xs text-gray-500 whitespace-nowrap flex-shrink-0">{dateRange}</span>}
       </div>
-      {subtitle && <p className="text-sm text-gray-600 mt-0.5">{subtitle}</p>}
-      {description && <p className="text-sm text-gray-700 mt-1.5 leading-relaxed">{description}</p>}
+      {subtitle && <p className="text-sm text-gray-600 mt-0.5 break-words" style={{ overflowWrap: 'anywhere' }}>{subtitle}</p>}
+      {description && <p className="text-sm text-gray-700 mt-1.5 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }}>{description}</p>}
     </div>
   );
 }

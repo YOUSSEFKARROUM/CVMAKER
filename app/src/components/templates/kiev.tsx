@@ -215,7 +215,9 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                       <p className="text-xs text-gray-500 mb-1">
                         {formatDate(exp.startDate)} - {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
                       </p>
-                      <p className="text-sm text-gray-700">{exp.description}</p>
+                      {exp.description && (
+                        <p className="text-sm text-gray-700 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
+                      )}
                     </div>
                   ))}
                 </div>

@@ -105,11 +105,11 @@ export const OxfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                               </span>
                             </div>
                             {/* Content */}
-                            <div className="flex-1">
-                              <h4 className="font-semibold text-sm text-gray-900">{edu.diploma}</h4>
-                              <p className="text-sm text-gray-600">{edu.school}</p>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.diploma}</h4>
+                              <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}</p>
                               {edu.description && (
-                                <p className="text-xs text-gray-700 mt-1">{edu.description}</p>
+                                <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
                               )}
                             </div>
                           </div>
@@ -142,11 +142,11 @@ export const OxfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                               </span>
                             </div>
                             {/* Content */}
-                            <div className="flex-1">
-                              <h4 className="font-semibold text-sm text-gray-900">{exp.jobTitle}</h4>
-                              <p className="text-sm text-gray-600">{exp.employer}{exp.city && `, ${exp.city}`}</p>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.jobTitle}</h4>
+                              <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
                               {exp.description && (
-                                <p className="text-xs text-gray-700 mt-1 leading-relaxed">{exp.description}</p>
+                                <p className="text-xs text-gray-700 mt-1 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
                               )}
                             </div>
                           </div>

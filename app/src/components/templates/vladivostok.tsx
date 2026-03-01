@@ -45,15 +45,17 @@ export const VladivostokTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             {experiences.length > 0 && (
               <div className="mb-8">
                 <SectionTitle titleKey="experience.title" variant="underline" color={settings.primaryColor} />
-                <div className="space-y-5">
+                <div className="space-y-5 min-w-0">
                   {experiences.map((exp) => (
-                    <div key={exp.id} className="border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
-                      <h4 className="font-semibold text-gray-900">{exp.jobTitle}</h4>
-                      <p className="text-gray-600">{exp.employer}{exp.city && `, ${exp.city}`}</p>
+                    <div key={exp.id} className="border-l-2 pl-4 min-w-0" style={{ borderColor: settings.primaryColor }}>
+                      <h4 className="font-semibold text-gray-900 break-words">{exp.jobTitle}</h4>
+                      <p className="text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
                       <p className="text-sm text-gray-500 mb-1">
                         {formatDate(exp.startDate)} - {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
                       </p>
-                      <p className="text-sm text-gray-700">{exp.description}</p>
+                      {exp.description && (
+                        <p className="text-sm text-gray-700 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -63,12 +65,15 @@ export const VladivostokTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             {educations.length > 0 && (
               <div className="mb-8">
                 <SectionTitle titleKey="education.title" variant="underline" color={settings.primaryColor} />
-                <div className="space-y-4">
+                <div className="space-y-4 min-w-0">
                   {educations.map((edu) => (
-                    <div key={edu.id} className="border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
-                      <h4 className="font-semibold text-gray-900">{edu.diploma}</h4>
-                      <p className="text-gray-600">{edu.school}</p>
+                    <div key={edu.id} className="border-l-2 pl-4 min-w-0" style={{ borderColor: settings.primaryColor }}>
+                      <h4 className="font-semibold text-gray-900 break-words">{edu.diploma}</h4>
+                      <p className="text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city ? `, ${edu.city}` : ''}</p>
                       <p className="text-sm text-gray-500">{formatDate(edu.graduationDate)}</p>
+                      {edu.description && (
+                        <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                      )}
                     </div>
                   ))}
                 </div>

@@ -34,58 +34,58 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
           <h1 className="text-xl font-semibold tracking-wide text-white">Curriculum Vitae</h1>
         </div>
 
-        <div className="p-8">
+        <div className="p-8 min-w-0">
           {/* Name and Contact Info - 2 columns */}
-          <div className="grid grid-cols-2 gap-8 mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">
+          <div className="grid grid-cols-2 gap-8 mb-6 min-w-0">
+            <div className="min-w-0">
+              <h2 className="text-2xl font-bold text-gray-900 mb-1 break-words">
                 {contact.firstName} {contact.lastName}
               </h2>
               {contact.jobTitle && (
-                <p className="text-sm text-gray-600">{contact.jobTitle}</p>
+                <p className="text-sm text-gray-600 break-words">{contact.jobTitle}</p>
               )}
             </div>
-            <div className="text-sm text-gray-700 space-y-1">
+            <div className="text-sm text-gray-700 space-y-1 min-w-0">
               {contact.address && (
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" style={{ color: settings.primaryColor }} />
-                  <span>{contact.address}{contact.city ? `, ${contact.city}` : ''}{contact.postalCode ? ` ${contact.postalCode}` : ''}{contact.country ? `, ${contact.country}` : ''}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <MapPin className="w-4 h-4 flex-shrink-0" style={{ color: settings.primaryColor }} />
+                  <span className="break-words" style={{ overflowWrap: 'anywhere' }}>{contact.address}{contact.city ? `, ${contact.city}` : ''}{contact.postalCode ? ` ${contact.postalCode}` : ''}{contact.country ? `, ${contact.country}` : ''}</span>
                 </div>
               )}
               {!contact.address && (contact.city || contact.country) && (
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" style={{ color: settings.primaryColor }} />
-                  <span>{[contact.city, contact.country].filter(Boolean).join(', ')}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <MapPin className="w-4 h-4 flex-shrink-0" style={{ color: settings.primaryColor }} />
+                  <span className="break-words" style={{ overflowWrap: 'anywhere' }}>{[contact.city, contact.country].filter(Boolean).join(', ')}</span>
                 </div>
               )}
               {contact.phone && (
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" style={{ color: settings.primaryColor }} />
-                  <span>{contact.phone}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <Phone className="w-4 h-4 flex-shrink-0" style={{ color: settings.primaryColor }} />
+                  <span className="break-words" style={{ overflowWrap: 'anywhere' }}>{contact.phone}</span>
                 </div>
               )}
               {contact.email && (
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" style={{ color: settings.primaryColor }} />
-                  <span>{contact.email}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <Mail className="w-4 h-4 flex-shrink-0" style={{ color: settings.primaryColor }} />
+                  <span className="break-words" style={{ overflowWrap: 'anywhere' }}>{contact.email}</span>
                 </div>
               )}
               {contact.linkedin && (
-                <div className="flex items-center gap-2">
-                  <Linkedin className="w-4 h-4" style={{ color: settings.primaryColor }} />
-                  <span>{contact.linkedin}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <Linkedin className="w-4 h-4 flex-shrink-0" style={{ color: settings.primaryColor }} />
+                  <span className="break-words" style={{ overflowWrap: 'anywhere' }}>{contact.linkedin}</span>
                 </div>
               )}
               {contact.portfolio && (
-                <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4" style={{ color: settings.primaryColor }} />
-                  <span>{contact.portfolio}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <Globe className="w-4 h-4 flex-shrink-0" style={{ color: settings.primaryColor }} />
+                  <span className="break-words" style={{ overflowWrap: 'anywhere' }}>{contact.portfolio}</span>
                 </div>
               )}
               {contact.github && (
-                <div className="flex items-center gap-2">
-                  <Github className="w-4 h-4" style={{ color: settings.primaryColor }} />
-                  <span>{contact.github}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <Github className="w-4 h-4 flex-shrink-0" style={{ color: settings.primaryColor }} />
+                  <span className="break-words" style={{ overflowWrap: 'anywhere' }}>{contact.github}</span>
                 </div>
               )}
             </div>
@@ -99,13 +99,13 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
           )}
 
           {/* Two-column layout */}
-          <div className="grid grid-cols-2 gap-8">
+          <div className="grid grid-cols-2 gap-8 min-w-0">
             {/* Left Column: ENSEIGNEMENT, EXPÉRIENCE PROFESSIONNELLE */}
-            <div className="space-y-6">
+            <div className="space-y-6 min-w-0">
               {/* Education - ENSEIGNEMENT */}
               {educations.length > 0 && (
-                <div>
-                  <h3 
+                <div className="min-w-0">
+                  <h3
                     className="text-sm font-bold uppercase tracking-wider mb-4 pb-1 border-b-2"
                     style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
                   >
@@ -113,14 +113,14 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                   </h3>
                   <div className="space-y-4">
                     {educations.map((edu) => (
-                      <div key={edu.id}>
+                      <div key={edu.id} className="min-w-0">
                         <p className="text-xs text-gray-500 mb-0.5">
                           {formatDate(edu.graduationDate)}
                         </p>
-                        <h4 className="font-semibold text-sm text-gray-900">{edu.diploma}</h4>
-                        <p className="text-xs text-gray-600">{edu.school}{edu.city ? `, ${edu.city}` : ''}</p>
+                        <h4 className="font-semibold text-sm text-gray-900 break-words">{edu.diploma}</h4>
+                        <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city ? `, ${edu.city}` : ''}</p>
                         {edu.description && (
-                          <p className="text-xs text-gray-700 mt-1">{edu.description}</p>
+                          <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
                         )}
                       </div>
                     ))}
@@ -130,8 +130,8 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
               {/* Experience - EXPÉRIENCE PROFESSIONNELLE */}
               {experiences.length > 0 && (
-                <div>
-                  <h3 
+                <div className="min-w-0">
+                  <h3
                     className="text-sm font-bold uppercase tracking-wider mb-4 pb-1 border-b-2"
                     style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
                   >
@@ -139,14 +139,14 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                   </h3>
                   <div className="space-y-4">
                     {experiences.map((exp) => (
-                      <div key={exp.id}>
+                      <div key={exp.id} className="min-w-0">
                         <p className="text-xs text-gray-500 mb-0.5">
                           {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
                         </p>
-                        <h4 className="font-semibold text-sm text-gray-900">{exp.jobTitle}</h4>
-                        <p className="text-xs text-gray-600">{exp.employer}{exp.city ? `, ${exp.city}` : ''}</p>
+                        <h4 className="font-semibold text-sm text-gray-900 break-words">{exp.jobTitle}</h4>
+                        <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city ? `, ${exp.city}` : ''}</p>
                         {exp.description && (
-                          <p className="text-xs text-gray-700 mt-1">{exp.description}</p>
+                          <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
                         )}
                       </div>
                     ))}
