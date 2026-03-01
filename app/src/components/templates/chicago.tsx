@@ -15,76 +15,73 @@ export const ChicagoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         ref={ref}
         id="cv-preview"
         data-cv-preview
-        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl p-12 ${className}`}
+        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl p-10 ${className}`}
         style={{ fontFamily: settings.bodyFont }}
       >
         {/* Header */}
-        <div className="text-center mb-10 border-b-2 pb-6" style={{ borderColor: settings.primaryColor }}>
+        <div className="text-center mb-9 pb-6 border-b-2" style={{ borderColor: settings.primaryColor }}>
           {/* Photo or Initials */}
           {contact.photo ? (
             <img 
               src={contact.photo} 
               alt="Profile" 
-              className="w-28 h-28 rounded-full mx-auto mb-4 object-cover border-4"
+              className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 shadow-sm"
               style={{ borderColor: settings.primaryColor }}
             />
           ) : (
             <div 
-              className="w-28 h-28 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl font-bold text-white border-4"
+              className="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl font-bold text-white border-4 shadow-sm"
               style={{ backgroundColor: settings.primaryColor, borderColor: settings.primaryColor }}
             >
               {getInitials(contact.firstName, contact.lastName)}
             </div>
           )}
           <h1 
-            className="text-4xl font-bold mb-2"
+            className="text-3xl font-bold mb-1.5 tracking-tight"
             style={{ fontFamily: settings.titleFont, color: settings.primaryColor }}
           >
             {contact.firstName.toUpperCase()} {contact.lastName.toUpperCase()}
           </h1>
           {contact.jobTitle && (
-            <p className="text-xl text-gray-600 mb-4">{contact.jobTitle}</p>
+            <p className="text-lg text-gray-600 mb-4 font-medium">{contact.jobTitle}</p>
           )}
           
           {/* Contact Info */}
-          <div className="flex justify-center gap-4 text-sm text-gray-600 flex-wrap">
-            <ContactItem icon="phone" value={contact.phone} variant="inline" />
-            <ContactItem icon="email" value={contact.email} variant="inline" />
+          <div className="flex justify-center gap-x-4 gap-y-1 text-sm text-gray-600 flex-wrap">
+            <ContactItem icon="phone" value={contact.phone} variant="inline" accentColor={settings.primaryColor} />
+            <ContactItem icon="email" value={contact.email} variant="inline" accentColor={settings.primaryColor} />
             {(contact.city || contact.country) && (
               <ContactItem 
                 icon="location" 
                 value={[contact.city, contact.country].filter(Boolean).join(', ')} 
                 variant="inline" 
+                accentColor={settings.primaryColor}
               />
             )}
-          </div>
-          
-          {/* Additional Contact Info */}
-          <div className="flex justify-center gap-4 text-sm text-gray-600 flex-wrap mt-2">
-            <ContactItem icon="github" value={contact.github} variant="inline" />
-            <ContactItem icon="linkedin" value={contact.linkedin} variant="inline" />
-            <ContactItem icon="portfolio" value={contact.portfolio} variant="inline" />
-            <ContactItem icon="nationality" value={contact.nationality} variant="inline" />
-            <ContactItem icon="birthdate" value={contact.birthDate} variant="inline" />
-            <ContactItem icon="driving" value={contact.drivingLicense} variant="inline" />
+            <ContactItem icon="github" value={contact.github} variant="inline" accentColor={settings.primaryColor} />
+            <ContactItem icon="linkedin" value={contact.linkedin} variant="inline" accentColor={settings.primaryColor} />
+            <ContactItem icon="portfolio" value={contact.portfolio} variant="inline" accentColor={settings.primaryColor} />
+            <ContactItem icon="nationality" value={contact.nationality} variant="inline" accentColor={settings.primaryColor} />
+            <ContactItem icon="birthdate" value={contact.birthDate} variant="inline" accentColor={settings.primaryColor} />
+            <ContactItem icon="driving" value={contact.drivingLicense} variant="inline" accentColor={settings.primaryColor} />
           </div>
         </div>
 
         {/* Profile */}
         {profile && (
-          <div className="mb-8">
+          <div className="mb-7">
             <SectionTitle 
               titleKey="template.profile" 
               color={settings.primaryColor}
               variant="bordered"
             />
-            <p className="text-gray-700 leading-relaxed break-all">{profile}</p>
+            <p className="text-gray-700 leading-relaxed text-sm break-words">{profile}</p>
           </div>
         )}
 
         {/* Experience */}
         {experiences.length > 0 && (
-          <div className="mb-8">
+          <div className="mb-7">
             <SectionTitle 
               titleKey="template.experience" 
               color={settings.primaryColor}

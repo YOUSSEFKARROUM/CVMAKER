@@ -22,28 +22,28 @@ export const BudapestTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         <div className="flex">
           {/* Left Sidebar */}
           <div 
-            className="w-[35%] p-8 text-white min-h-[297mm]"
+            className="w-[35%] px-7 py-8 text-white min-h-[297mm]"
             style={{ backgroundColor: settings.primaryColor }}
           >
             {/* Photo */}
             {contact.photo ? (
-              <div className="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-white/30">
+              <div className="w-28 h-28 mx-auto mb-6 rounded-full overflow-hidden border-4 border-white/40 shadow-lg">
                 <img src={contact.photo} alt="Profile" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-white/20 flex items-center justify-center text-4xl font-bold">
+              <div className="w-28 h-28 mx-auto mb-6 rounded-full bg-white/25 flex items-center justify-center text-3xl font-bold border-4 border-white/30">
                 {getInitials(contact.firstName, contact.lastName)}
               </div>
             )}
 
             {/* Contact Info */}
-            <div className="mb-8">
+            <div className="mb-7">
               <SectionTitle 
                 titleKey="template.contact" 
                 variant="sidebar" 
                 className="text-white"
               />
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 <ContactItem icon="phone" value={contact.phone} variant="sidebar" />
                 <ContactItem icon="email" value={contact.email} variant="sidebar" />
                 <ContactItem 
@@ -62,7 +62,7 @@ export const BudapestTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
             {/* Skills */}
             {skills.length > 0 && (
-              <div className="mb-8">
+              <div className="mb-7">
                 <SectionTitle 
                   titleKey="template.skills" 
                   variant="sidebar" 
@@ -71,9 +71,9 @@ export const BudapestTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 <div className="space-y-3">
                   {skills.map((skill) => (
                     <div key={skill.id}>
-                      <p className="text-sm mb-1">{skill.name}</p>
+                      <p className="text-sm mb-1.5 text-white/95">{skill.name}</p>
                       {!settings.showSkillsAsTags && settings.showSkillLevels && (
-                        <div className="w-full h-1.5 bg-white/30 rounded-full overflow-hidden">
+                        <div className="w-full h-2 bg-white/25 rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-white rounded-full"
                             style={{ width: getSkillLevelWidth(skill.level) }}

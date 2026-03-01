@@ -15,28 +15,28 @@ export const BruneiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         ref={ref}
         id="cv-preview"
         data-cv-preview
-        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl p-12 ${className}`}
+        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl p-10 ${className}`}
         style={{ fontFamily: settings.bodyFont }}
       >
         {/* Header Minimalist */}
-        <div className="border-b-2 pb-6 mb-8" style={{ borderColor: settings.primaryColor }}>
-          <div className="flex items-end justify-between">
+        <div className="pb-6 mb-8 border-b" style={{ borderColor: `${settings.primaryColor}30` }}>
+          <div className="flex items-end justify-between gap-6">
             <div>
               <h1 
-                className="text-4xl font-light mb-2 tracking-wide"
+                className="text-4xl font-light mb-1.5 tracking-tight"
                 style={{ fontFamily: settings.titleFont, color: settings.primaryColor }}
               >
-                {contact.firstName.toUpperCase()} <span className="font-bold">{contact.lastName.toUpperCase()}</span>
+                {contact.firstName.toUpperCase()} <span className="font-semibold">{contact.lastName.toUpperCase()}</span>
               </h1>
               {contact.jobTitle && (
-                <p className="text-lg text-gray-500 tracking-widest uppercase">{contact.jobTitle}</p>
+                <p className="text-base text-gray-500 tracking-widest uppercase font-medium">{contact.jobTitle}</p>
               )}
             </div>
             {contact.photo && (
               <img 
                 src={contact.photo} 
                 alt="Profile" 
-                className="w-24 h-24 object-cover"
+                className="w-20 h-20 object-cover rounded-lg shadow-sm"
                 style={{ border: `2px solid ${settings.primaryColor}` }}
               />
             )}
@@ -44,60 +44,61 @@ export const BruneiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         </div>
 
         {/* Two Column Layout */}
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid grid-cols-3 gap-10">
           {/* Left Column - Contact & Skills */}
-          <div className="col-span-1">
+          <div className="col-span-1 space-y-6">
             {/* Contact */}
-            <div className="mb-6">
+            <div>
               <SectionTitle 
                 titleKey="template.contact" 
                 color={settings.primaryColor}
                 variant="underline"
                 className="text-sm uppercase tracking-wider"
               />
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {contact.email && (
-                  <ContactItem icon="email" value={contact.email} />
+                  <ContactItem icon="email" value={contact.email} accentColor={settings.primaryColor} />
                 )}
                 {contact.phone && (
-                  <ContactItem icon="phone" value={contact.phone} />
+                  <ContactItem icon="phone" value={contact.phone} accentColor={settings.primaryColor} />
                 )}
                 {(contact.city || contact.country) && (
                   <ContactItem 
                     icon="location" 
                     value={[contact.city, contact.country].filter(Boolean).join(', ')} 
+                    accentColor={settings.primaryColor}
                   />
                 )}
                 {contact.linkedin && (
-                  <ContactItem icon="linkedin" value={contact.linkedin} />
+                  <ContactItem icon="linkedin" value={contact.linkedin} accentColor={settings.primaryColor} />
                 )}
                 {contact.github && (
-                  <ContactItem icon="github" value={contact.github} />
+                  <ContactItem icon="github" value={contact.github} accentColor={settings.primaryColor} />
                 )}
                 {contact.portfolio && (
-                  <ContactItem icon="portfolio" value={contact.portfolio} />
+                  <ContactItem icon="portfolio" value={contact.portfolio} accentColor={settings.primaryColor} />
                 )}
                 {contact.nationality && (
-                  <ContactItem icon="nationality" value={contact.nationality} />
+                  <ContactItem icon="nationality" value={contact.nationality} accentColor={settings.primaryColor} />
                 )}
                 {contact.drivingLicense && (
-                  <ContactItem icon="driving" value={contact.drivingLicense} />
+                  <ContactItem icon="driving" value={contact.drivingLicense} accentColor={settings.primaryColor} />
                 )}
               </div>
             </div>
 
             {/* Skills */}
             {skills.length > 0 && (
-              <div className="mb-6">
+              <div>
                 <SectionTitle 
                   titleKey="template.skills" 
                   color={settings.primaryColor}
                   variant="underline"
                   className="text-sm uppercase tracking-wider"
                 />
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   {skills.map((skill) => (
-                    <p key={skill.id} className="text-sm text-gray-700">{skill.name}</p>
+                    <p key={skill.id} className="text-sm text-gray-700 leading-snug">{skill.name}</p>
                   ))}
                 </div>
               </div>
@@ -105,7 +106,7 @@ export const BruneiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
             {/* Languages */}
             {languages.length > 0 && (
-              <div className="mb-6">
+              <div>
                 <SectionTitle 
                   titleKey="template.languages" 
                   color={settings.primaryColor}
@@ -122,7 +123,7 @@ export const BruneiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
             {/* Certifications */}
             {certifications.length > 0 && (
-              <div className="mb-6">
+              <div>
                 <SectionTitle 
                   titleKey="template.certifications" 
                   color={settings.primaryColor}
@@ -142,7 +143,7 @@ export const BruneiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
             {/* Interests */}
             {interests.length > 0 && (
-              <div className="mb-6">
+              <div>
                 <SectionTitle 
                   titleKey="template.interests" 
                   color={settings.primaryColor}
@@ -161,7 +162,7 @@ export const BruneiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
           </div>
 
           {/* Right Column - Content */}
-          <div className="col-span-2 space-y-6">
+          <div className="col-span-2 space-y-7">
             {/* Profile */}
             {profile && (
               <div>
@@ -184,15 +185,15 @@ export const BruneiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                   variant="underline"
                   className="text-sm uppercase tracking-wider"
                 />
-                <div className="space-y-4">
+                <div className="space-y-5">
                   {experiences.map((exp) => (
-                    <div key={exp.id}>
-                      <h4 className="font-semibold text-gray-900">{exp.jobTitle}</h4>
+                    <div key={exp.id} className="border-l-2 pl-4 py-0.5" style={{ borderColor: `${settings.primaryColor}40` }}>
+                      <h4 className="font-semibold text-gray-900 text-[15px]">{exp.jobTitle}</h4>
                       <p className="text-sm text-gray-600">{exp.employer}</p>
-                      <p className="text-xs text-gray-500 mb-1">
-                        {formatDate(exp.startDate)} - {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
+                      <p className="text-xs text-gray-500 mb-1.5">
+                        {formatDate(exp.startDate)} – {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
                       </p>
-                      <p className="text-sm text-gray-700">{exp.description}</p>
+                      <p className="text-sm text-gray-700 leading-relaxed">{exp.description}</p>
                     </div>
                   ))}
                 </div>
@@ -208,10 +209,10 @@ export const BruneiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                   variant="underline"
                   className="text-sm uppercase tracking-wider"
                 />
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {educations.map((edu) => (
-                    <div key={edu.id}>
-                      <h4 className="font-semibold text-gray-900">{edu.diploma}</h4>
+                    <div key={edu.id} className="py-0.5">
+                      <h4 className="font-semibold text-gray-900 text-[15px]">{edu.diploma}</h4>
                       <p className="text-sm text-gray-600">{edu.school}</p>
                       <p className="text-xs text-gray-500">{formatDate(edu.graduationDate)}</p>
                     </div>

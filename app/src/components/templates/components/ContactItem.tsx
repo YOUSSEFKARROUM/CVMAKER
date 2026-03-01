@@ -16,6 +16,7 @@ interface ContactItemProps {
   icon: 'email' | 'phone' | 'location' | 'linkedin' | 'portfolio' | 'github' | 'nationality' | 'driving' | 'birthdate';
   value?: string;
   variant?: 'default' | 'sidebar' | 'inline';
+  accentColor?: string;
   className?: string;
 }
 
@@ -35,6 +36,7 @@ export function ContactItem({
   icon, 
   value, 
   variant = 'default',
+  accentColor,
   className = '' 
 }: ContactItemProps) {
   const Icon = iconMap[icon];
@@ -42,21 +44,26 @@ export function ContactItem({
   if (!value) return null;
 
   const variantStyles = {
-    default: 'flex items-center gap-2 text-sm',
-    sidebar: 'flex items-center gap-2 text-sm text-white',
-    inline: 'inline-flex items-center gap-1 text-sm'
+    default: 'flex items-center gap-2.5 text-sm text-gray-700',
+    sidebar: 'flex items-center gap-2.5 text-sm text-white/95',
+    inline: 'inline-flex items-center gap-1.5 text-sm text-gray-600'
   };
 
   const iconStyles = {
-    default: 'w-4 h-4 opacity-70',
-    sidebar: 'w-4 h-4 opacity-70',
-    inline: 'w-3 h-3'
+    default: 'w-4 h-4 flex-shrink-0 opacity-75',
+    sidebar: 'w-4 h-4 flex-shrink-0 opacity-90',
+    inline: 'w-3.5 h-3.5 flex-shrink-0'
   };
+
+  const iconColor = accentColor && variant !== 'sidebar' ? accentColor : undefined;
 
   return (
     <div className={`${variantStyles[variant]} ${className}`}>
-      <Icon className={iconStyles[variant]} />
-      <span className={variant === 'sidebar' ? 'break-all' : ''}>{value}</span>
+      <Icon 
+        className={iconStyles[variant]} 
+        style={iconColor ? { color: iconColor } : undefined}
+      />
+      <span className={variant === 'sidebar' ? 'break-all leading-snug' : 'leading-snug'}>{value}</span>
     </div>
   );
 }
