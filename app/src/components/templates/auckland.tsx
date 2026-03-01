@@ -28,11 +28,14 @@ export const AucklandTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         className={`bg-white w-[210mm] min-h-[297mm] shadow-xl ${className}`}
         style={{ fontFamily: settings.bodyFont }}
       >
-        {/* Name Box - Centered with black border */}
-        <div className="mx-10 mt-10 border-2 border-black px-8 py-5 text-center">
+        {/* Name Box - Centered with accent border */}
+        <div 
+          className="mx-10 mt-10 border-2 px-8 py-5 text-center"
+          style={{ borderColor: settings.primaryColor }}
+        >
           <h1 
             className="text-3xl font-bold tracking-wide"
-            style={{ fontFamily: settings.titleFont }}
+            style={{ fontFamily: settings.titleFont, color: settings.primaryColor }}
           >
             {contact.firstName} {contact.lastName}
           </h1>
@@ -45,8 +48,8 @@ export const AucklandTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             {/* Personal Info */}
             <div className="mb-6">
               <h3 
-                className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 text-black"
-                style={{ fontFamily: settings.titleFont }}
+                className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3"
+                style={{ fontFamily: settings.titleFont, color: settings.primaryColor }}
               >
                 Personnelles
               </h3>
@@ -78,15 +81,18 @@ export const AucklandTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             {interests.length > 0 && (
               <div className="mb-6">
                 <h3 
-                  className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 text-black"
-                  style={{ fontFamily: settings.titleFont }}
+                  className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3"
+                  style={{ fontFamily: settings.titleFont, color: settings.primaryColor }}
                 >
                   Intérêts
                 </h3>
                 <div className="space-y-1">
                   {interests.map((interest, idx) => (
                     <div key={idx} className="flex items-start gap-2 text-[10px] text-gray-800">
-                      <span className="inline-block w-1.5 h-1.5 bg-black mt-1.5 flex-shrink-0"></span>
+                      <span 
+                        className="inline-block w-1.5 h-1.5 mt-1.5 flex-shrink-0"
+                        style={{ backgroundColor: settings.primaryColor }}
+                      ></span>
                       <span>{interest}</span>
                     </div>
                   ))}
@@ -98,8 +104,8 @@ export const AucklandTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             {languages.length > 0 && (
               <div className="mb-6">
                 <h3 
-                  className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 text-black"
-                  style={{ fontFamily: settings.titleFont }}
+                  className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3"
+                  style={{ fontFamily: settings.titleFont, color: settings.primaryColor }}
                 >
                   Langues
                 </h3>
@@ -111,9 +117,8 @@ export const AucklandTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         {[1, 2, 3, 4, 5].map((dot) => (
                           <div 
                             key={dot} 
-                            className={`w-2 h-2 rounded-full ${
-                              dot <= getDotRating(lang.level) ? 'bg-black' : 'bg-gray-300'
-                            }`}
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: dot <= getDotRating(lang.level) ? settings.primaryColor : '#D1D5DB' }}
                           />
                         ))}
                       </div>
@@ -127,8 +132,8 @@ export const AucklandTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             {certifications.length > 0 && (
               <div className="mb-6">
                 <h3 
-                  className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 text-black"
-                  style={{ fontFamily: settings.titleFont }}
+                  className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3"
+                  style={{ fontFamily: settings.titleFont, color: settings.primaryColor }}
                 >
                   Certificats
                 </h3>
@@ -157,8 +162,8 @@ export const AucklandTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             {educations.length > 0 && (
               <div className="mb-6">
                 <h3 
-                  className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 text-black"
-                  style={{ fontFamily: settings.titleFont }}
+                  className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3"
+                  style={{ fontFamily: settings.titleFont, color: settings.primaryColor }}
                 >
                   Enseignement
                 </h3>
@@ -183,8 +188,8 @@ export const AucklandTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             {experiences.length > 0 && (
               <div className="mb-6">
                 <h3 
-                  className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 text-black"
-                  style={{ fontFamily: settings.titleFont }}
+                  className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3"
+                  style={{ fontFamily: settings.titleFont, color: settings.primaryColor }}
                 >
                   Expérience Professionnelle
                 </h3>
@@ -228,9 +233,8 @@ export const AucklandTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         {[1, 2, 3, 4, 5].map((dot) => (
                           <div 
                             key={dot} 
-                            className={`w-2 h-2 rounded-full ${
-                              dot <= getDotRating(skill.level) ? 'bg-black' : 'bg-gray-300'
-                            }`}
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: dot <= getDotRating(skill.level) ? settings.primaryColor : '#D1D5DB' }}
                           />
                         ))}
                       </div>
@@ -243,8 +247,8 @@ export const AucklandTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             {/* References at bottom */}
             <div>
               <h3 
-                className="text-[11px] font-bold uppercase tracking-[0.15em] mb-2 text-black"
-                style={{ fontFamily: settings.titleFont }}
+                className="text-[11px] font-bold uppercase tracking-[0.15em] mb-2"
+                style={{ fontFamily: settings.titleFont, color: settings.primaryColor }}
               >
                 Références
               </h3>
