@@ -230,19 +230,19 @@ export const BruneiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                   variant="underline"
                   className="text-sm uppercase tracking-wider"
                 />
-                <div className="space-y-3">
+                <div className="space-y-3 min-w-0">
                   {projects.map((proj) => (
-                    <div key={proj.id}>
-                      <div className="flex items-center gap-2 mb-1">
-                        <Folder className="w-3 h-3" style={{ color: settings.primaryColor }} />
-                        <h4 className="font-semibold text-gray-900">{proj.name}</h4>
+                    <div key={proj.id} className="min-w-0 overflow-hidden">
+                      <div className="flex items-center gap-2 mb-1 min-w-0">
+                        <Folder className="w-3 h-3 flex-shrink-0" style={{ color: settings.primaryColor }} />
+                        <h4 className="font-semibold text-gray-900 truncate">{proj.name}</h4>
                       </div>
-                      <p className="text-sm text-gray-700 mb-1">{proj.description}</p>
-                      {proj.technologies.length > 0 && (
+                      <p className="text-sm text-gray-700 mb-1 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{proj.description}</p>
+                      {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
                         <div className="flex flex-wrap gap-1">
-                          {proj.technologies.map((tech, idx) => (
-                            <span key={idx} className="text-xs text-gray-500">
-                              {tech}{idx < proj.technologies.length - 1 ? ',' : ''}
+                          {proj.technologies.slice(0, 15).map((tech, idx) => (
+                            <span key={idx} className="text-xs text-gray-500 break-all">
+                              {String(tech)}{idx < Math.min(proj.technologies.length, 15) - 1 ? ', ' : ''}
                             </span>
                           ))}
                         </div>

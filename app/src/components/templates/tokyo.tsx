@@ -152,19 +152,19 @@ export const TokyoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                   color={settings.primaryColor}
                   className="text-sm uppercase"
                 />
-                <div className="space-y-3">
+                <div className="space-y-3 min-w-0">
                   {projects.map((proj) => (
-                    <div key={proj.id}>
-                      <div className="flex items-center gap-1 mb-1">
-                        <Folder className="w-3 h-3" style={{ color: settings.primaryColor }} />
-                        <h4 className="font-semibold text-sm text-gray-900">{proj.name}</h4>
+                    <div key={proj.id} className="min-w-0 overflow-hidden">
+                      <div className="flex items-center gap-1 mb-1 min-w-0">
+                        <Folder className="w-3 h-3 flex-shrink-0" style={{ color: settings.primaryColor }} />
+                        <h4 className="font-semibold text-sm text-gray-900 truncate">{proj.name}</h4>
                       </div>
-                      <p className="text-xs text-gray-700">{proj.description}</p>
-                      {proj.technologies.length > 0 && (
+                      <p className="text-xs text-gray-700 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{proj.description}</p>
+                      {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1">
-                          {proj.technologies.map((tech, idx) => (
+                          {proj.technologies.slice(0, 15).map((tech, idx) => (
                             <span key={idx} className="text-xs px-1.5 py-0.5 bg-gray-100 rounded text-gray-600">
-                              {tech}
+                              {String(tech)}
                             </span>
                           ))}
                         </div>

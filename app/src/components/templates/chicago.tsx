@@ -180,19 +180,19 @@ export const ChicagoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               color={settings.primaryColor}
               variant="bordered"
             />
-            <div className="space-y-4">
+            <div className="space-y-4 min-w-0">
               {projects.map((proj) => (
-                <div key={proj.id}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <Folder className="w-4 h-4" style={{ color: settings.primaryColor }} />
-                    <h4 className="font-semibold text-gray-900">{proj.name}</h4>
+                <div key={proj.id} className="min-w-0 overflow-hidden">
+                  <div className="flex items-center gap-2 mb-1 min-w-0">
+                    <Folder className="w-4 h-4 flex-shrink-0" style={{ color: settings.primaryColor }} />
+                    <h4 className="font-semibold text-gray-900 truncate">{proj.name}</h4>
                   </div>
-                  <p className="text-sm text-gray-700 mb-1 break-all">{proj.description}</p>
-                  {proj.technologies.length > 0 && (
+                  <p className="text-sm text-gray-700 mb-1 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{proj.description}</p>
+                  {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
                     <div className="flex flex-wrap gap-1">
-                      {proj.technologies.map((tech, idx) => (
+                      {proj.technologies.slice(0, 15).map((tech, idx) => (
                         <span key={idx} className="text-xs px-2 py-0.5 bg-gray-100 rounded-full text-gray-600">
-                          {tech}
+                          {String(tech)}
                         </span>
                       ))}
                     </div>

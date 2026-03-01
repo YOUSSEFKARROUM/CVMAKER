@@ -198,8 +198,8 @@ export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     <div className="w-24 flex-shrink-0 text-right">
                       <Folder className="w-5 h-5 ml-auto" style={{ color: settings.primaryColor }} />
                     </div>
-                    <div className="flex-1 border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
-                      <h4 className="font-semibold text-gray-900">
+                    <div className="flex-1 min-w-0 overflow-hidden border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
+                      <h4 className="font-semibold text-gray-900 truncate">
                         {proj.name}
                         {proj.link && (
                           <a 
@@ -213,12 +213,12 @@ export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                           </a>
                         )}
                       </h4>
-                      <p className="text-sm text-gray-700 mt-1">{proj.description}</p>
-                      {proj.technologies.length > 0 && (
+                      <p className="text-sm text-gray-700 mt-1 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{proj.description}</p>
+                      {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
-                          {proj.technologies.map((tech, idx) => (
+                          {proj.technologies.slice(0, 15).map((tech, idx) => (
                             <span key={idx} className="text-xs px-2 py-0.5 bg-gray-100 rounded text-gray-600">
-                              {tech}
+                              {String(tech)}
                             </span>
                           ))}
                         </div>
