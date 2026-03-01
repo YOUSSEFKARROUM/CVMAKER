@@ -490,7 +490,8 @@
     "loginLink": "Se connecter",
     "forgotLink": "Mot de passe oublié ?",
     "backToLogin": "Retour à la connexion",
-    "serviceUnavailable": "Le service est temporairement indisponible. Veuillez réessayer plus tard."
+    "serviceUnavailable": "Le service est temporairement indisponible. Veuillez réessayer plus tard.",
+    "accountNotFullySetUp": "Votre compte a été créé mais n'est pas encore entièrement configuré côté authentification. Veuillez réessayer dans quelques instants ou contacter l'administrateur."
   },
   "cloud": {
     "save": "Sauvegarder",

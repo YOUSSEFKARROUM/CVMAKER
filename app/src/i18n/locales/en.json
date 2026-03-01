@@ -487,7 +487,8 @@
     "loginLink": "Sign in",
     "forgotLink": "Forgot password?",
     "backToLogin": "Back to sign in",
-    "serviceUnavailable": "The service is temporarily unavailable. Please try again later."
+    "serviceUnavailable": "The service is temporarily unavailable. Please try again later.",
+    "accountNotFullySetUp": "Your account has been created but is not fully configured yet on the authentication side. Please try again in a moment or contact the administrator."
   },
   "cloud": {
     "save": "Save",
