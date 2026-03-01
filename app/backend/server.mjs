@@ -125,6 +125,29 @@ app.post('/auth/register', async (req, res) => {
       });
     }
 
+    // Récupérer l'ID du nouvel utilisateur (Keycloak le renvoie dans l'en-tête Location)
+    const location = response.headers.get('Location');
+    const userId = location ? location.replace(/\/users\/?/, '').split('/').pop() : null;
+
+    if (userId) {
+      // Forcer requiredActions: [] et emailVerified: true pour éviter "Account is not fully set up"
+      const userUrl = `${KEYCLOAK_URL}/admin/realms/${KEYCLOAK_REALM}/users/${userId}`;
+      const getRes = await fetch(userUrl, { headers: { Authorization: `Bearer ${adminToken}` } });
+      if (getRes.ok) {
+        const user = await getRes.json();
+        user.requiredActions = [];
+        user.emailVerified = true;
+        await fetch(userUrl, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${adminToken}`,
+          },
+          body: JSON.stringify(user),
+        }).catch((err) => console.warn('[cv-maker-backend] User update (requiredActions) failed:', err.message));
+      }
+    }
+
     return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('[cv-maker-backend] /auth/register error:', err);
