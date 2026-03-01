@@ -125,33 +125,33 @@ app.post('/auth/register', async (req, res) => {
       });
     }
 
-    // Récupérer l'ID du nouvel utilisateur (Keycloak le renvoie dans l'en-tête Location)
+    // Récupérer l'ID du nouvel utilisateur et forcer requiredActions à vide pour éviter "Account is not fully set up"
     const location = response.headers.get('Location');
     const userId = location ? location.split('/').filter(Boolean).pop() : null;
 
     if (userId) {
       const userUrl = `${KEYCLOAK_URL}/admin/realms/${KEYCLOAK_REALM}/users/${userId}`;
-      const getRes = await fetch(userUrl, { headers: { Authorization: `Bearer ${adminToken}` } });
-      if (getRes.ok) {
-        const user = await getRes.json();
-        user.requiredActions = [];
-        user.emailVerified = true;
-        // Ne pas renvoyer credentials (GET ne les expose pas, mais on évite tout risque)
-        delete user.credentials;
-        const putRes = await fetch(userUrl, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${adminToken}`,
-          },
-          body: JSON.stringify(user),
-        });
-        if (!putRes.ok) {
-          const putBody = await putRes.text().catch(() => '');
-          console.warn('[cv-maker-backend] User update (requiredActions) failed:', putRes.status, putBody);
-        }
-      } else {
-        console.warn('[cv-maker-backend] Could not GET user after create:', getRes.status);
+      // Mise à jour minimale : uniquement les champs nécessaires pour que le compte soit "fully set up"
+      const updatePayload = {
+        username: email,
+        email,
+        emailVerified: true,
+        firstName: displayName.split(' ')[0] || '',
+        lastName: displayName.split(' ').slice(1).join(' ') || '',
+        enabled: true,
+        requiredActions: [],
+      };
+      const putRes = await fetch(userUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify(updatePayload),
+      });
+      if (!putRes.ok) {
+        const putBody = await putRes.text().catch(() => '');
+        console.warn('[cv-maker-backend] User update (requiredActions) failed:', putRes.status, putBody);
       }
     } else {
       console.warn('[cv-maker-backend] No Location header, cannot clear requiredActions for new user');
