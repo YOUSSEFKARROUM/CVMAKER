@@ -22,7 +22,7 @@ export async function exportCVToPDF(
   element: HTMLElement,
   filename: string
 ): Promise<void> {
-  // Attendre que tout soit chargé
+  // Attendre polices et rendu
   await document.fonts.ready;
   await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -31,7 +31,6 @@ export async function exportCVToPDF(
   const pageWidth = dims.width;  // 210mm
   const pageHeight = dims.height; // 297mm
 
-  // Sauvegarder les styles et classes originaux
   const originalStyles = {
     width: element.style.width,
     height: element.style.height,
@@ -42,30 +41,28 @@ export async function exportCVToPDF(
     position: element.style.position,
     left: element.style.left,
     top: element.style.top,
-    margin: element.style.margin,
-    padding: element.style.padding,
+    overflow: element.style.overflow,
+    overflowX: element.style.overflowX,
+    overflowY: element.style.overflowY,
   };
   const hadPdfExportClass = element.classList.contains('pdf-export-mode');
 
   try {
-    // 1. Préparer l'élément pour une capture parfaite
-    // Ajouter classe pour styles PDF
     element.classList.add('pdf-export-mode');
-    
-    // Forcer une taille fixe exactement A4 pour le rendu
     element.style.width = '210mm';
     element.style.maxWidth = '210mm';
     element.style.height = 'auto';
     element.style.maxHeight = 'none';
-    element.style.margin = '0';
-    element.style.padding = '0';
     element.style.transform = 'none';
     element.style.position = 'relative';
     element.style.left = '0';
     element.style.top = '0';
+    // Éviter que overflow-hidden sur la racine ne coupe le contenu en PDF
+    element.style.overflow = 'visible';
+    element.style.overflowX = 'visible';
+    element.style.overflowY = 'visible';
 
-    // Attendre le rendu
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise(resolve => setTimeout(resolve, 400));
 
     // 2. Capturer avec html2canvas
     // Utiliser un scale élevé pour la qualité, mais nous réduirons ensuite
@@ -149,7 +146,6 @@ export async function exportCVToPDF(
     pdf.save(filename);
 
   } finally {
-    // Toujours restaurer les styles et classes originaux
     if (!hadPdfExportClass) {
       element.classList.remove('pdf-export-mode');
     }
@@ -162,8 +158,9 @@ export async function exportCVToPDF(
     element.style.position = originalStyles.position;
     element.style.left = originalStyles.left;
     element.style.top = originalStyles.top;
-    element.style.margin = originalStyles.margin;
-    element.style.padding = originalStyles.padding;
+    element.style.overflow = originalStyles.overflow;
+    element.style.overflowX = originalStyles.overflowX;
+    element.style.overflowY = originalStyles.overflowY;
   }
 }
 
