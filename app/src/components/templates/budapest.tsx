@@ -2,7 +2,7 @@ import { forwardRef } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { TemplateProps } from './types';
-import { getInitials, getSkillLevelWidth, formatDate } from './utils';
+import { getInitials, getSkillLevelWidth, formatDate, getOrderedSections, type LayoutSectionId } from './utils';
 import { SectionTitle } from './components/SectionTitle';
 import { ContactItem } from './components/ContactItem';
 
@@ -10,6 +10,8 @@ export const BudapestTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
     const { t } = useTranslation();
     const { contact, experiences, educations, skills, profile, languages, interests, certifications, projects } = cvData;
+    const mainIds: LayoutSectionId[] = ['profile', 'experience', 'education', 'certifications', 'projects'];
+    const orderedSections = getOrderedSections(settings).filter((id) => mainIds.includes(id));
 
     return (
       <div 
@@ -187,127 +189,111 @@ export const BudapestTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               )}
             </div>
 
-            {/* Profile */}
-            {profile && (
-              <div className="mb-8">
-                <SectionTitle 
-                  titleKey="template.profile" 
-                  variant="underline" 
-                  color={settings.primaryColor}
-                />
-                <p className="text-gray-700 leading-relaxed">{profile}</p>
-              </div>
-            )}
-
-            {/* Experience */}
-            {experiences.length > 0 && (
-              <div className="mb-8">
-                <SectionTitle 
-                  titleKey="template.experience" 
-                  variant="underline" 
-                  color={settings.primaryColor}
-                />
-                <div className="space-y-5 min-w-0">
-                  {experiences.map((exp) => (
-                    <div key={exp.id} className="min-w-0">
-                      <div className="flex justify-between items-start gap-2 mb-1 min-w-0">
-                        <h4 className="font-semibold text-gray-900 break-words min-w-0">{exp.jobTitle}</h4>
-                        <span className="text-sm text-gray-500 flex-shrink-0">
-                          {formatDate(exp.startDate)} - {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
-                        </span>
-                      </div>
-                      <p className="text-gray-600 mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
-                      {exp.description && (
-                        <p className="text-sm text-gray-700 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Education */}
-            {educations.length > 0 && (
-              <div className="mb-8">
-                <SectionTitle 
-                  titleKey="template.education" 
-                  variant="underline" 
-                  color={settings.primaryColor}
-                />
-                <div className="space-y-4 min-w-0">
-                  {educations.map((edu) => (
-                    <div key={edu.id} className="min-w-0">
-                      <div className="flex justify-between items-start gap-2 mb-1 min-w-0">
-                        <h4 className="font-semibold text-gray-900 break-words min-w-0">{edu.diploma}</h4>
-                        <span className="text-sm text-gray-500 flex-shrink-0">{formatDate(edu.graduationDate)}</span>
-                      </div>
-                      <p className="text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city && `, ${edu.city}`}</p>
-                      {edu.description && (
-                        <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Certifications */}
-            {certifications.length > 0 && (
-              <div className="mb-8">
-                <SectionTitle 
-                  titleKey="template.certifications" 
-                  variant="underline" 
-                  color={settings.primaryColor}
-                />
-                <div className="space-y-4">
-                  {certifications.map((cert) => (
-                    <div key={cert.id}>
-                      <div className="flex justify-between items-start mb-1">
-                        <h4 className="font-semibold text-gray-900">{cert.name}</h4>
-                        <span className="text-sm text-gray-500">{formatDate(cert.date)}</span>
-                      </div>
-                      <p className="text-gray-600">{cert.organization}</p>
-                      {cert.credentialId && (
-                        <p className="text-xs text-gray-500">ID: {cert.credentialId}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Projects */}
-            {projects.length > 0 && (
-              <div>
-                <SectionTitle 
-                  titleKey="template.projects" 
-                  variant="underline" 
-                  color={settings.primaryColor}
-                />
-                <div className="space-y-4 min-w-0">
-                  {projects.map((proj) => (
-                    <div key={proj.id} className="min-w-0 overflow-hidden">
-                      <div className="flex items-center gap-2 mb-1 min-w-0">
-                        <h4 className="font-semibold text-gray-900 truncate">{proj.name}</h4>
-                        {proj.link && (
-                          <ExternalLink className="w-3 h-3 flex-shrink-0 text-gray-400" />
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-700 mb-1 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{proj.description}</p>
-                      {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {proj.technologies.slice(0, 15).map((tech, idx) => (
-                            <span key={idx} className="text-xs px-2 py-0.5 bg-gray-100 rounded text-gray-600">
-                              {String(tech)}
+            {orderedSections.map((section) => {
+              if (section === 'profile' && profile) {
+                return (
+                  <div className="mb-8" key="profile">
+                    <SectionTitle titleKey="template.profile" variant="underline" color={settings.primaryColor} />
+                    <p className="text-gray-700 leading-relaxed">{profile}</p>
+                  </div>
+                );
+              }
+              if (section === 'experience' && experiences.length > 0) {
+                return (
+                  <div className="mb-8" key="experience">
+                    <SectionTitle titleKey="template.experience" variant="underline" color={settings.primaryColor} />
+                    <div className="space-y-5 min-w-0">
+                      {experiences.map((exp) => (
+                        <div key={exp.id} className="min-w-0">
+                          <div className="flex justify-between items-start gap-2 mb-1 min-w-0">
+                            <h4 className="font-semibold text-gray-900 break-words min-w-0">{exp.jobTitle}</h4>
+                            <span className="text-sm text-gray-500 flex-shrink-0">
+                              {formatDate(exp.startDate)} - {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
                             </span>
-                          ))}
+                          </div>
+                          <p className="text-gray-600 mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
+                          {exp.description && (
+                            <p className="text-sm text-gray-700 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
+                          )}
                         </div>
-                      )}
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                  </div>
+                );
+              }
+              if (section === 'education' && educations.length > 0) {
+                return (
+                  <div className="mb-8" key="education">
+                    <SectionTitle titleKey="template.education" variant="underline" color={settings.primaryColor} />
+                    <div className="space-y-4 min-w-0">
+                      {educations.map((edu) => (
+                        <div key={edu.id} className="min-w-0">
+                          <div className="flex justify-between items-start gap-2 mb-1 min-w-0">
+                            <h4 className="font-semibold text-gray-900 break-words min-w-0">{edu.diploma}</h4>
+                            <span className="text-sm text-gray-500 flex-shrink-0">{formatDate(edu.graduationDate)}</span>
+                          </div>
+                          <p className="text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city && `, ${edu.city}`}</p>
+                          {edu.description && (
+                            <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+              if (section === 'certifications' && certifications.length > 0) {
+                return (
+                  <div className="mb-8" key="certifications">
+                    <SectionTitle titleKey="template.certifications" variant="underline" color={settings.primaryColor} />
+                    <div className="space-y-4">
+                      {certifications.map((cert) => (
+                        <div key={cert.id}>
+                          <div className="flex justify-between items-start mb-1">
+                            <h4 className="font-semibold text-gray-900">{cert.name}</h4>
+                            <span className="text-sm text-gray-500">{formatDate(cert.date)}</span>
+                          </div>
+                          <p className="text-gray-600">{cert.organization}</p>
+                          {cert.credentialId && (
+                            <p className="text-xs text-gray-500">ID: {cert.credentialId}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+              if (section === 'projects' && projects.length > 0) {
+                return (
+                  <div key="projects">
+                    <SectionTitle titleKey="template.projects" variant="underline" color={settings.primaryColor} />
+                    <div className="space-y-4 min-w-0">
+                      {projects.map((proj) => (
+                        <div key={proj.id} className="min-w-0 overflow-hidden">
+                          <div className="flex items-center gap-2 mb-1 min-w-0">
+                            <h4 className="font-semibold text-gray-900 truncate">{proj.name}</h4>
+                            {proj.link && (
+                              <ExternalLink className="w-3 h-3 flex-shrink-0 text-gray-400" />
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-700 mb-1 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{proj.description}</p>
+                          {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {proj.technologies.slice(0, 15).map((tech, idx) => (
+                                <span key={idx} className="text-xs px-2 py-0.5 bg-gray-100 rounded text-gray-600">
+                                  {String(tech)}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })}
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { MapPin, Phone, Mail } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { formatDate } from './utils';
+import { formatDate, getOrderedSections, type LayoutSectionId } from './utils';
 
 // Helper to convert skill level to French text
 const getSkillLevelText = (level: string): string => {
@@ -17,6 +17,8 @@ const getSkillLevelText = (level: string): string => {
 export const OtagoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
     const { contact, experiences, educations, skills, profile, languages, interests } = cvData;
+    const mainIds: LayoutSectionId[] = ['profile', 'experience', 'education'];
+    const orderedSections = getOrderedSections(settings).filter((id) => mainIds.includes(id));
 
     // Helper to safely access optional contact fields
     const getContactField = (field: string): string | undefined => {
@@ -122,60 +124,60 @@ export const OtagoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
           </div>
         </div>
 
-        {/* Profile - Italic style */}
-        {profile && (
-          <div className="mb-8">
-            <p className="text-sm text-gray-700 leading-relaxed italic">{profile}</p>
-          </div>
-        )}
-
-        {/* Education Section */}
-        {educations.length > 0 && (
-          <div className="mb-8">
-            <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b border-gray-300 pb-1">
-              Enseignement
-            </h3>
-            <div className="space-y-4">
-              {educations.map((edu) => (
-                <div key={edu.id} className="flex justify-between items-start gap-2 min-w-0">
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-sm text-gray-900 break-words">{edu.diploma}</h4>
-                    <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city && `, ${edu.city}`}</p>
-                    {edu.description && (
-                      <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
-                    )}
-                  </div>
-                  <span className="text-xs text-gray-500 whitespace-nowrap flex-shrink-0">{formatDate(edu.graduationDate)}</span>
+        {orderedSections.map((section) => {
+          if (section === 'profile' && profile) {
+            return (
+              <div className="mb-8" key="profile">
+                <p className="text-sm text-gray-700 leading-relaxed italic">{profile}</p>
+              </div>
+            );
+          }
+          if (section === 'education' && educations.length > 0) {
+            return (
+              <div className="mb-8" key="education">
+                <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b border-gray-300 pb-1">Enseignement</h3>
+                <div className="space-y-4">
+                  {educations.map((edu) => (
+                    <div key={edu.id} className="flex justify-between items-start gap-2 min-w-0">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-sm text-gray-900 break-words">{edu.diploma}</h4>
+                        <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city && `, ${edu.city}`}</p>
+                        {edu.description && (
+                          <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-500 whitespace-nowrap flex-shrink-0">{formatDate(edu.graduationDate)}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Experience Section */}
-        {experiences.length > 0 && (
-          <div className="mb-8">
-            <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b border-gray-300 pb-1">
-              Expérience professionnelle
-            </h3>
-            <div className="space-y-5">
-              {experiences.map((exp) => (
-                <div key={exp.id} className="flex justify-between items-start gap-2 min-w-0">
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-sm text-gray-900 break-words">{exp.jobTitle}</h4>
-                    <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
-                    {exp.description && (
-                      <p className="text-xs text-gray-700 leading-relaxed mt-1 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
-                    )}
-                  </div>
-                  <span className="text-xs text-gray-500 whitespace-nowrap flex-shrink-0">
-                    {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
-                  </span>
+              </div>
+            );
+          }
+          if (section === 'experience' && experiences.length > 0) {
+            return (
+              <div className="mb-8" key="experience">
+                <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b border-gray-300 pb-1">Expérience professionnelle</h3>
+                <div className="space-y-5">
+                  {experiences.map((exp) => (
+                    <div key={exp.id} className="flex justify-between items-start gap-2 min-w-0">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-sm text-gray-900 break-words">{exp.jobTitle}</h4>
+                        <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
+                        {exp.description && (
+                          <p className="text-xs text-gray-700 leading-relaxed mt-1 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-500 whitespace-nowrap flex-shrink-0">
+                        {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+              </div>
+            );
+          }
+          return null;
+        })}
 
         {/* Skills Section - with text level indicators */}
         {skills.length > 0 && (

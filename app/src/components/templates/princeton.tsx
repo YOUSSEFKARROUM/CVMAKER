@@ -1,10 +1,12 @@
 import { forwardRef } from 'react';
 import type { TemplateProps } from './types';
-import { getInitials, formatDate } from './utils';
+import { getInitials, formatDate, getOrderedSections, type LayoutSectionId } from './utils';
 
 export const PrincetonTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
     const { contact, experiences, educations, skills, profile, languages, interests, certifications } = cvData;
+    const mainIds: LayoutSectionId[] = ['profile', 'experience', 'education', 'certifications'];
+    const orderedSections = getOrderedSections(settings).filter((id) => mainIds.includes(id));
 
     // Helper to format date range for experience
     const formatDateRange = (startDate: string, endDate: string | null, currentlyWorking: boolean) => {
@@ -42,13 +44,6 @@ export const PrincetonTemplate = forwardRef<HTMLDivElement, TemplateProps>(
           )}
           <h1 className="text-lg font-bold text-gray-900 uppercase tracking-wide">Curriculum vitae</h1>
         </div>
-
-        {/* Profile paragraph below the header */}
-        {profile && (
-          <div className="mb-6">
-            <p className="text-sm text-gray-800 leading-relaxed text-justify">{profile}</p>
-          </div>
-        )}
 
         <hr className="border-gray-400 mb-6" />
 
@@ -95,58 +90,82 @@ export const PrincetonTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
         <hr className="border-gray-400 mb-6" />
 
-        {/* ENSEIGNEMENT - dates left, content right */}
-        {educations.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-xs font-bold uppercase tracking-wider mb-4 text-gray-900">Enseignement</h2>
-            <div className="space-y-4">
-              {educations.map((edu) => (
-                <div key={edu.id} className="grid grid-cols-[120px_1fr] gap-4">
-                  <div className="text-sm text-gray-800 flex-shrink-0">
-                    {edu.graduationDate ? formatDate(edu.graduationDate) : '-'}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm text-gray-800 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.diploma}{edu.school ? `, ${edu.school}` : ''}{edu.city ? `, ${edu.city}` : ''}</p>
-                    {edu.description && (
-                      <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
-                    )}
-                  </div>
+        {/* Ordered sections: profile, experience, education, certifications */}
+        {orderedSections.map((section) => {
+          if (section === 'profile' && profile) {
+            return (
+              <div key="profile" className="mb-6">
+                <p className="text-sm text-gray-800 leading-relaxed text-justify">{profile}</p>
+              </div>
+            );
+          }
+          if (section === 'education' && educations.length > 0) {
+            return (
+              <div key="education" className="mb-6">
+                <h2 className="text-xs font-bold uppercase tracking-wider mb-4 text-gray-900">Enseignement</h2>
+                <div className="space-y-4">
+                  {educations.map((edu) => (
+                    <div key={edu.id} className="grid grid-cols-[120px_1fr] gap-4">
+                      <div className="text-sm text-gray-800 flex-shrink-0">
+                        {edu.graduationDate ? formatDate(edu.graduationDate) : '-'}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm text-gray-800 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.diploma}{edu.school ? `, ${edu.school}` : ''}{edu.city ? `, ${edu.city}` : ''}</p>
+                        {edu.description && (
+                          <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {educations.length > 0 && <hr className="border-gray-400 mb-6" />}
-
-        {/* EXPÉRIENCE PROFESSIONNELLE - Date range left, job title/company/bullets right */}
-        {experiences.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-xs font-bold uppercase tracking-wider mb-4 text-gray-900">Expérience professionnelle</h2>
-            <div className="space-y-5">
-              {experiences.map((exp) => (
-                <div key={exp.id} className="grid grid-cols-[120px_1fr] gap-4">
-                  <div className="text-sm text-gray-800 flex-shrink-0">
-                    {formatDateRange(exp.startDate, exp.endDate, exp.currentlyWorking)}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.jobTitle}</p>
-                    <p className="text-sm text-gray-700 italic mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city ? `, ${exp.city}` : ''}</p>
-                    {exp.description && (
-                      <ul className="text-sm text-gray-800 list-disc list-inside space-y-0.5 break-words" style={{ overflowWrap: 'anywhere' }}>
-                        {exp.description.split('\n').filter(line => line.trim()).map((line, idx) => (
-                          <li key={idx}>{line.trim().replace(/^[-•]\s*/, '')}</li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
+              </div>
+            );
+          }
+          if (section === 'experience' && experiences.length > 0) {
+            return (
+              <div key="experience" className="mb-6">
+                <h2 className="text-xs font-bold uppercase tracking-wider mb-4 text-gray-900">Expérience professionnelle</h2>
+                <div className="space-y-5">
+                  {experiences.map((exp) => (
+                    <div key={exp.id} className="grid grid-cols-[120px_1fr] gap-4">
+                      <div className="text-sm text-gray-800 flex-shrink-0">
+                        {formatDateRange(exp.startDate, exp.endDate, exp.currentlyWorking)}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.jobTitle}</p>
+                        <p className="text-sm text-gray-700 italic mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city ? `, ${exp.city}` : ''}</p>
+                        {exp.description && (
+                          <ul className="text-sm text-gray-800 list-disc list-inside space-y-0.5 break-words" style={{ overflowWrap: 'anywhere' }}>
+                            {exp.description.split('\n').filter(line => line.trim()).map((line, idx) => (
+                              <li key={idx}>{line.trim().replace(/^[-•]\s*/, '')}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+              </div>
+            );
+          }
+          if (section === 'certifications' && certifications.length > 0) {
+            return (
+              <div key="certifications" className="mb-6">
+                <h2 className="text-xs font-bold uppercase tracking-wider mb-4 text-gray-900">Certifications</h2>
+                <div className="space-y-2">
+                  {certifications.map((cert) => (
+                    <div key={cert.id} className="text-sm text-gray-800">
+                      {cert.name}{cert.organization ? ` - ${cert.organization}` : ''}{cert.date ? ` (${formatDate(cert.date)})` : ''}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          }
+          return null;
+        })}
 
-        {experiences.length > 0 && <hr className="border-gray-400 mb-6" />}
+        {orderedSections.length > 0 && <hr className="border-gray-400 mb-6" />}
 
         {/* COMPÉTENCES */}
         {skills.length > 0 && (
@@ -176,22 +195,6 @@ export const PrincetonTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         )}
 
         {languages.length > 0 && <hr className="border-gray-400 mb-6" />}
-
-        {/* CERTIFICATIONS */}
-        {certifications.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-xs font-bold uppercase tracking-wider mb-4 text-gray-900">Certifications</h2>
-            <div className="space-y-2">
-              {certifications.map((cert) => (
-                <div key={cert.id} className="text-sm text-gray-800">
-                  {cert.name}{cert.organization ? ` - ${cert.organization}` : ''}{cert.date ? ` (${formatDate(cert.date)})` : ''}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {certifications.length > 0 && <hr className="border-gray-400 mb-6" />}
 
         {/* INTÉRÊTS */}
         {interests.length > 0 && (

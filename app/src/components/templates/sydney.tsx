@@ -2,7 +2,7 @@ import { forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Award, Folder, Flag } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { getInitials, formatDate } from './utils';
+import { getInitials, formatDate, getOrderedSections, type LayoutSectionId } from './utils';
 import { SectionTitle } from './components/SectionTitle';
 import { ContactItem } from './components/ContactItem';
 
@@ -20,6 +20,7 @@ export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
       projects, 
       interests 
     } = cvData;
+    const orderedSections = getOrderedSections(settings);
 
     return (
       <div 
@@ -94,146 +95,141 @@ export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
         {/* Content */}
         <div className="max-w-2xl mx-auto space-y-8">
-          {profile && (
-            <div className="text-center">
-              <p className="text-gray-700 italic">{profile}</p>
-            </div>
-          )}
-
-          {experiences.length > 0 && (
-            <div>
-              <SectionTitle 
-                titleKey="template.experience" 
-                color={settings.primaryColor}
-                variant="bordered"
-                className="text-center"
-              />
-              <div className="space-y-6">
-                {experiences.map((exp) => (
-                  <div key={exp.id} className="flex gap-4 min-w-0">
-                    <div className="w-24 flex-shrink-0 text-right">
-                      <p className="text-sm text-gray-500">
-                        {formatDate(exp.startDate)}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                          {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
-                      </p>
-                    </div>
-                    <div className="flex-1 min-w-0 pb-6 border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
-                      <h4 className="font-semibold text-gray-900 break-words">{exp.jobTitle}</h4>
-                      <p className="text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
-                      {exp.description && (
-                        <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {educations.length > 0 && (
-            <div>
-              <SectionTitle 
-                titleKey="template.education" 
-                color={settings.primaryColor}
-                variant="bordered"
-                className="text-center"
-              />
-              <div className="space-y-4">
-                {educations.map((edu) => (
-                  <div key={edu.id} className="flex gap-4 min-w-0">
-                    <div className="w-24 flex-shrink-0 text-right">
-                      <p className="text-sm text-gray-500">{formatDate(edu.graduationDate)}</p>
-                    </div>
-                    <div className="flex-1 min-w-0 border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
-                      <h4 className="font-semibold text-gray-900 break-words">{edu.diploma}</h4>
-                      <p className="text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city ? `, ${edu.city}` : ''}</p>
-                      {edu.description && (
-                        <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {certifications.length > 0 && (
-            <div>
-              <SectionTitle 
-                titleKey="template.certifications" 
-                color={settings.primaryColor}
-                variant="bordered"
-                className="text-center"
-              />
-              <div className="space-y-4">
-                {certifications.map((cert) => (
-                  <div key={cert.id} className="flex gap-4">
-                    <div className="w-24 flex-shrink-0 text-right">
-                      <p className="text-sm text-gray-500">{formatDate(cert.date)}</p>
-                    </div>
-                    <div className="flex-1 border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
-                      <div className="flex items-center gap-2">
-                        <Award className="w-4 h-4" style={{ color: settings.primaryColor }} />
-                        <h4 className="font-semibold text-gray-900">{cert.name}</h4>
-                      </div>
-                      <p className="text-gray-600">{cert.organization}</p>
-                      {cert.credentialId && (
-                        <p className="text-xs text-gray-500">ID: {cert.credentialId}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {projects.length > 0 && (
-            <div>
-              <SectionTitle 
-                titleKey="template.projects" 
-                color={settings.primaryColor}
-                variant="bordered"
-                className="text-center"
-              />
-              <div className="space-y-4">
-                {projects.map((proj) => (
-                  <div key={proj.id} className="flex gap-4">
-                    <div className="w-24 flex-shrink-0 text-right">
-                      <Folder className="w-5 h-5 ml-auto" style={{ color: settings.primaryColor }} />
-                    </div>
-                    <div className="flex-1 min-w-0 overflow-hidden border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
-                      <h4 className="font-semibold text-gray-900 truncate">
-                        {proj.name}
-                        {proj.link && (
-                          <a 
-                            href={proj.link} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-xs ml-2 break-all"
-                            style={{ color: settings.primaryColor }}
-                          >
-                            {proj.link}
-                          </a>
-                        )}
-                      </h4>
-                      <p className="text-sm text-gray-700 mt-1 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{proj.description}</p>
-                      {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {proj.technologies.slice(0, 15).map((tech, idx) => (
-                            <span key={idx} className="text-xs px-2 py-0.5 bg-gray-100 rounded text-gray-600">
-                              {String(tech)}
-                            </span>
-                          ))}
+          {orderedSections.map((section) => {
+            if (section === 'profile' && profile) {
+              return (
+                <div key="profile" className="text-center">
+                  <p className="text-gray-700 italic">{profile}</p>
+                </div>
+              );
+            }
+            if (section === 'experience' && experiences.length > 0) {
+              return (
+                <div key="experience">
+                  <SectionTitle titleKey="template.experience" color={settings.primaryColor} variant="bordered" className="text-center" />
+                  <div className="space-y-6">
+                    {experiences.map((exp) => (
+                      <div key={exp.id} className="flex gap-4 min-w-0">
+                        <div className="w-24 flex-shrink-0 text-right">
+                          <p className="text-sm text-gray-500">{formatDate(exp.startDate)}</p>
+                          <p className="text-sm text-gray-500">{exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}</p>
                         </div>
-                      )}
-                    </div>
+                        <div className="flex-1 min-w-0 pb-6 border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
+                          <h4 className="font-semibold text-gray-900 break-words">{exp.jobTitle}</h4>
+                          <p className="text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
+                          {exp.description && (
+                            <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
+                </div>
+              );
+            }
+            if (section === 'education' && educations.length > 0) {
+              return (
+                <div key="education">
+                  <SectionTitle titleKey="template.education" color={settings.primaryColor} variant="bordered" className="text-center" />
+                  <div className="space-y-4">
+                    {educations.map((edu) => (
+                      <div key={edu.id} className="flex gap-4 min-w-0">
+                        <div className="w-24 flex-shrink-0 text-right">
+                          <p className="text-sm text-gray-500">{formatDate(edu.graduationDate)}</p>
+                        </div>
+                        <div className="flex-1 min-w-0 border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
+                          <h4 className="font-semibold text-gray-900 break-words">{edu.diploma}</h4>
+                          <p className="text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city ? `, ${edu.city}` : ''}</p>
+                          {edu.description && (
+                            <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            if (section === 'certifications' && certifications.length > 0) {
+              return (
+                <div key="certifications">
+                  <SectionTitle titleKey="template.certifications" color={settings.primaryColor} variant="bordered" className="text-center" />
+                  <div className="space-y-4">
+                    {certifications.map((cert) => (
+                      <div key={cert.id} className="flex gap-4">
+                        <div className="w-24 flex-shrink-0 text-right">
+                          <p className="text-sm text-gray-500">{formatDate(cert.date)}</p>
+                        </div>
+                        <div className="flex-1 border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
+                          <div className="flex items-center gap-2">
+                            <Award className="w-4 h-4" style={{ color: settings.primaryColor }} />
+                            <h4 className="font-semibold text-gray-900">{cert.name}</h4>
+                          </div>
+                          <p className="text-gray-600">{cert.organization}</p>
+                          {cert.credentialId && (
+                            <p className="text-xs text-gray-500">ID: {cert.credentialId}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            if (section === 'projects' && projects.length > 0) {
+              return (
+                <div key="projects">
+                  <SectionTitle titleKey="template.projects" color={settings.primaryColor} variant="bordered" className="text-center" />
+                  <div className="space-y-4">
+                    {projects.map((proj) => (
+                      <div key={proj.id} className="flex gap-4">
+                        <div className="w-24 flex-shrink-0 text-right">
+                          <Folder className="w-5 h-5 ml-auto" style={{ color: settings.primaryColor }} />
+                        </div>
+                        <div className="flex-1 min-w-0 overflow-hidden border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
+                          <h4 className="font-semibold text-gray-900 truncate">
+                            {proj.name}
+                            {proj.link && (
+                              <a href={proj.link} target="_blank" rel="noopener noreferrer" className="text-xs ml-2 break-all" style={{ color: settings.primaryColor }}>
+                                {proj.link}
+                              </a>
+                            )}
+                          </h4>
+                          <p className="text-sm text-gray-700 mt-1 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{proj.description}</p>
+                          {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {proj.technologies.slice(0, 15).map((tech, idx) => (
+                                <span key={idx} className="text-xs px-2 py-0.5 bg-gray-100 rounded text-gray-600">
+                                  {String(tech)}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            if (section === 'languages' && languages.length > 0) {
+              return (
+                <div key="languages">
+                  <SectionTitle titleKey="template.languages" color={settings.primaryColor} variant="bordered" className="text-center" />
+                  <div className="flex flex-wrap justify-center gap-4">
+                    {languages.map((lang) => (
+                      <div key={lang.id} className="flex items-center gap-2">
+                        <Flag className="w-4 h-4" style={{ color: settings.primaryColor }} />
+                        <span className="text-sm text-gray-700">{lang.name}</span>
+                        <span className="text-xs text-gray-500">({t(`languages.levels.${lang.level}`)})</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          })}
 
           {skills.length > 0 && (
             <div>
@@ -252,26 +248,6 @@ export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                   >
                     {skill.name}
                   </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {languages.length > 0 && (
-            <div>
-              <SectionTitle 
-                titleKey="template.languages" 
-                color={settings.primaryColor}
-                variant="bordered"
-                className="text-center"
-              />
-              <div className="flex flex-wrap justify-center gap-4">
-                {languages.map((lang) => (
-                  <div key={lang.id} className="flex items-center gap-2">
-                    <Flag className="w-4 h-4" style={{ color: settings.primaryColor }} />
-                    <span className="text-sm text-gray-700">{lang.name}</span>
-                    <span className="text-xs text-gray-500">({t(`languages.levels.${lang.level}`)})</span>
-                  </div>
                 ))}
               </div>
             </div>

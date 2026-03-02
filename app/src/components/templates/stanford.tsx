@@ -1,11 +1,13 @@
 import { forwardRef } from 'react';
 import { MapPin, Phone, Mail, Linkedin, Globe, Github, Flag, Car } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { getInitials, getSkillLevelWidth, formatDate } from './utils';
+import { getInitials, getSkillLevelWidth, formatDate, getOrderedSections, type LayoutSectionId } from './utils';
 
 export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
     const { contact, experiences, educations, skills, profile, languages, interests, certifications } = cvData;
+    const mainIds: LayoutSectionId[] = ['profile', 'experience', 'education', 'certifications'];
+    const orderedSections = getOrderedSections(settings).filter((id) => mainIds.includes(id));
 
     // Helper function to get language level text
     const getLanguageLevelText = (level: string) => {
@@ -170,67 +172,83 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
           {/* Main Content - White */}
           <div className="w-[68%] p-8">
-            {/* Profile */}
-            {profile && (
-              <div className="mb-6">
-                <p className="text-sm text-gray-700 leading-relaxed">{profile}</p>
-              </div>
-            )}
-
-            {/* Education - Enseignement */}
-            {educations.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">
-                  Enseignement
-                </h3>
-                <div className="space-y-3">
-                  {educations.map((edu) => (
-                    <div key={edu.id}>
-                      <div className="flex justify-between items-start mb-1">
-                        <h4 className="font-semibold text-sm text-gray-900">{edu.diploma}</h4>
-                        <span className="text-xs text-gray-500">{formatDate(edu.graduationDate)}</span>
-                      </div>
-                      <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city && `, ${edu.city}`}</p>
-                      {edu.description && (
-                        <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
-                      )}
+            {orderedSections.map((section) => {
+              if (section === 'profile' && profile) {
+                return (
+                  <div className="mb-6" key="profile">
+                    <p className="text-sm text-gray-700 leading-relaxed">{profile}</p>
+                  </div>
+                );
+              }
+              if (section === 'education' && educations.length > 0) {
+                return (
+                  <div className="mb-6" key="education">
+                    <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">Enseignement</h3>
+                    <div className="space-y-3">
+                      {educations.map((edu) => (
+                        <div key={edu.id}>
+                          <div className="flex justify-between items-start mb-1">
+                            <h4 className="font-semibold text-sm text-gray-900">{edu.diploma}</h4>
+                            <span className="text-xs text-gray-500">{formatDate(edu.graduationDate)}</span>
+                          </div>
+                          <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city && `, ${edu.city}`}</p>
+                          {edu.description && (
+                            <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Experience - Expérience professionnelle */}
-            {experiences.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">
-                  Expérience professionnelle
-                </h3>
-                <div className="space-y-4">
-                  {experiences.map((exp) => (
-                    <div key={exp.id}>
-                      <div className="flex justify-between items-start mb-1">
-                        <h4 className="font-semibold text-sm text-gray-900">{exp.jobTitle}</h4>
-                        <span className="text-xs text-gray-500">
-                          {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-600 mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
-                      {exp.description && (
-                        <p className="text-xs text-gray-700 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
-                      )}
+                  </div>
+                );
+              }
+              if (section === 'experience' && experiences.length > 0) {
+                return (
+                  <div className="mb-6" key="experience">
+                    <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">Expérience professionnelle</h3>
+                    <div className="space-y-4">
+                      {experiences.map((exp) => (
+                        <div key={exp.id}>
+                          <div className="flex justify-between items-start mb-1">
+                            <h4 className="font-semibold text-sm text-gray-900">{exp.jobTitle}</h4>
+                            <span className="text-xs text-gray-500">
+                              {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-600 mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
+                          {exp.description && (
+                            <p className="text-xs text-gray-700 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                  </div>
+                );
+              }
+              if (section === 'certifications' && certifications.length > 0) {
+                return (
+                  <div className="mb-6" key="certifications">
+                    <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">Certificats</h3>
+                    <div className="space-y-2">
+                      {certifications.map((cert) => (
+                        <div key={cert.id} className="flex justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{cert.name}</p>
+                            <p className="text-xs text-gray-600">{cert.organization}</p>
+                          </div>
+                          <span className="text-xs text-gray-500">{formatDate(cert.date)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })}
 
-            {/* Skills repeated in main content with bar charts */}
+            {/* Skills repeated in main content with bar charts - fixed */}
             {skills.length > 0 && !settings.showSkillsAsTags && (
               <div className="mb-6">
-                <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">
-                  Compétences
-                </h3>
+                <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">Compétences</h3>
                 <div className="space-y-3">
                   {skills.map((skill) => (
                     <div key={`main-${skill.id}`}>
@@ -239,35 +257,12 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                       </div>
                       {settings.showSkillLevels && (
                         <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div 
+                          <div
                             className="h-full rounded-full"
-                            style={{ 
-                              width: getSkillLevelWidth(skill.level),
-                              backgroundColor: '#4A4A4A'
-                            }}
+                            style={{ width: getSkillLevelWidth(skill.level), backgroundColor: '#4A4A4A' }}
                           />
                         </div>
                       )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Certifications */}
-            {certifications.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">
-                  Certificats
-                </h3>
-                <div className="space-y-2">
-                  {certifications.map((cert) => (
-                    <div key={cert.id} className="flex justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{cert.name}</p>
-                        <p className="text-xs text-gray-600">{cert.organization}</p>
-                      </div>
-                      <span className="text-xs text-gray-500">{formatDate(cert.date)}</span>
                     </div>
                   ))}
                 </div>

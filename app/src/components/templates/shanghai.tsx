@@ -2,13 +2,15 @@ import { forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Award, Folder, Calendar } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { formatDate, getInitials } from './utils';
+import { formatDate, getInitials, getOrderedSections, type LayoutSectionId } from './utils';
 import { SectionTitle, ContactItem } from './components';
 
 export const ShanghaiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
     const { t } = useTranslation();
     const { contact, experiences, educations, skills, profile, languages, certifications, projects, interests } = cvData;
+    const rightColumnIds: LayoutSectionId[] = ['experience', 'education', 'projects'];
+    const orderedRight = getOrderedSections(settings).filter((id) => rightColumnIds.includes(id));
 
     return (
       <div 
@@ -180,90 +182,82 @@ export const ShanghaiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               )}
             </div>
 
-            {/* Right Column */}
+            {/* Right Column - ordered */}
             <div className="col-span-2 space-y-6">
-              {experiences.length > 0 && (
-                <div>
-                  <SectionTitle 
-                    titleKey="template.experience" 
-                    variant="underline"
-                    color={settings.primaryColor}
-                    className="text-sm uppercase"
-                  />
-                  <div className="space-y-4">
-                    {experiences.map((exp) => (
-                      <div key={exp.id}>
-                        <div className="flex justify-between items-start">
-                          <h4 className="font-semibold text-gray-900">{exp.jobTitle}</h4>
-                          <span className="text-sm text-gray-500">
-                            {formatDate(exp.startDate)} - {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
-                          </span>
-                        </div>
-                        <p className="text-gray-600 text-sm break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
-                        {exp.description && (
-                          <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {educations.length > 0 && (
-                <div>
-                  <SectionTitle 
-                    titleKey="template.education" 
-                    variant="underline"
-                    color={settings.primaryColor}
-                    className="text-sm uppercase"
-                  />
-                  <div className="space-y-3">
-                    {educations.map((edu) => (
-                      <div key={edu.id}>
-                        <div className="flex justify-between items-start">
-                          <h4 className="font-semibold text-gray-900">{edu.diploma}</h4>
-                          <span className="text-sm text-gray-500">{formatDate(edu.graduationDate)}</span>
-                        </div>
-                        <p className="text-gray-600 text-sm break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city ? `, ${edu.city}` : ''}</p>
-                        {edu.description && (
-                          <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {projects.length > 0 && (
-                <div>
-                  <SectionTitle 
-                    titleKey="template.projects" 
-                    variant="underline"
-                    color={settings.primaryColor}
-                    className="text-sm uppercase"
-                  />
-                  <div className="space-y-4">
-                    {projects.map((proj) => (
-                      <div key={proj.id} className="min-w-0 overflow-hidden">
-                        <div className="flex items-center gap-2 mb-1 min-w-0">
-                          <Folder className="w-4 h-4 flex-shrink-0" style={{ color: settings.primaryColor }} />
-                          <h4 className="font-semibold text-gray-900 truncate">{proj.name}</h4>
-                        </div>
-                        <p className="text-sm text-gray-700 mb-1 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{proj.description}</p>
-                        {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            {proj.technologies.slice(0, 15).map((tech, idx) => (
-                              <span key={idx} className="text-xs px-2 py-0.5 bg-gray-100 rounded-full text-gray-600">
-                                {String(tech)}
+              {orderedRight.map((section) => {
+                if (section === 'experience' && experiences.length > 0) {
+                  return (
+                    <div key="experience">
+                      <SectionTitle titleKey="template.experience" variant="underline" color={settings.primaryColor} className="text-sm uppercase" />
+                      <div className="space-y-4">
+                        {experiences.map((exp) => (
+                          <div key={exp.id}>
+                            <div className="flex justify-between items-start">
+                              <h4 className="font-semibold text-gray-900">{exp.jobTitle}</h4>
+                              <span className="text-sm text-gray-500">
+                                {formatDate(exp.startDate)} - {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
                               </span>
-                            ))}
+                            </div>
+                            <p className="text-gray-600 text-sm break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
+                            {exp.description && (
+                              <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
+                            )}
                           </div>
-                        )}
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                    </div>
+                  );
+                }
+                if (section === 'education' && educations.length > 0) {
+                  return (
+                    <div key="education">
+                      <SectionTitle titleKey="template.education" variant="underline" color={settings.primaryColor} className="text-sm uppercase" />
+                      <div className="space-y-3">
+                        {educations.map((edu) => (
+                          <div key={edu.id}>
+                            <div className="flex justify-between items-start">
+                              <h4 className="font-semibold text-gray-900">{edu.diploma}</h4>
+                              <span className="text-sm text-gray-500">{formatDate(edu.graduationDate)}</span>
+                            </div>
+                            <p className="text-gray-600 text-sm break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city ? `, ${edu.city}` : ''}</p>
+                            {edu.description && (
+                              <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+                if (section === 'projects' && projects.length > 0) {
+                  return (
+                    <div key="projects">
+                      <SectionTitle titleKey="template.projects" variant="underline" color={settings.primaryColor} className="text-sm uppercase" />
+                      <div className="space-y-4">
+                        {projects.map((proj) => (
+                          <div key={proj.id} className="min-w-0 overflow-hidden">
+                            <div className="flex items-center gap-2 mb-1 min-w-0">
+                              <Folder className="w-4 h-4 flex-shrink-0" style={{ color: settings.primaryColor }} />
+                              <h4 className="font-semibold text-gray-900 truncate">{proj.name}</h4>
+                            </div>
+                            <p className="text-sm text-gray-700 mb-1 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{proj.description}</p>
+                            {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {proj.technologies.slice(0, 15).map((tech, idx) => (
+                                  <span key={idx} className="text-xs px-2 py-0.5 bg-gray-100 rounded-full text-gray-600">
+                                    {String(tech)}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })}
             </div>
           </div>
         </div>

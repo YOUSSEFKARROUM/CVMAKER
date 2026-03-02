@@ -90,7 +90,8 @@ const areEqual = (prevProps: CVPreviewProps, nextProps: CVPreviewProps) => {
     prevProps.settings.titleFont === nextProps.settings.titleFont &&
     prevProps.settings.bodyFont === nextProps.settings.bodyFont &&
     prevProps.settings.showSkillLevels === nextProps.settings.showSkillLevels &&
-    prevProps.settings.showSkillsAsTags === nextProps.settings.showSkillsAsTags;
+    prevProps.settings.showSkillsAsTags === nextProps.settings.showSkillsAsTags &&
+    JSON.stringify(prevProps.settings.sectionOrder ?? []) === JSON.stringify(nextProps.settings.sectionOrder ?? []);
 
   if (!settingsEqual) return false;
 
