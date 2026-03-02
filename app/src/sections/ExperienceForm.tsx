@@ -76,26 +76,22 @@ export function ExperienceForm({
     }
   };
 
-  const getAISuggestions = async (): Promise<string[]> => {
-    const exp = newExperience || experiences[experiences.length - 1];
-    if (!exp) return [];
-    return generateExperienceSuggestions(exp.jobTitle, 5, '500K€');
-  };
+  const renderExperienceForm = (exp: Experience, isNew: boolean) => {
+    const getAISuggestions = async (): Promise<string[]> => {
+      return generateExperienceSuggestions(exp.jobTitle, 5, '500K€');
+    };
 
-  const applySuggestion = (suggestion: string) => {
-    const exp = newExperience || experiences[experiences.length - 1];
-    if (exp) {
+    const applySuggestion = (suggestion: string) => {
       const currentDesc = exp.description;
       const newDesc = currentDesc ? `${currentDesc}\n• ${suggestion}` : `• ${suggestion}`;
-      if (newExperience) {
-        setNewExperience({ ...newExperience, description: newDesc });
+      if (isNew) {
+        setNewExperience((prev) => prev ? { ...prev, description: newDesc } : prev);
       } else {
         onUpdate(exp.id, { description: newDesc });
       }
-    }
-  };
+    };
 
-  const renderExperienceForm = (exp: Experience, isNew: boolean) => (
+    return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4">
       <div className="flex justify-between items-start mb-4">
         <div>
@@ -264,7 +260,8 @@ export function ExperienceForm({
         </div>
       )}
     </div>
-  );
+    );
+  };
 
   return (
     <div className="max-w-2xl">

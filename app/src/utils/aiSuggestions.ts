@@ -158,7 +158,7 @@ export function generateExperienceSuggestions(
   const category = getCategoryFromJobTitle(jobTitle);
   const templates = experienceTemplates[category] || experienceTemplates.default;
 
-  return templates.slice(0, 4).map(template =>
+  return templates.slice(0, 5).map(template =>
     template
       .replace('{type}', getJobType(jobTitle))
       .replace('{users}', '10 000+')

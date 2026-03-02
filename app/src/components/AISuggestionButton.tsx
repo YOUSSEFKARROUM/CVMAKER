@@ -51,7 +51,7 @@ export function AISuggestionButton({
         size="sm"
         onClick={handleClick}
         disabled={isLoading}
-        className="text-purple-600 border-purple-200 hover:bg-purple-50"
+        className="mt-2 text-purple-600 border-purple-300 bg-purple-50/50 hover:bg-purple-100 hover:border-purple-400 font-medium"
       >
         {isLoading ? (
           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
