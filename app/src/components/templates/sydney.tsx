@@ -2,7 +2,7 @@ import { forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Award, Folder, Flag } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { getInitials, formatDate, getOrderedSections, type LayoutSectionId } from './utils';
+import { getInitials, formatDate, getOrderedSections } from './utils';
 import { SectionTitle } from './components/SectionTitle';
 import { ContactItem } from './components/ContactItem';
 

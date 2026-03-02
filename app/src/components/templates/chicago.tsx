@@ -2,7 +2,7 @@ import { forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Award, Folder } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { formatDate, getInitials, getOrderedSections, type LayoutSectionId } from './utils';
+import { formatDate, getInitials, getOrderedSections } from './utils';
 import { SectionTitle, ContactItem } from './components';
 
 export const ChicagoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
