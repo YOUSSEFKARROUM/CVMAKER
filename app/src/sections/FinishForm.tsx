@@ -238,7 +238,7 @@ export function FinishForm({
             Ordre des sections du CV
           </Label>
           <p className="text-xs text-gray-500 mb-3">
-            Glissez-déposez pour changer l&apos;ordre des blocs (Profil, Expérience, etc.).
+            Glissez-déposez l&apos;icône à gauche pour changer l&apos;ordre des blocs (Profil, Expérience, etc.).
           </p>
           <SortableList
             items={sectionItems}

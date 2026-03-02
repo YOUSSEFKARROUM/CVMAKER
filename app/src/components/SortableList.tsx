@@ -47,7 +47,9 @@ function SortableItem({ id, children }: SortableItemProps) {
       <button
         {...attributes}
         {...listeners}
-        className="mt-3 p-1 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+        style={{ touchAction: 'none' }}
+        className="mt-2 p-2 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+        aria-label="Reorder"
       >
         <GripVertical className="w-4 h-4" />
       </button>
