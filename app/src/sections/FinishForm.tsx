@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, ArrowLeft, LayoutGrid, User, Check, RotateCcw, FileJson } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PhotoUpload } from '../components/PhotoUpload';
 import type { CVData, CVSettings, ContactInfo } from '../types/cv';
+import { SortableList } from '../components/SortableList';
+import { DEFAULT_SECTION_ORDER, type LayoutSectionId } from '../components/templates/utils';
 
 interface FinishFormProps {
   cvData: CVData;
@@ -59,6 +61,34 @@ export function FinishForm({
   const [showTitleFontDropdown, setShowTitleFontDropdown] = useState(false);
   const [showBodyFontDropdown, setShowBodyFontDropdown] = useState(false);
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+
+  type SectionItem = { id: LayoutSectionId; label: string };
+
+  const sectionItems: SectionItem[] = useMemo(() => {
+    const labels: Record<LayoutSectionId, string> = {
+      profile: 'Profil',
+      experience: 'Expérience professionnelle',
+      education: 'Formation',
+      projects: 'Projets',
+      certifications: 'Certifications',
+      languages: 'Langues',
+    };
+
+    const rawOrder =
+      settings.sectionOrder && settings.sectionOrder.length > 0
+        ? settings.sectionOrder
+        : DEFAULT_SECTION_ORDER;
+
+    const validOrder = rawOrder.filter(
+      (id): id is LayoutSectionId =>
+        (DEFAULT_SECTION_ORDER as string[]).includes(id)
+    );
+
+    return validOrder.map((id) => ({
+      id,
+      label: labels[id],
+    }));
+  }, [settings.sectionOrder]);
 
   return (
     <div className="max-w-2xl">
@@ -201,6 +231,27 @@ export function FinishForm({
               ))}
             </div>
           )}
+        </div>
+
+        <div className="mt-6">
+          <Label className="text-xs uppercase text-gray-500 mb-2 block">
+            Ordre des sections du CV
+          </Label>
+          <p className="text-xs text-gray-500 mb-3">
+            Glissez-déposez pour changer l&apos;ordre des blocs (Profil, Expérience, etc.).
+          </p>
+          <SortableList
+            items={sectionItems}
+            onReorder={(items) => {
+              const newOrder = items.map((item) => item.id);
+              setSettings({ ...settings, sectionOrder: newOrder });
+            }}
+            renderItem={(item) => (
+              <div className="px-3 py-2 bg-white border border-gray-200 rounded-md text-sm">
+                {item.label}
+              </div>
+            )}
+          />
         </div>
       </div>
 
