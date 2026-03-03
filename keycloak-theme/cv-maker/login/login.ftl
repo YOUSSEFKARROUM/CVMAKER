@@ -87,6 +87,18 @@
           </div>
         </div>
 
+        <!-- Options supplémentaires (Se souvenir de moi) -->
+        <#if realm.rememberMe>
+        <div id="kc-form-options">
+          <label class="remember-me">
+            <input tabindex="3" id="rememberMe" name="rememberMe" type="checkbox"
+              <#if login.rememberMe?? && login.rememberMe>checked</#if>
+            />
+            Se souvenir de moi sur cet appareil
+          </label>
+        </div>
+        </#if>
+
         <!-- Bouton connexion -->
         <div id="kc-form-buttons">
           <input tabindex="4" type="submit" value="Se connecter →" class="btn-primary"/>

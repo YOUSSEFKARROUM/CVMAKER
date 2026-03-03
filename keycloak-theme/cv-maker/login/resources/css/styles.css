@@ -454,6 +454,31 @@ button[type="submit"]:active {
 }
 
 /* ============================================
+   OPTIONS DU FORMULAIRE (remember me, etc.)
+   ============================================ */
+
+#kc-form-options {
+  margin-top: 8px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 13px !important;
+  color: #6b7280 !important;
+}
+
+.remember-me {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.remember-me input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 4px !important;
+}
+
+/* ============================================
    ALERTES / ERREURS
    ============================================ */
 
