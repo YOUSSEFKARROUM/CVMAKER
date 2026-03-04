@@ -364,14 +364,16 @@ export function DownloadPage({
         </div>
 
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={onHomeClick}
-            className="border-gray-600 text-gray-100 hover:bg-gray-800"
+
+        <Button
+          variant="default"
+          onClick={onHomeClick}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Revenir en arrière
-          </Button>
+        </Button>
+
           <Button
             onClick={() => setIsExportModalOpen(true)}
             className="bg-indigo-600 hover:bg-indigo-700 text-white"
