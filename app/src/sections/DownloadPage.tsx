@@ -1,13 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
-import { Check, Download, FileText, Home } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, Check, Download, FileText, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CVPreview } from '../components/CVPreview';
 import { ExportModal } from '../components/ExportModal';
 import { ConfettiEffect } from '../components/ConfettiEffect';
 import { useToast } from '../hooks/useToast';
 import type { CVData, CVSettings } from '../types/cv';
+import { SortableList } from '../components/SortableList';
+import { DEFAULT_SECTION_ORDER, type LayoutSectionId } from '../components/templates/utils';
 
-type DownloadTab = 'template' | 'colors' | 'fonts';
+type DownloadTab = 'template' | 'colors' | 'fonts' | 'sections';
 
 interface DownloadPageProps {
   cvData: CVData;
@@ -90,6 +92,12 @@ function SidebarTabs({ activeTab, onChange }: SidebarTabsProps) {
       >
         Polices
       </button>
+      <button
+        onClick={() => onChange('sections')}
+        className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${activeTab === 'sections' ? activeClass : inactiveClass}`}
+      >
+        Sections
+      </button>
     </div>
   );
 }
@@ -139,6 +147,61 @@ function TemplateTab({ selectedTemplate, onChangeTemplate }: TemplateTabProps) {
           </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+interface SectionsTabProps {
+  sectionOrder: string[] | undefined;
+  onChangeOrder: (order: LayoutSectionId[]) => void;
+}
+
+function SectionsTab({ sectionOrder, onChangeOrder }: SectionsTabProps) {
+  type SectionItem = { id: LayoutSectionId; label: string };
+
+  const sectionItems: SectionItem[] = useMemo(() => {
+    const labels: Record<LayoutSectionId, string> = {
+      profile: 'Profil',
+      experience: 'Expérience professionnelle',
+      education: 'Formation',
+      projects: 'Projets',
+      certifications: 'Certifications',
+      languages: 'Langues',
+    };
+
+    const rawOrder =
+      sectionOrder && sectionOrder.length > 0
+        ? sectionOrder
+        : DEFAULT_SECTION_ORDER;
+
+    const validOrder = rawOrder.filter(
+      (id): id is LayoutSectionId =>
+        (DEFAULT_SECTION_ORDER as string[]).includes(id)
+    );
+
+    return validOrder.map((id) => ({
+      id,
+      label: labels[id],
+    }));
+  }, [sectionOrder]);
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <h3 className="font-semibold text-gray-900">Ordre des sections du CV</h3>
+        <p className="text-xs text-gray-500 mt-1">
+          Glissez-déposez les éléments pour modifier l&apos;ordre d&apos;affichage (Profil, Expérience, Formation, etc.).
+        </p>
+      </div>
+      <SortableList
+        items={sectionItems}
+        onReorder={(items) => onChangeOrder(items.map((item) => item.id))}
+        renderItem={(item) => (
+          <div className="px-3 py-2 bg-white border border-gray-200 rounded-md text-sm">
+            {item.label}
+          </div>
+        )}
+      />
     </div>
   );
 }
@@ -275,6 +338,10 @@ export function DownloadPage({
     setSettings({ ...settings, bodyFont: font });
   };
 
+  const handleSectionOrderChange = (order: LayoutSectionId[]) => {
+    setSettings({ ...settings, sectionOrder: order });
+  };
+
   const resolvedPreviewElement =
     previewRef.current ?? (document.getElementById('cv-preview') as HTMLElement | null);
 
@@ -297,6 +364,14 @@ export function DownloadPage({
         </div>
 
         <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={onHomeClick}
+            className="border-gray-600 text-gray-100 hover:bg-gray-800"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Revenir en arrière
+          </Button>
           <Button
             onClick={() => setIsExportModalOpen(true)}
             className="bg-indigo-600 hover:bg-indigo-700 text-white"
@@ -335,6 +410,13 @@ export function DownloadPage({
                 bodyFont={settings.bodyFont}
                 onChangeTitleFont={handleTitleFontChange}
                 onChangeBodyFont={handleBodyFontChange}
+              />
+            )}
+
+            {activeTab === 'sections' && (
+              <SectionsTab
+                sectionOrder={settings.sectionOrder}
+                onChangeOrder={handleSectionOrderChange}
               />
             )}
           </div>
