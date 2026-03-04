@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { MapPin, Phone, Mail, Linkedin, Globe, Github, Award, Star, Square, GraduationCap, Briefcase, CheckCircle, User, Lightbulb, MessageSquare } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { getInitials, formatDate } from './utils';
+import { getInitials, formatDate, getOrderedSections, type LayoutSectionId } from './utils';
 
 // Star rating component
 const StarRating = ({ level, color = 'white' }: { level: string; color?: string }) => {
@@ -82,6 +82,10 @@ const TimelineItem = ({
 export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
     const { contact, experiences, educations, skills, profile, languages, interests, certifications } = cvData;
+    const mainSectionIds: LayoutSectionId[] = ['profile', 'education', 'experience', 'certifications'];
+    const orderedSections = getOrderedSections(settings).filter((id) =>
+      mainSectionIds.includes(id)
+    );
 
     return (
       <div 
@@ -233,53 +237,82 @@ export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
           {/* Main Content */}
           <div className="w-[65%] p-8">
-            {/* Profile */}
-            {profile && (
-              <div className="mb-8">
-                <SectionHeader icon={User} title="Profil" />
-                <p className="text-sm text-gray-700 leading-relaxed pl-10">{profile}</p>
-              </div>
-            )}
+            {orderedSections.map((sectionId) => {
+              if (sectionId === 'profile' && profile) {
+                return (
+                  <div className="mb-8" key="profile">
+                    <SectionHeader icon={User} title="Profil" />
+                    <p className="text-sm text-gray-700 leading-relaxed pl-10">{profile}</p>
+                  </div>
+                );
+              }
 
-            {/* Enseignement (Education) */}
-            {educations.length > 0 && (
-              <div className="mb-8">
-                <SectionHeader icon={GraduationCap} title="Enseignement" />
-                <div className="pl-10">
-                  {educations.map((edu) => (
-                    <TimelineItem
-                      key={edu.id}
-                      startDate={edu.graduationDate}
-                      title={edu.diploma}
-                      subtitle={`${edu.school}${edu.city ? `, ${edu.city}` : ''}`}
-                      description={edu.description}
-                      primaryColor={settings.primaryColor}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
+              if (sectionId === 'education' && educations.length > 0) {
+                return (
+                  <div className="mb-8" key="education">
+                    <SectionHeader icon={GraduationCap} title="Enseignement" />
+                    <div className="pl-10">
+                      {educations.map((edu) => (
+                        <TimelineItem
+                          key={edu.id}
+                          startDate={edu.graduationDate}
+                          title={edu.diploma}
+                          subtitle={`${edu.school}${edu.city ? `, ${edu.city}` : ''}`}
+                          description={edu.description}
+                          primaryColor={settings.primaryColor}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
 
-            {/* Expérience Professionnelle */}
-            {experiences.length > 0 && (
-              <div className="mb-8">
-                <SectionHeader icon={Briefcase} title="Expérience Professionnelle" />
-                <div className="pl-10">
-                  {experiences.map((exp) => (
-                    <TimelineItem
-                      key={exp.id}
-                      startDate={exp.startDate}
-                      endDate={exp.endDate}
-                      currentlyWorking={exp.currentlyWorking}
-                      title={exp.jobTitle}
-                      subtitle={`${exp.employer}${exp.city ? `, ${exp.city}` : ''}`}
-                      description={exp.description}
-                      primaryColor={settings.primaryColor}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
+              if (sectionId === 'experience' && experiences.length > 0) {
+                return (
+                  <div className="mb-8" key="experience">
+                    <SectionHeader icon={Briefcase} title="Expérience Professionnelle" />
+                    <div className="pl-10">
+                      {experiences.map((exp) => (
+                        <TimelineItem
+                          key={exp.id}
+                          startDate={exp.startDate}
+                          endDate={exp.endDate}
+                          currentlyWorking={exp.currentlyWorking}
+                          title={exp.jobTitle}
+                          subtitle={`${exp.employer}${exp.city ? `, ${exp.city}` : ''}`}
+                          description={exp.description}
+                          primaryColor={settings.primaryColor}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              if (sectionId === 'certifications' && certifications.length > 0) {
+                return (
+                  <div className="mb-8" key="certifications">
+                    <SectionHeader icon={Award} title="Certifications" />
+                    <div className="pl-10 space-y-3">
+                      {certifications.map((cert) => (
+                        <div key={cert.id} className="flex items-start gap-3">
+                          <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: settings.primaryColor }} />
+                          <div>
+                            <h4 className="font-semibold text-sm text-gray-900">{cert.name}</h4>
+                            <p className="text-xs text-gray-600">{cert.organization}</p>
+                            {cert.date && (
+                              <p className="text-xs text-gray-500">{formatDate(cert.date)}</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              return null;
+            })}
 
             {/* Compétences - Main content */}
             {skills.length > 0 && (
@@ -302,27 +335,6 @@ export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                             }}
                           />
                         ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Certifications */}
-            {certifications.length > 0 && (
-              <div className="mb-8">
-                <SectionHeader icon={Award} title="Certifications" />
-                <div className="pl-10 space-y-3">
-                  {certifications.map((cert) => (
-                    <div key={cert.id} className="flex items-start gap-3">
-                      <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: settings.primaryColor }} />
-                      <div>
-                        <h4 className="font-semibold text-sm text-gray-900">{cert.name}</h4>
-                        <p className="text-xs text-gray-600">{cert.organization}</p>
-                        {cert.date && (
-                          <p className="text-xs text-gray-500">{formatDate(cert.date)}</p>
-                        )}
                       </div>
                     </div>
                   ))}

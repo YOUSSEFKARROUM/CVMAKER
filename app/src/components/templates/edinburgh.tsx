@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { MapPin, Phone, Mail, Linkedin, Circle, Calendar, Flag, Car, HeartHandshake } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { getInitials, formatDate } from './utils';
+import { getInitials, formatDate, getOrderedSections, type LayoutSectionId } from './utils';
 
 // 5-dot rating component for skills and languages
 const DotRating = ({ level }: { level: string }) => {
@@ -61,6 +61,10 @@ const getContactIcon = (type: string) => {
 export const EdinburghTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
     const { contact, experiences, educations, skills, profile, languages, interests, certifications, references } = cvData;
+    const mainSectionIds: LayoutSectionId[] = ['profile', 'education', 'experience'];
+    const orderedSections = getOrderedSections(settings).filter((id) =>
+      mainSectionIds.includes(id)
+    );
 
     return (
       <div
@@ -232,67 +236,74 @@ export const EdinburghTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
           {/* Main Content ~70% */}
           <div className="w-[70%] min-w-0 p-6">
-            {/* Profile */}
-            {profile && (
-              <div className="mb-6">
-                <p className="text-sm text-gray-700 leading-relaxed">{profile}</p>
-              </div>
-            )}
+            {orderedSections.map((sectionId) => {
+              if (sectionId === 'profile' && profile) {
+                return (
+                  <div className="mb-6" key="profile">
+                    <p className="text-sm text-gray-700 leading-relaxed">{profile}</p>
+                  </div>
+                );
+              }
 
-            {/* Enseignement */}
-            {educations && educations.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">
-                  Enseignement
-                </h3>
-                <div className="space-y-4">
-                  {educations.map((edu) => (
-                    <div key={edu.id} className="min-w-0">
-                      <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.diploma}</h4>
-                      <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}</p>
-                      {edu.fieldOfStudy && (
-                        <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.fieldOfStudy}</p>
-                      )}
-                      {edu.graduationDate && (
-                        <p className="text-xs text-gray-500 mt-1">{formatDate(edu.graduationDate)}</p>
-                      )}
-                      {edu.description && (
-                        <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
-                      )}
+              if (sectionId === 'education' && educations && educations.length > 0) {
+                return (
+                  <div className="mb-6" key="education">
+                    <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">
+                      Enseignement
+                    </h3>
+                    <div className="space-y-4">
+                      {educations.map((edu) => (
+                        <div key={edu.id} className="min-w-0">
+                          <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.diploma}</h4>
+                          <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}</p>
+                          {edu.fieldOfStudy && (
+                            <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.fieldOfStudy}</p>
+                          )}
+                          {edu.graduationDate && (
+                            <p className="text-xs text-gray-500 mt-1">{formatDate(edu.graduationDate)}</p>
+                          )}
+                          {edu.description && (
+                            <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                  </div>
+                );
+              }
 
-            {/* Expérience professionnelle */}
-            {experiences && experiences.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">
-                  Expérience professionnelle
-                </h3>
-                <div className="space-y-5">
-                  {experiences.map((exp) => (
-                    <div key={exp.id} className="min-w-0">
-                      <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.jobTitle}</h4>
-                      <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city ? `, ${exp.city}` : ''}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
-                      </p>
-                      {exp.description && (
-                        <div 
-                          className="text-xs text-gray-700 mt-2 leading-relaxed break-words"
-                          style={{ overflowWrap: 'anywhere' }}
-                          dangerouslySetInnerHTML={{ 
-                            __html: exp.description.replace(/\n/g, '<br/>').replace(/• /g, '&bull; ') 
-                          }}
-                        />
-                      )}
+              if (sectionId === 'experience' && experiences && experiences.length > 0) {
+                return (
+                  <div className="mb-6" key="experience">
+                    <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">
+                      Expérience professionnelle
+                    </h3>
+                    <div className="space-y-5">
+                      {experiences.map((exp) => (
+                        <div key={exp.id} className="min-w-0">
+                          <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.jobTitle}</h4>
+                          <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city ? `, ${exp.city}` : ''}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
+                          </p>
+                          {exp.description && (
+                            <div 
+                              className="text-xs text-gray-700 mt-2 leading-relaxed break-words"
+                              style={{ overflowWrap: 'anywhere' }}
+                              dangerouslySetInnerHTML={{ 
+                                __html: exp.description.replace(/\n/g, '<br/>').replace(/• /g, '&bull; ') 
+                              }}
+                            />
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                  </div>
+                );
+              }
+
+              return null;
+            })}
 
             {/* Références */}
             <div>

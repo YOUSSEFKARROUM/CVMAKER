@@ -1,11 +1,15 @@
 import { forwardRef } from 'react';
 import { User, Briefcase, GraduationCap } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { getInitials, formatDate } from './utils';
+import { getInitials, formatDate, getOrderedSections, type LayoutSectionId } from './utils';
 
 export const BerkeleyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
     const { contact, experiences, educations, profile } = cvData;
+    const mainSectionIds: LayoutSectionId[] = ['education', 'experience'];
+    const orderedSections = getOrderedSections(settings).filter((id) =>
+      mainSectionIds.includes(id)
+    );
 
     return (
       <div 
@@ -70,70 +74,76 @@ export const BerkeleyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
           </div>
         </div>
 
-        {/* Education Section */}
-        {educations.length > 0 && (
-          <div className="mb-6">
-            <div 
-              className="flex items-center gap-2 px-3 py-2 rounded mb-3"
-              style={{ backgroundColor: '#e5e7eb' }}
-            >
-              <GraduationCap className="w-4 h-4 text-gray-700" />
-              <span className="text-sm font-semibold text-gray-800">Enseignement</span>
-            </div>
-            <div className="pl-3 space-y-4">
-              {educations.map((edu) => (
-                <div key={edu.id} className="flex justify-between items-start gap-4">
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.diploma}</h4>
-                    <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}</p>
-                    {edu.description && (
-                      <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
-                    )}
-                  </div>
-                  <span className="text-sm text-gray-500 whitespace-nowrap flex-shrink-0">
-                    {formatDate(edu.graduationDate)}
-                  </span>
+        {orderedSections.map((sectionId) => {
+          if (sectionId === 'education' && educations.length > 0) {
+            return (
+              <div className="mb-6" key="education">
+                <div 
+                  className="flex items-center gap-2 px-3 py-2 rounded mb-3"
+                  style={{ backgroundColor: '#e5e7eb' }}
+                >
+                  <GraduationCap className="w-4 h-4 text-gray-700" />
+                  <span className="text-sm font-semibold text-gray-800">Enseignement</span>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+                <div className="pl-3 space-y-4">
+                  {educations.map((edu) => (
+                    <div key={edu.id} className="flex justify-between items-start gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.diploma}</h4>
+                        <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}</p>
+                        {edu.description && (
+                          <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                        )}
+                      </div>
+                      <span className="text-sm text-gray-500 whitespace-nowrap flex-shrink-0">
+                        {formatDate(edu.graduationDate)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          }
 
-        {/* Experience Section */}
-        {experiences.length > 0 && (
-          <div className="mb-6">
-            <div 
-              className="flex items-center gap-2 px-3 py-2 rounded mb-3"
-              style={{ backgroundColor: '#e5e7eb' }}
-            >
-              <Briefcase className="w-4 h-4 text-gray-700" />
-              <span className="text-sm font-semibold text-gray-800">Expérience professionnelle</span>
-            </div>
-            <div className="pl-3 space-y-5">
-              {experiences.map((exp) => (
-                <div key={exp.id} className="flex justify-between items-start gap-4">
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.jobTitle}</h4>
-                    <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}</p>
-                    {exp.description && (
-                      <ul className="mt-2 space-y-1">
-                        {exp.description.split('\n').filter(line => line.trim()).map((line, idx) => (
-                          <li key={idx} className="text-sm text-gray-700 flex items-start gap-2 break-words" style={{ overflowWrap: 'anywhere' }}>
-                            <span className="text-gray-400 mt-1.5 flex-shrink-0">•</span>
-                            <span>{line.trim().replace(/^[•\-\*]\s*/, '')}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                  <span className="text-sm text-gray-500 whitespace-nowrap flex-shrink-0">
-                    {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'aujourd\'hui' : formatDate(exp.endDate)}
-                  </span>
+          if (sectionId === 'experience' && experiences.length > 0) {
+            return (
+              <div className="mb-6" key="experience">
+                <div 
+                  className="flex items-center gap-2 px-3 py-2 rounded mb-3"
+                  style={{ backgroundColor: '#e5e7eb' }}
+                >
+                  <Briefcase className="w-4 h-4 text-gray-700" />
+                  <span className="text-sm font-semibold text-gray-800">Expérience professionnelle</span>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+                <div className="pl-3 space-y-5">
+                  {experiences.map((exp) => (
+                    <div key={exp.id} className="flex justify-between items-start gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.jobTitle}</h4>
+                        <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}</p>
+                        {exp.description && (
+                          <ul className="mt-2 space-y-1">
+                            {exp.description.split('\n').filter(line => line.trim()).map((line, idx) => (
+                              <li key={idx} className="text-sm text-gray-700 flex items-start gap-2 break-words" style={{ overflowWrap: 'anywhere' }}>
+                                <span className="text-gray-400 mt-1.5 flex-shrink-0">•</span>
+                                <span>{line.trim().replace(/^[•\-\*]\s*/, '')}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                      <span className="text-sm text-gray-500 whitespace-nowrap flex-shrink-0">
+                        {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'aujourd\'hui' : formatDate(exp.endDate)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          }
+
+          return null;
+        })}
       </div>
     );
   }

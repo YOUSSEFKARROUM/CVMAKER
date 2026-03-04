@@ -1,10 +1,14 @@
 import { forwardRef } from 'react';
 import type { TemplateProps } from './types';
-import { formatDate } from './utils';
+import { formatDate, getOrderedSections, type LayoutSectionId } from './utils';
 
 export const OxfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
     const { contact, experiences, educations, skills, profile, languages, interests, certifications } = cvData;
+    const mainSectionIds: LayoutSectionId[] = ['education', 'experience', 'certifications'];
+    const orderedSections = getOrderedSections(settings).filter((id) =>
+      mainSectionIds.includes(id)
+    );
 
     return (
       <div 
@@ -83,109 +87,116 @@ export const OxfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
           <div className="flex gap-8">
             {/* Left Column - Timeline */}
             <div className="flex-1">
-              {/* Education Section */}
-              {educations.length > 0 && (
-                <div className="mb-6">
-                  <h2 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 pb-1 border-b border-gray-300">
-                    Enseignement
-                  </h2>
-                  <div className="relative">
-                    {/* Vertical timeline line */}
-                    <div className="absolute left-0 top-0 bottom-0 w-px bg-gray-400"></div>
-                    <div className="space-y-4">
-                      {educations.map((edu) => (
-                        <div key={edu.id} className="relative pl-6">
-                          {/* Timeline dot */}
-                          <div className="absolute left-0 top-1.5 w-2 h-2 rounded-full bg-gray-600 -translate-x-1/2"></div>
-                          <div className="flex gap-4">
-                            {/* Date on the left */}
-                            <div className="w-20 flex-shrink-0">
-                              <span className="text-xs text-gray-600 font-medium">
-                                {formatDate(edu.graduationDate)}
-                              </span>
+              {orderedSections.map((sectionId) => {
+                if (sectionId === 'education' && educations.length > 0) {
+                  return (
+                    <div className="mb-6" key="education">
+                      <h2 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 pb-1 border-b border-gray-300">
+                        Enseignement
+                      </h2>
+                      <div className="relative">
+                        {/* Vertical timeline line */}
+                        <div className="absolute left-0 top-0 bottom-0 w-px bg-gray-400"></div>
+                        <div className="space-y-4">
+                          {educations.map((edu) => (
+                            <div key={edu.id} className="relative pl-6">
+                              {/* Timeline dot */}
+                              <div className="absolute left-0 top-1.5 w-2 h-2 rounded-full bg-gray-600 -translate-x-1/2"></div>
+                              <div className="flex gap-4">
+                                {/* Date on the left */}
+                                <div className="w-20 flex-shrink-0">
+                                  <span className="text-xs text-gray-600 font-medium">
+                                    {formatDate(edu.graduationDate)}
+                                  </span>
+                                </div>
+                                {/* Content */}
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.diploma}</h4>
+                                  <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}</p>
+                                  {edu.description && (
+                                    <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                            {/* Content */}
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.diploma}</h4>
-                              <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}</p>
-                              {edu.description && (
-                                <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
-                              )}
-                            </div>
-                          </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
                     </div>
-                  </div>
-                </div>
-              )}
+                  );
+                }
 
-              {/* Experience Section */}
-              {experiences.length > 0 && (
-                <div className="mb-6">
-                  <h2 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 pb-1 border-b border-gray-300">
-                    Expérience
-                  </h2>
-                  <div className="relative">
-                    {/* Vertical timeline line */}
-                    <div className="absolute left-0 top-0 bottom-0 w-px bg-gray-400"></div>
-                    <div className="space-y-5">
-                      {experiences.map((exp) => (
-                        <div key={exp.id} className="relative pl-6">
-                          {/* Timeline dot */}
-                          <div className="absolute left-0 top-1.5 w-2 h-2 rounded-full bg-gray-600 -translate-x-1/2"></div>
-                          <div className="flex gap-4">
-                            {/* Date on the left */}
-                            <div className="w-20 flex-shrink-0">
-                              <span className="text-xs text-gray-600 font-medium">
-                                {formatDate(exp.startDate)} – {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
-                              </span>
+                if (sectionId === 'experience' && experiences.length > 0) {
+                  return (
+                    <div className="mb-6" key="experience">
+                      <h2 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 pb-1 border-b border-gray-300">
+                        Expérience
+                      </h2>
+                      <div className="relative">
+                        {/* Vertical timeline line */}
+                        <div className="absolute left-0 top-0 bottom-0 w-px bg-gray-400"></div>
+                        <div className="space-y-5">
+                          {experiences.map((exp) => (
+                            <div key={exp.id} className="relative pl-6">
+                              {/* Timeline dot */}
+                              <div className="absolute left-0 top-1.5 w-2 h-2 rounded-full bg-gray-600 -translate-x-1/2"></div>
+                              <div className="flex gap-4">
+                                {/* Date on the left */}
+                                <div className="w-20 flex-shrink-0">
+                                  <span className="text-xs text-gray-600 font-medium">
+                                    {formatDate(exp.startDate)} – {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
+                                  </span>
+                                </div>
+                                {/* Content */}
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.jobTitle}</h4>
+                                  <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
+                                  {exp.description && (
+                                    <p className="text-xs text-gray-700 mt-1 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                            {/* Content */}
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.jobTitle}</h4>
-                              <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
-                              {exp.description && (
-                                <p className="text-xs text-gray-700 mt-1 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
-                              )}
-                            </div>
-                          </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
                     </div>
-                  </div>
-                </div>
-              )}
+                  );
+                }
 
-              {/* Certifications */}
-              {certifications.length > 0 && (
-                <div className="mb-6">
-                  <h2 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 pb-1 border-b border-gray-300">
-                    Certificats
-                  </h2>
-                  <div className="relative">
-                    <div className="absolute left-0 top-0 bottom-0 w-px bg-gray-400"></div>
-                    <div className="space-y-3">
-                      {certifications.map((cert) => (
-                        <div key={cert.id} className="relative pl-6">
-                          <div className="absolute left-0 top-1.5 w-2 h-2 rounded-full bg-gray-600 -translate-x-1/2"></div>
-                          <div className="flex gap-4">
-                            <div className="w-20 flex-shrink-0">
-                              <span className="text-xs text-gray-600 font-medium">
-                                {cert.date && formatDate(cert.date)}
-                              </span>
+                if (sectionId === 'certifications' && certifications.length > 0) {
+                  return (
+                    <div className="mb-6" key="certifications">
+                      <h2 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 pb-1 border-b border-gray-300">
+                        Certificats
+                      </h2>
+                      <div className="relative">
+                        <div className="absolute left-0 top-0 bottom-0 w-px bg-gray-400"></div>
+                        <div className="space-y-3">
+                          {certifications.map((cert) => (
+                            <div key={cert.id} className="relative pl-6">
+                              <div className="absolute left-0 top-1.5 w-2 h-2 rounded-full bg-gray-600 -translate-x-1/2"></div>
+                              <div className="flex gap-4">
+                                <div className="w-20 flex-shrink-0">
+                                  <span className="text-xs text-gray-600 font-medium">
+                                    {cert.date && formatDate(cert.date)}
+                                  </span>
+                                </div>
+                                <div className="flex-1">
+                                  <h4 className="font-semibold text-sm text-gray-900">{cert.name}</h4>
+                                  <p className="text-sm text-gray-600">{cert.organization}</p>
+                                </div>
+                              </div>
                             </div>
-                            <div className="flex-1">
-                              <h4 className="font-semibold text-sm text-gray-900">{cert.name}</h4>
-                              <p className="text-sm text-gray-600">{cert.organization}</p>
-                            </div>
-                          </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
                     </div>
-                  </div>
-                </div>
-              )}
+                  );
+                }
+
+                return null;
+              })}
             </div>
 
             {/* Right Sidebar - Personal Info */}

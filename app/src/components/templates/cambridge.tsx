@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { MapPin, Phone, Mail, Linkedin, Globe, Github, User, Calendar, Flag, Heart, Car } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { formatDate } from './utils';
+import { formatDate, getOrderedSections, type LayoutSectionId } from './utils';
 
 const getLevelDots = (level: string) => {
   const levelMap: Record<string, number> = {
@@ -17,6 +17,10 @@ const getLevelDots = (level: string) => {
 export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
     const { contact, experiences, educations, skills, profile, languages, interests, references } = cvData;
+    const mainSectionIds: LayoutSectionId[] = ['education', 'experience'];
+    const orderedSections = getOrderedSections(settings).filter((id) =>
+      mainSectionIds.includes(id)
+    );
 
     return (
       <div 
@@ -100,59 +104,65 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
           {/* Two-column layout */}
           <div className="grid grid-cols-2 gap-8 min-w-0">
-            {/* Left Column: ENSEIGNEMENT, EXPÉRIENCE PROFESSIONNELLE */}
+            {/* Left Column: sections re-orderable (Enseignement, Expérience) */}
             <div className="space-y-6 min-w-0">
-              {/* Education - ENSEIGNEMENT */}
-              {educations.length > 0 && (
-                <div className="min-w-0">
-                  <h3
-                    className="text-sm font-bold uppercase tracking-wider mb-4 pb-1 border-b-2"
-                    style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
-                  >
-                    Enseignement
-                  </h3>
-                  <div className="space-y-4">
-                    {educations.map((edu) => (
-                      <div key={edu.id} className="min-w-0">
-                        <p className="text-xs text-gray-500 mb-0.5">
-                          {formatDate(edu.graduationDate)}
-                        </p>
-                        <h4 className="font-semibold text-sm text-gray-900 break-words">{edu.diploma}</h4>
-                        <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city ? `, ${edu.city}` : ''}</p>
-                        {edu.description && (
-                          <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
-                        )}
+              {orderedSections.map((sectionId) => {
+                if (sectionId === 'education' && educations.length > 0) {
+                  return (
+                    <div className="min-w-0" key="education">
+                      <h3
+                        className="text-sm font-bold uppercase tracking-wider mb-4 pb-1 border-b-2"
+                        style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
+                      >
+                        Enseignement
+                      </h3>
+                      <div className="space-y-4">
+                        {educations.map((edu) => (
+                          <div key={edu.id} className="min-w-0">
+                            <p className="text-xs text-gray-500 mb-0.5">
+                              {formatDate(edu.graduationDate)}
+                            </p>
+                            <h4 className="font-semibold text-sm text-gray-900 break-words">{edu.diploma}</h4>
+                            <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city ? `, ${edu.city}` : ''}</p>
+                            {edu.description && (
+                              <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                    </div>
+                  );
+                }
 
-              {/* Experience - EXPÉRIENCE PROFESSIONNELLE */}
-              {experiences.length > 0 && (
-                <div className="min-w-0">
-                  <h3
-                    className="text-sm font-bold uppercase tracking-wider mb-4 pb-1 border-b-2"
-                    style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
-                  >
-                    Expérience Professionnelle
-                  </h3>
-                  <div className="space-y-4">
-                    {experiences.map((exp) => (
-                      <div key={exp.id} className="min-w-0">
-                        <p className="text-xs text-gray-500 mb-0.5">
-                          {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
-                        </p>
-                        <h4 className="font-semibold text-sm text-gray-900 break-words">{exp.jobTitle}</h4>
-                        <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city ? `, ${exp.city}` : ''}</p>
-                        {exp.description && (
-                          <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
-                        )}
+                if (sectionId === 'experience' && experiences.length > 0) {
+                  return (
+                    <div className="min-w-0" key="experience">
+                      <h3
+                        className="text-sm font-bold uppercase tracking-wider mb-4 pb-1 border-b-2"
+                        style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
+                      >
+                        Expérience Professionnelle
+                      </h3>
+                      <div className="space-y-4">
+                        {experiences.map((exp) => (
+                          <div key={exp.id} className="min-w-0">
+                            <p className="text-xs text-gray-500 mb-0.5">
+                              {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
+                            </p>
+                            <h4 className="font-semibold text-sm text-gray-900 break-words">{exp.jobTitle}</h4>
+                            <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city ? `, ${exp.city}` : ''}</p>
+                            {exp.description && (
+                              <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                    </div>
+                  );
+                }
+
+                return null;
+              })}
             </div>
 
             {/* Right Column: PERSONNELLES, INTÉRÊTS, LANGUES, COMPÉTENCES, RÉFÉRENCES */}
