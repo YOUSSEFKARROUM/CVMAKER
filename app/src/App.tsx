@@ -773,6 +773,7 @@ function App() {
               settings={settings}
               setSettings={setSettings}
               onHomeClick={goToLanding}
+              onBack={() => setCurrentStep('finish')}
             />
           );
         default:

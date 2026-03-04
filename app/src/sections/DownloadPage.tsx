@@ -16,6 +16,7 @@ interface DownloadPageProps {
   settings: CVSettings;
   setSettings: (settings: CVSettings) => void;
   onHomeClick?: () => void;
+  onBack?: () => void;
 }
 
 interface TemplateMeta {
@@ -306,6 +307,7 @@ export function DownloadPage({
   settings,
   setSettings,
   onHomeClick,
+  onBack,
 }: DownloadPageProps) {
   const [activeTab, setActiveTab] = useState<DownloadTab>('template');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -345,38 +347,52 @@ export function DownloadPage({
   const resolvedPreviewElement =
     previewRef.current ?? (document.getElementById('cv-preview') as HTMLElement | null);
 
+  const handleBackClick = () => {
+    if (onBack) {
+      onBack();
+    } else if (onHomeClick) {
+      onHomeClick();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-gray-900 z-50 flex flex-col">
+    <div className="fixed inset-0 bg-gray-950 z-50 flex flex-col">
       {/* Header */}
-      <div className="bg-gray-900 text-white p-4 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-gray-950 via-slate-900 to-gray-950 text-white px-6 py-4 flex items-center justify-between shadow-lg border-b border-white/5">
         <div className="flex items-center gap-4">
-          <button
-            onClick={onHomeClick}
-            className="p-2 hover:bg-red-500 rounded-lg transition-colors"
-            title="Retour à l'accueil"
-          >
-            <Home className="w-5 h-5" />
-          </button>
+          {onHomeClick && (
+            <button
+              onClick={onHomeClick}
+              className="p-2 hover:bg-red-500/90 rounded-lg transition-colors bg-red-500/20 border border-red-400/40"
+              title="Retour à l'accueil"
+            >
+              <Home className="w-5 h-5" />
+            </button>
+          )}
           <div className="flex items-center gap-2">
-            <FileText className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-            <span className="text-xl font-semibold">Finaliser votre CV</span>
+            <FileText className="w-6 h-6 text-indigo-400" />
+            <div className="flex flex-col">
+              <span className="text-lg font-semibold">Finaliser votre CV</span>
+              <span className="text-xs text-slate-300">
+                Ajustez le template, les couleurs, les polices et l&apos;ordre des sections avant de télécharger.
+              </span>
+            </div>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-
-        <Button
-          variant="default"
-          onClick={onHomeClick}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white"
+          <Button
+            variant="outline"
+            onClick={handleBackClick}
+            className="border-indigo-500/60 text-indigo-100 bg-indigo-500/10 hover:bg-indigo-500/20 hover:text-white"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Revenir en arrière
-        </Button>
+          </Button>
 
           <Button
             onClick={() => setIsExportModalOpen(true)}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-900/40"
             disabled={!resolvedPreviewElement}
           >
             <Download className="w-4 h-4 mr-2" />
