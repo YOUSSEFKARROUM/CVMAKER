@@ -76,6 +76,56 @@ export function ExperienceForm({
     }
   };
 
+  const applyDescriptionFormatting = (exp: Experience, isNew: boolean, tag: string) => {
+    const textareaId = `experience-description-${exp.id || 'new'}`;
+    const textarea = document.getElementById(textareaId) as HTMLTextAreaElement | null;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const baseText = exp.description || '';
+    const selectedText = baseText.substring(start, end);
+
+    let formattedText = '';
+    switch (tag) {
+      case 'bold':
+        formattedText = `**${selectedText}**`;
+        break;
+      case 'italic':
+        formattedText = `*${selectedText}*`;
+        break;
+      case 'underline':
+        formattedText = `<u>${selectedText}</u>`;
+        break;
+      case 'strikethrough':
+        formattedText = `~~${selectedText}~~`;
+        break;
+      case 'list':
+        formattedText = `\n• ${selectedText}`;
+        break;
+      case 'ordered-list':
+        formattedText = `\n1. ${selectedText}`;
+        break;
+      default:
+        formattedText = selectedText;
+    }
+
+    const newText = baseText.substring(0, start) + formattedText + baseText.substring(end);
+
+    if (isNew) {
+      setNewExperience((prev) =>
+        prev && prev.id === exp.id ? { ...prev, description: newText } : prev
+      );
+    } else {
+      onUpdate(exp.id, { description: newText });
+    }
+
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + formattedText.length, start + formattedText.length);
+    }, 0);
+  };
+
   const renderExperienceForm = (exp: Experience, isNew: boolean) => {
     const getAISuggestions = async (): Promise<string[]> => {
       return generateExperienceSuggestions(exp.jobTitle, 5, '500K€');
@@ -221,16 +271,61 @@ export function ExperienceForm({
           <div>
             <Label className="text-xs uppercase text-gray-500">{t('experience.description')}</Label>
             <div className="border border-gray-200 rounded-lg mt-1">
-              <div className="flex items-center gap-2 p-2 border-b border-gray-200">
-                <button className="p-1 hover:bg-gray-100 rounded"><Bold className="w-4 h-4" /></button>
-                <button className="p-1 hover:bg-gray-100 rounded"><Italic className="w-4 h-4" /></button>
-                <button className="p-1 hover:bg-gray-100 rounded"><Underline className="w-4 h-4" /></button>
-                <button className="p-1 hover:bg-gray-100 rounded"><Strikethrough className="w-4 h-4" /></button>
-                <button className="p-1 hover:bg-gray-100 rounded"><List className="w-4 h-4" /></button>
-                <button className="p-1 hover:bg-gray-100 rounded"><ListOrdered className="w-4 h-4" /></button>
-                <button className="p-1 hover:bg-gray-100 rounded"><Link className="w-4 h-4" /></button>
+              <div className="flex items-center gap-2 p-2 border-b border-gray-200 bg-gray-50">
+                <button
+                  type="button"
+                  onClick={() => applyDescriptionFormatting(exp, isNew, 'bold')}
+                  className="p-1 hover:bg-gray-200 rounded transition-colors"
+                >
+                  <Bold className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyDescriptionFormatting(exp, isNew, 'italic')}
+                  className="p-1 hover:bg-gray-200 rounded transition-colors"
+                >
+                  <Italic className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyDescriptionFormatting(exp, isNew, 'underline')}
+                  className="p-1 hover:bg-gray-200 rounded transition-colors"
+                >
+                  <Underline className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyDescriptionFormatting(exp, isNew, 'strikethrough')}
+                  className="p-1 hover:bg-gray-200 rounded transition-colors"
+                >
+                  <Strikethrough className="w-4 h-4" />
+                </button>
+                <div className="w-px h-4 bg-gray-300 mx-1" />
+                <button
+                  type="button"
+                  onClick={() => applyDescriptionFormatting(exp, isNew, 'list')}
+                  className="p-1 hover:bg-gray-200 rounded transition-colors"
+                >
+                  <List className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyDescriptionFormatting(exp, isNew, 'ordered-list')}
+                  className="p-1 hover:bg-gray-200 rounded transition-colors"
+                >
+                  <ListOrdered className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  className="p-1 hover:bg-gray-200 rounded transition-colors opacity-50 cursor-not-allowed"
+                  title="Lien non encore pris en charge"
+                  disabled
+                >
+                  <Link className="w-4 h-4" />
+                </button>
               </div>
               <textarea
+                id={`experience-description-${exp.id || 'new'}`}
                 value={exp.description}
                 onChange={(e) => isNew
                   ? setNewExperience({ ...exp, description: e.target.value })
