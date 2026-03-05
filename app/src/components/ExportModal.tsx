@@ -10,6 +10,16 @@ const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID as string | undef
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL as string | undefined;
 const PAYPAL_ENABLED = Boolean(PAYPAL_CLIENT_ID && BACKEND_URL);
 
+if (import.meta.env.DEV) {
+  // Aide au débogage en local sans exposer tout le client id
+  // eslint-disable-next-line no-console
+  console.log('[PayPal][Debug] Front config', {
+    paypalClientIdPrefix: PAYPAL_CLIENT_ID ? PAYPAL_CLIENT_ID.slice(0, 6) : null,
+    backendUrl: BACKEND_URL,
+    enabled: PAYPAL_ENABLED,
+  });
+}
+
 type PayPalButtonsInstance = {
   render: (container: HTMLElement) => void | Promise<void>;
   close?: () => void;
@@ -51,8 +61,10 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
   const [imageFormat, setImageFormat] = useState<'png' | 'jpeg' | 'webp'>('png');
   const [imageQuality, setImageQuality] = useState(0.95);
 
+  const mustPayBeforeDownload = PAYPAL_ENABLED && isPaypalReady && !hasPaid && !paypalError;
+
   const handleExportPDF = async () => {
-    if (PAYPAL_ENABLED && !hasPaid && !paypalError) {
+    if (mustPayBeforeDownload) {
       error("Veuillez d'abord effectuer le paiement PayPal pour télécharger votre CV en PDF.");
       return;
     }
@@ -109,6 +121,9 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
     if (!isOpen || activeTab !== 'pdf') return;
     if (!PAYPAL_ENABLED) return;
 
+    // eslint-disable-next-line no-console
+    console.log('[PayPal][Debug] Chargement du SDK PayPal...');
+
     if (window.paypal) {
       setIsPaypalReady(true);
       return;
@@ -134,9 +149,13 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
     script.dataset.cvPaypalSdk = 'true';
     script.onload = () => {
       setIsPaypalReady(true);
+      // eslint-disable-next-line no-console
+      console.log('[PayPal][Debug] SDK PayPal chargé.');
     };
     script.onerror = () => {
       setPaypalError("Impossible de charger le module de paiement PayPal pour le moment.");
+      // eslint-disable-next-line no-console
+      console.error('[PayPal][Debug] Erreur de chargement du SDK PayPal.');
     };
     document.body.appendChild(script);
   }, [isOpen, activeTab]);
@@ -447,7 +466,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
           {activeTab === 'pdf' && (
             <Button
               onClick={handleExportPDF}
-              disabled={isExporting || (PAYPAL_ENABLED && !hasPaid && !paypalError)}
+              disabled={isExporting || mustPayBeforeDownload}
               className="bg-indigo-600 hover:bg-indigo-700 text-white"
             >
               {isExporting ? (
@@ -458,9 +477,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
               ) : (
                 <>
                   <Download className="w-4 h-4 mr-2" />
-                  {PAYPAL_ENABLED && !hasPaid && !paypalError
-                    ? 'Télécharger après paiement'
-                    : 'Télécharger PDF'}
+                  {mustPayBeforeDownload ? 'Télécharger après paiement' : 'Télécharger PDF'}
                 </>
               )}
             </Button>
