@@ -1,10 +1,34 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { X, Download, FileText, Image as ImageIcon, Printer, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { exportCVToPDF, exportToImage, downloadImage, printCV } from '../utils/pdfExport';
 import { useToast } from '../hooks/useToast';
 import { colors } from '../styles/design-system';
+
+const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID as string | undefined;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL as string | undefined;
+const PAYPAL_ENABLED = Boolean(PAYPAL_CLIENT_ID && BACKEND_URL);
+
+type PayPalButtonsInstance = {
+  render: (container: HTMLElement) => void | Promise<void>;
+  close?: () => void;
+};
+
+type PayPalOnApproveData = {
+  orderID?: string;
+  [key: string]: unknown;
+};
+
+interface PayPalNamespace {
+  Buttons: (options: Record<string, unknown>) => PayPalButtonsInstance;
+}
+
+declare global {
+  interface Window {
+    paypal?: PayPalNamespace;
+  }
+}
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -17,12 +41,22 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
   const [activeTab, setActiveTab] = useState<'pdf' | 'image' | 'print'>('pdf');
   const [isExporting, setIsExporting] = useState(false);
   const { success, error } = useToast();
+  const [hasPaid, setHasPaid] = useState(false);
+  const [isPaypalReady, setIsPaypalReady] = useState(false);
+  const [paypalError, setPaypalError] = useState<string | null>(null);
+  const paypalContainerRef = useRef<HTMLDivElement | null>(null);
+  const paypalButtonsRenderedRef = useRef(false);
 
   // Image Options
   const [imageFormat, setImageFormat] = useState<'png' | 'jpeg' | 'webp'>('png');
   const [imageQuality, setImageQuality] = useState(0.95);
 
   const handleExportPDF = async () => {
+    if (PAYPAL_ENABLED && !hasPaid && !paypalError) {
+      error("Veuillez d'abord effectuer le paiement PayPal pour télécharger votre CV en PDF.");
+      return;
+    }
+
     if (!previewElement) {
       error('Aperçu non disponible');
       return;
@@ -69,6 +103,145 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
     printCV(previewElement.id || 'cv-preview');
     onClose();
   };
+
+  // Charger le SDK PayPal uniquement si nécessaire
+  useEffect(() => {
+    if (!isOpen || activeTab !== 'pdf') return;
+    if (!PAYPAL_ENABLED) return;
+
+    if (window.paypal) {
+      setIsPaypalReady(true);
+      return;
+    }
+
+    const existingScript = document.querySelector<HTMLScriptElement>(
+      'script[data-cv-paypal-sdk="true"]'
+    );
+    if (existingScript) {
+      existingScript.addEventListener(
+        'load',
+        () => {
+          setIsPaypalReady(true);
+        },
+        { once: true }
+      );
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=EUR&intent=CAPTURE`;
+    script.async = true;
+    script.dataset.cvPaypalSdk = 'true';
+    script.onload = () => {
+      setIsPaypalReady(true);
+    };
+    script.onerror = () => {
+      setPaypalError("Impossible de charger le module de paiement PayPal pour le moment.");
+    };
+    document.body.appendChild(script);
+  }, [isOpen, activeTab]);
+
+  // Rendu des boutons PayPal
+  useEffect(() => {
+    if (!PAYPAL_ENABLED) return;
+    if (!isOpen || activeTab !== 'pdf') return;
+    if (!isPaypalReady || !window.paypal || !paypalContainerRef.current) return;
+    if (paypalButtonsRenderedRef.current) return;
+
+    const buttons = window.paypal.Buttons({
+      style: {
+        layout: 'vertical',
+        color: 'gold',
+        shape: 'pill',
+        label: 'pay',
+      },
+      createOrder: async () => {
+        if (!BACKEND_URL) {
+          throw new Error('Backend PayPal non configuré');
+        }
+        const response = await fetch(`${BACKEND_URL}/payments/create-order`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ cvTitle: filename }),
+        });
+
+        if (!response.ok) {
+          const text = await response.text().catch(() => '');
+          throw new Error(text || 'Erreur lors de la création de la commande PayPal.');
+        }
+
+        const data = await response.json();
+        return data.id as string;
+      },
+      onApprove: async (data: PayPalOnApproveData) => {
+        try {
+          if (!BACKEND_URL) {
+            throw new Error('Backend PayPal non configuré');
+          }
+          if (!data.orderID) {
+            throw new Error('orderID manquant dans la réponse PayPal');
+          }
+
+          const response = await fetch(`${BACKEND_URL}/payments/capture-order`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ orderId: data.orderID }),
+          });
+
+          if (!response.ok) {
+            const text = await response.text().catch(() => '');
+            throw new Error(text || 'Erreur lors de la confirmation du paiement PayPal.');
+          }
+
+          const result = await response.json();
+          if (result.status !== 'COMPLETED' && result.status !== 'APPROVED') {
+            throw new Error('Paiement PayPal non complété.');
+          }
+
+          setHasPaid(true);
+          setPaypalError(null);
+          success('Paiement confirmé. Vous pouvez maintenant télécharger votre CV en PDF.');
+        } catch (err) {
+          console.error(err);
+          error('Une erreur est survenue lors de la confirmation du paiement PayPal.');
+        }
+      },
+      onError: (err: unknown) => {
+        console.error(err);
+        setPaypalError('Une erreur est survenue avec le module de paiement PayPal.');
+      },
+    });
+
+    buttons
+      .render(paypalContainerRef.current)
+      .then(() => {
+        paypalButtonsRenderedRef.current = true;
+      })
+      .catch((err: unknown) => {
+        console.error(err);
+        setPaypalError('Impossible d\'afficher les boutons PayPal.');
+      });
+
+    return () => {
+      if (buttons.close) {
+        buttons.close();
+      }
+      paypalButtonsRenderedRef.current = false;
+    };
+  }, [isOpen, activeTab, isPaypalReady, filename, success, error]);
+
+  // Réinitialiser l'état paiement à la fermeture
+  useEffect(() => {
+    if (!isOpen) {
+      setHasPaid(false);
+      setPaypalError(null);
+      paypalButtonsRenderedRef.current = false;
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -161,6 +334,36 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
                   Pour un meilleur résultat, limitez votre CV à une page.
                 </p>
               </div>
+
+              <div className="p-4 bg-emerald-50 rounded-lg space-y-2">
+                <h3 className="font-medium text-emerald-900">
+                  Paiement sécurisé pour le téléchargement PDF
+                </h3>
+                <p className="text-sm text-emerald-800">
+                  Prix : <span className="font-semibold">2 € (≈ 20 DH)</span> par CV, via PayPal
+                  (carte bancaire ou compte PayPal).
+                </p>
+                {PAYPAL_ENABLED ? (
+                  <>
+                    <div ref={paypalContainerRef} className="mt-2" />
+                    {paypalError && (
+                      <p className="text-xs text-red-600 mt-2">
+                        {paypalError}
+                      </p>
+                    )}
+                    {hasPaid && (
+                      <p className="text-xs text-emerald-700 mt-1">
+                        Paiement validé. Vous pouvez maintenant lancer le téléchargement PDF.
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-xs text-amber-700 mt-2">
+                    Le paiement PayPal n&apos;est pas encore configuré (variables d&apos;environnement
+                    manquantes). En développement, le téléchargement reste gratuit.
+                  </p>
+                )}
+              </div>
             </div>
           )}
 
@@ -242,7 +445,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
           {activeTab === 'pdf' && (
             <Button
               onClick={handleExportPDF}
-              disabled={isExporting}
+              disabled={isExporting || (PAYPAL_ENABLED && !hasPaid && !paypalError)}
               className="bg-indigo-600 hover:bg-indigo-700 text-white"
             >
               {isExporting ? (
@@ -253,7 +456,9 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
               ) : (
                 <>
                   <Download className="w-4 h-4 mr-2" />
-                  Télécharger PDF
+                  {PAYPAL_ENABLED && !hasPaid && !paypalError
+                    ? 'Télécharger après paiement'
+                    : 'Télécharger PDF'}
                 </>
               )}
             </Button>
