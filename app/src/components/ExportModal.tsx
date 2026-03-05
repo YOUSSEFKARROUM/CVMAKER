@@ -216,15 +216,17 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
       },
     });
 
-    buttons
-      .render(paypalContainerRef.current)
-      .then(() => {
+    const renderButtons = async () => {
+      try {
+        await Promise.resolve(buttons.render(paypalContainerRef.current!));
         paypalButtonsRenderedRef.current = true;
-      })
-      .catch((err: unknown) => {
+      } catch (err) {
         console.error(err);
-        setPaypalError('Impossible d\'afficher les boutons PayPal.');
-      });
+        setPaypalError("Impossible d'afficher les boutons PayPal.");
+      }
+    };
+
+    renderButtons();
 
     return () => {
       if (buttons.close) {
