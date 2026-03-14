@@ -61,7 +61,8 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
   const [imageFormat, setImageFormat] = useState<'png' | 'jpeg' | 'webp'>('png');
   const [imageQuality, setImageQuality] = useState(0.95);
 
-  const mustPayBeforeDownload = PAYPAL_ENABLED && isPaypalReady && !hasPaid && !paypalError;
+  // Paiement requis si PayPal est activé et non encore payé (même si le SDK échoue à charger)
+  const mustPayBeforeDownload = PAYPAL_ENABLED && !hasPaid;
 
   const handleExportPDF = async () => {
     if (mustPayBeforeDownload) {
@@ -367,9 +368,20 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
                   <>
                     <div ref={paypalContainerRef} className="mt-2" />
                     {paypalError && (
-                      <p className="text-xs text-red-600 mt-2">
-                        {paypalError}
-                      </p>
+                      <div className="mt-2 p-3 bg-red-50 rounded-lg border border-red-200">
+                        <p className="text-xs text-red-700 font-medium mb-1">
+                          Le module de paiement PayPal n&apos;a pas pu se charger.
+                        </p>
+                        <p className="text-xs text-red-600">
+                          Vérifiez votre connexion et rechargez la page. Si le problème persiste, le Client ID PayPal sandbox est peut-être expiré.
+                        </p>
+                        <button
+                          onClick={() => { setPaypalError(null); setIsPaypalReady(false); paypalButtonsRenderedRef.current = false; }}
+                          className="mt-2 text-xs text-red-700 underline hover:no-underline"
+                        >
+                          Réessayer
+                        </button>
+                      </div>
                     )}
                     {hasPaid && (
                       <p className="text-xs text-emerald-700 mt-1">
