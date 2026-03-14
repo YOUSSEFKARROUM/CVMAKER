@@ -75,7 +75,9 @@
     "download": "Download",
     "export": "Export",
     "import": "Import",
-    "close": "Close"
+    "close": "Close",
+    "progress": "Progress",
+    "view": "View"
   },
   "landing": {
     "title": "Create your professional CV",

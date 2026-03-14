@@ -136,16 +136,18 @@ function App() {
   // Gestion de la langue
   const { i18n } = useTranslation();
   
+  // Synchronisation initiale de la langue (run once on mount)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const currentI18nLang = i18n.language;
     const settingsLang = settings.language;
-    
+
     if (settingsLang && settingsLang !== currentI18nLang) {
       i18n.changeLanguage(settingsLang);
     } else if (!settingsLang && currentI18nLang) {
-      setSettings({ ...settings, language: currentI18nLang });
+      setSettings(prev => ({ ...prev, language: currentI18nLang }));
     }
-  }, []);
+  }, []); // Intentionnellement vide : synchronisation initiale seulement
   
   useEffect(() => {
     if (i18n.language !== settings.language) {
@@ -614,9 +616,15 @@ function App() {
     }
   }, [currentStep]);
 
-  const renderContent = () => {
+  // Rediriger vers landing si non authentifié (via effet, pas dans le render)
+  useEffect(() => {
     if (!isAuthenticated && currentStep !== 'landing') {
       setCurrentStep('landing');
+    }
+  }, [isAuthenticated, currentStep]);
+
+  const renderContent = () => {
+    if (!isAuthenticated && currentStep !== 'landing') {
       return null;
     }
 

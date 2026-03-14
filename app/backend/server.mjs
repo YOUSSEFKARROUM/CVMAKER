@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -33,6 +34,23 @@ if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
 }
 
 app.use(express.json());
+
+// Rate limiting — protection anti-abus
+const paymentLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  message: { error: 'too_many_requests', message: 'Trop de tentatives de paiement. Réessayez dans 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 heure
+  max: 20,
+  message: { error: 'too_many_requests', message: 'Trop de tentatives. Réessayez dans 1 heure.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
   .split(',')
@@ -104,7 +122,7 @@ async function getAdminToken() {
 }
 
 // Create PayPal order for CV download
-app.post('/payments/create-order', async (req, res) => {
+app.post('/payments/create-order', paymentLimiter, async (req, res) => {
   try {
     if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
       return res.status(503).json({
@@ -169,7 +187,7 @@ app.post('/payments/create-order', async (req, res) => {
 });
 
 // Capture PayPal order after approval
-app.post('/payments/capture-order', async (req, res) => {
+app.post('/payments/capture-order', paymentLimiter, async (req, res) => {
   try {
     if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
       return res.status(503).json({
@@ -231,7 +249,7 @@ app.post('/payments/capture-order', async (req, res) => {
   }
 });
 
-app.post('/auth/register', async (req, res) => {
+app.post('/auth/register', authLimiter, async (req, res) => {
   try {
     const { email, password, displayName } = req.body || {};
 
@@ -337,7 +355,7 @@ app.post('/auth/register', async (req, res) => {
   }
 });
 
-app.post('/auth/forgot-password', async (req, res) => {
+app.post('/auth/forgot-password', authLimiter, async (req, res) => {
   try {
     const { email } = req.body || {};
     if (!email) {

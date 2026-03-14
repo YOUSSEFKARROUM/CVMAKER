@@ -51,7 +51,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
   const [activeTab, setActiveTab] = useState<'pdf' | 'image' | 'print'>('pdf');
   const [isExporting, setIsExporting] = useState(false);
   const { success, error } = useToast();
-  const [hasPaid, setHasPaid] = useState(false);
+  const [hasPaid, setHasPaid] = useState(() => sessionStorage.getItem('cv-maker-paid') === 'true');
   const [isPaypalReady, setIsPaypalReady] = useState(false);
   const [paypalError, setPaypalError] = useState<string | null>(null);
   const paypalContainerRef = useRef<HTMLDivElement | null>(null);
@@ -78,8 +78,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
     try {
       // Utiliser la fonction optimisée pour les CV (A4 exact)
       await exportCVToPDF(previewElement, `${filename}.pdf`);
-      success('PDF exporté avec succès');
-      onClose();
+      success('PDF exporté avec succès !');
     } catch (err) {
       error('Erreur lors de l\'export PDF');
     } finally {
@@ -221,6 +220,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
             throw new Error('Paiement PayPal non complété.');
           }
 
+          sessionStorage.setItem('cv-maker-paid', 'true');
           setHasPaid(true);
           setPaypalError(null);
           success('Paiement confirmé. Vous pouvez maintenant télécharger votre CV en PDF.');
@@ -255,10 +255,9 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
     };
   }, [isOpen, activeTab, isPaypalReady, filename, success, error]);
 
-  // Réinitialiser l'état paiement à la fermeture
+  // Réinitialiser l'état PayPal à la fermeture (mais conserver hasPaid via sessionStorage)
   useEffect(() => {
     if (!isOpen) {
-      setHasPaid(false);
       setPaypalError(null);
       paypalButtonsRenderedRef.current = false;
     }
