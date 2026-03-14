@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 import { MapPin, Phone, Mail, Linkedin, Globe, Github, User, Calendar, Flag, Heart, Car } from 'lucide-react';
 import type { TemplateProps } from './types';
 import { formatDate, getOrderedSections, type LayoutSectionId } from './utils';
@@ -125,7 +126,7 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                             <h4 className="font-semibold text-sm text-gray-900 break-words">{edu.diploma}</h4>
                             <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city ? `, ${edu.city}` : ''}</p>
                             {edu.description && (
-                              <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                              <div className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(edu.description) }} />
                             )}
                           </div>
                         ))}
@@ -152,7 +153,7 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                             <h4 className="font-semibold text-sm text-gray-900 break-words">{exp.jobTitle}</h4>
                             <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city ? `, ${exp.city}` : ''}</p>
                             {exp.description && (
-                              <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
+                              <div className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(exp.description) }} />
                             )}
                           </div>
                         ))}

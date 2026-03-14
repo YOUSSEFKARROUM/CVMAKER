@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 import type { TemplateProps } from './types';
 import { formatDate } from './utils';
 
@@ -176,7 +177,7 @@ export const AucklandTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                       </div>
                       <p className="text-[10px] text-gray-700 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city && `, ${edu.city}`}</p>
                       {edu.description && (
-                        <p className="text-[10px] text-gray-600 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                        <div className="text-[10px] text-gray-600 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(edu.description) }} />
                       )}
                     </div>
                   ))}
@@ -204,11 +205,7 @@ export const AucklandTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                       </div>
                       <p className="text-[10px] text-gray-700 mb-1.5 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
                       {exp.description && (
-                        <ul className="text-[10px] text-gray-700 leading-relaxed list-disc list-inside space-y-0.5 break-words" style={{ overflowWrap: 'anywhere' }}>
-                          {exp.description.split('\n').map((line, idx) => (
-                            line.trim() && <li key={idx}>{line.trim().replace(/^[-•]\s*/, '')}</li>
-                          ))}
-                        </ul>
+                        <div className="text-[10px] text-gray-700 leading-relaxed break-words cv-rich-text" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(exp.description) }} />
                       )}
                     </div>
                   ))}

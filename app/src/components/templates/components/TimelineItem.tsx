@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '../utils';
+import { sanitizeHtml } from '../../../utils/sanitize';
 
 interface TimelineItemProps {
   title: string;
@@ -43,7 +44,7 @@ export function TimelineItem({
           <div className="absolute left-[-5px] top-1.5 w-2 h-2 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: color || '#9ca3af' }} />
           <h4 className="font-semibold text-gray-900 text-[15px] break-words">{title}</h4>
           {subtitle && <p className="text-sm text-gray-600 mt-0.5 break-words" style={{ overflowWrap: 'anywhere' }}>{subtitle}</p>}
-          {description && <p className="text-sm text-gray-700 mt-1.5 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }}>{description}</p>}
+          {description && <div className="text-sm text-gray-700 mt-1.5 leading-relaxed break-words cv-rich-text" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }} />}
         </div>
       </div>
     );
@@ -58,7 +59,7 @@ export function TimelineItem({
         <h4 className="font-semibold text-gray-900 text-[15px] break-words">{title}</h4>
         {subtitle && <p className="text-sm text-gray-600 mt-0.5 break-words" style={{ overflowWrap: 'anywhere' }}>{subtitle}</p>}
         {dateRange && <p className="text-xs text-gray-500 mb-1">{dateRange}</p>}
-        {description && <p className="text-sm text-gray-700 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }}>{description}</p>}
+        {description && <div className="text-sm text-gray-700 leading-relaxed break-words cv-rich-text" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }} />}
       </div>
     );
   }
@@ -70,7 +71,7 @@ export function TimelineItem({
         {dateRange && <span className="text-xs text-gray-500 whitespace-nowrap flex-shrink-0">{dateRange}</span>}
       </div>
       {subtitle && <p className="text-sm text-gray-600 mt-0.5 break-words" style={{ overflowWrap: 'anywhere' }}>{subtitle}</p>}
-      {description && <p className="text-sm text-gray-700 mt-1.5 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }}>{description}</p>}
+      {description && <div className="text-sm text-gray-700 mt-1.5 leading-relaxed break-words cv-rich-text" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }} />}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 import { MapPin, Phone, Mail, Linkedin, Circle, Calendar, Flag, Car, HeartHandshake } from 'lucide-react';
 import type { TemplateProps } from './types';
 import { getInitials, formatDate, getOrderedSections, type LayoutSectionId } from './utils';
@@ -263,7 +264,7 @@ export const EdinburghTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                             <p className="text-xs text-gray-500 mt-1">{formatDate(edu.graduationDate)}</p>
                           )}
                           {edu.description && (
-                            <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                            <div className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(edu.description) }} />
                           )}
                         </div>
                       ))}

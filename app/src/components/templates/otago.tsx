@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 import { MapPin, Phone, Mail } from 'lucide-react';
 import type { TemplateProps } from './types';
 import { formatDate, getOrderedSections, type LayoutSectionId } from './utils';
@@ -143,7 +144,7 @@ export const OtagoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         <h4 className="font-semibold text-sm text-gray-900 break-words">{edu.diploma}</h4>
                         <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city && `, ${edu.city}`}</p>
                         {edu.description && (
-                          <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                          <div className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(edu.description) }} />
                         )}
                       </div>
                       <span className="text-xs text-gray-500 whitespace-nowrap flex-shrink-0">{formatDate(edu.graduationDate)}</span>
@@ -164,7 +165,7 @@ export const OtagoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         <h4 className="font-semibold text-sm text-gray-900 break-words">{exp.jobTitle}</h4>
                         <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
                         {exp.description && (
-                          <p className="text-xs text-gray-700 leading-relaxed mt-1 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
+                          <div className="text-xs text-gray-700 leading-relaxed mt-1 break-words" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(exp.description) }} />
                         )}
                       </div>
                       <span className="text-xs text-gray-500 whitespace-nowrap flex-shrink-0">

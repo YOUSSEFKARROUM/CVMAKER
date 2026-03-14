@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 import { useTranslation } from 'react-i18next';
 import { Globe, Award, Folder, Flag, Car } from 'lucide-react';
 import type { TemplateProps } from './types';
@@ -235,12 +236,7 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                             {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
                           </p>
                           {exp.description && (
-                            <p
-                              className="text-sm text-gray-700 break-words leading-relaxed"
-                              style={{ overflowWrap: 'anywhere' }}
-                            >
-                              {exp.description}
-                            </p>
+                            <div className="text-sm text-gray-700 break-words leading-relaxed cv-rich-text" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(exp.description) }} />
                           )}
                         </div>
                       ))}
@@ -318,12 +314,7 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                               <Globe className="w-3 h-3 flex-shrink-0 text-gray-400" />
                             )}
                           </div>
-                          <p
-                            className="text-sm text-gray-700 mb-1 break-words"
-                            style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
-                          >
-                            {proj.description}
-                          </p>
+                          <div className="text-sm text-gray-700 mb-1 break-words cv-rich-text" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(proj.description || '') }} />
                           {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
                             <div className="flex flex-wrap gap-1">
                               {proj.technologies.slice(0, 15).map((tech, idx) => (

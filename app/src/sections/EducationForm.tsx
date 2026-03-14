@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, ArrowLeft, Plus, Trash2, ChevronUp, Bold, Italic, Underline, Strikethrough, List, ListOrdered, Link } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Plus, Trash2, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { SortableList } from '../components/SortableList';
 import { AutocompleteInput } from '../components/AutocompleteInput';
+import { RichTextArea } from '../components/RichTextArea';
 import { commonSchools } from '../utils/aiSuggestions';
 import type { Education } from '../types/cv';
 
@@ -129,7 +130,7 @@ export function EducationForm({
                   ? setNewEducation({ ...edu, diploma: e.target.value })
                   : onUpdate(edu.id, { diploma: e.target.value })
                 }
-                className="w-full mt-1 h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2196F3]"
+                className="w-full mt-1 h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 {diplomaOptions.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -167,26 +168,15 @@ export function EducationForm({
 
           <div>
             <Label className="text-xs uppercase text-gray-500">{t('education.description')}</Label>
-            <div className="border border-gray-200 rounded-lg mt-1">
-              <div className="flex items-center gap-2 p-2 border-b border-gray-200">
-                <button className="p-1 hover:bg-gray-100 rounded"><Bold className="w-4 h-4" /></button>
-                <button className="p-1 hover:bg-gray-100 rounded"><Italic className="w-4 h-4" /></button>
-                <button className="p-1 hover:bg-gray-100 rounded"><Underline className="w-4 h-4" /></button>
-                <button className="p-1 hover:bg-gray-100 rounded"><Strikethrough className="w-4 h-4" /></button>
-                <button className="p-1 hover:bg-gray-100 rounded"><List className="w-4 h-4" /></button>
-                <button className="p-1 hover:bg-gray-100 rounded"><ListOrdered className="w-4 h-4" /></button>
-                <button className="p-1 hover:bg-gray-100 rounded"><Link className="w-4 h-4" /></button>
-              </div>
-              <textarea
-                value={edu.description}
-                onChange={(e) => isNew
-                  ? setNewEducation({ ...edu, description: e.target.value })
-                  : onUpdate(edu.id, { description: e.target.value })
-                }
-                placeholder={t('education.descriptionPlaceholder') || 'Décrivez vos études et réalisations...'}
-                className="w-full p-3 min-h-[100px] resize-none outline-none"
-              />
-            </div>
+            <RichTextArea
+              value={edu.description}
+              onChange={(html) => isNew
+                ? setNewEducation((prev) => prev ? { ...prev, description: html } : prev)
+                : onUpdate(edu.id, { description: html })
+              }
+              placeholder={t('education.descriptionPlaceholder') || 'Décrivez vos études et réalisations...'}
+              id={`education-description-${edu.id || 'new'}`}
+            />
           </div>
 
           {isNew && (
@@ -194,7 +184,7 @@ export function EducationForm({
               <Button variant="outline" onClick={handleCancel}>
                 {t('nav.cancel')}
               </Button>
-              <Button onClick={handleSave} className="bg-[#2196F3] hover:bg-[#1976D2]">
+              <Button onClick={handleSave} className="bg-indigo-600 hover:bg-indigo-700">
                 {t('nav.save')}
               </Button>
             </div>
@@ -207,7 +197,7 @@ export function EducationForm({
   return (
     <div className="max-w-2xl">
       <h2 className="text-3xl font-bold text-gray-800 mb-2">
-        <span className="text-[#2196F3]">{t('education.titleHighlight')}</span> {t('education.title')}
+        <span className="text-indigo-600">{t('education.titleHighlight')}</span> {t('education.title')}
       </h2>
       <p className="text-gray-500 mb-8">
         {t('education.subtitle')}
@@ -215,7 +205,7 @@ export function EducationForm({
 
       <button
         onClick={handleAdd}
-        className="flex items-center gap-2 text-[#2196F3] font-medium mb-4 hover:underline"
+        className="flex items-center gap-2 text-indigo-600 font-medium mb-4 hover:underline"
       >
         <Plus className="w-5 h-5" />
         {t('education.add')}
@@ -246,7 +236,7 @@ export function EducationForm({
         </Button>
         <Button
           onClick={handleNext}
-          className="bg-[#2196F3] hover:bg-[#1976D2] text-white px-6 py-2 rounded flex items-center gap-2"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded flex items-center gap-2"
         >
           {t('education.nextStep')}
           <ArrowRight className="w-4 h-4" />

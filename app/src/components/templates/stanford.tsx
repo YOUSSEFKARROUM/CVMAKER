@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 import { MapPin, Phone, Mail, Linkedin, Globe, Github, Flag, Car } from 'lucide-react';
 import type { TemplateProps } from './types';
 import { getInitials, getSkillLevelWidth, formatDate, getOrderedSections, type LayoutSectionId } from './utils';
@@ -193,7 +194,7 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                           </div>
                           <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city && `, ${edu.city}`}</p>
                           {edu.description && (
-                            <p className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                            <div className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(edu.description) }} />
                           )}
                         </div>
                       ))}
@@ -216,7 +217,7 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                           </div>
                           <p className="text-xs text-gray-600 mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
                           {exp.description && (
-                            <p className="text-xs text-gray-700 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
+                            <div className="text-xs text-gray-700 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(exp.description) }} />
                           )}
                         </div>
                       ))}

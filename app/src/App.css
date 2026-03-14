@@ -1,5 +1,57 @@
 /* CV Builder App Styles */
 
+/* ===== Rich Text Editor ===== */
+.rich-text-editor:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.rich-text-editor ul {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+  margin: 0.25rem 0;
+}
+
+.rich-text-editor ol {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+  margin: 0.25rem 0;
+}
+
+.rich-text-editor li {
+  margin: 0.1rem 0;
+}
+
+.rich-text-editor a {
+  color: #4f46e5;
+  text-decoration: underline;
+}
+
+/* HTML description rendu dans les templates */
+.cv-rich-text ul {
+  list-style-type: disc;
+  padding-left: 1rem;
+  margin: 0.15rem 0;
+}
+
+.cv-rich-text ol {
+  list-style-type: decimal;
+  padding-left: 1rem;
+  margin: 0.15rem 0;
+}
+
+.cv-rich-text li {
+  margin: 0.05rem 0;
+  line-height: 1.4;
+}
+
+.cv-rich-text strong, .cv-rich-text b { font-weight: 700; }
+.cv-rich-text em, .cv-rich-text i { font-style: italic; }
+.cv-rich-text u { text-decoration: underline; }
+.cv-rich-text s, .cv-rich-text strike { text-decoration: line-through; }
+.cv-rich-text a { color: inherit; text-decoration: underline; }
+
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;

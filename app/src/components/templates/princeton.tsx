@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 import type { TemplateProps } from './types';
 import { getInitials, formatDate, getOrderedSections, type LayoutSectionId } from './utils';
 
@@ -112,7 +113,7 @@ export const PrincetonTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                       <div className="min-w-0">
                         <p className="text-sm text-gray-800 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.diploma}{edu.school ? `, ${edu.school}` : ''}{edu.city ? `, ${edu.city}` : ''}</p>
                         {edu.description && (
-                          <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                          <div className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(edu.description) }} />
                         )}
                       </div>
                     </div>
@@ -135,11 +136,7 @@ export const PrincetonTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         <p className="text-sm font-semibold text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.jobTitle}</p>
                         <p className="text-sm text-gray-700 italic mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city ? `, ${exp.city}` : ''}</p>
                         {exp.description && (
-                          <ul className="text-sm text-gray-800 list-disc list-inside space-y-0.5 break-words" style={{ overflowWrap: 'anywhere' }}>
-                            {exp.description.split('\n').filter(line => line.trim()).map((line, idx) => (
-                              <li key={idx}>{line.trim().replace(/^[-•]\s*/, '')}</li>
-                            ))}
-                          </ul>
+                          <div className="text-sm text-gray-800 break-words cv-rich-text" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(exp.description) }} />
                         )}
                       </div>
                     </div>

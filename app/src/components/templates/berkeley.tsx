@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 import { User, Briefcase, GraduationCap } from 'lucide-react';
 import type { TemplateProps } from './types';
 import { getInitials, formatDate, getOrderedSections, type LayoutSectionId } from './utils';
@@ -92,7 +93,7 @@ export const BerkeleyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.diploma}</h4>
                         <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}</p>
                         {edu.description && (
-                          <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                          <div className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(edu.description) }} />
                         )}
                       </div>
                       <span className="text-sm text-gray-500 whitespace-nowrap flex-shrink-0">
@@ -122,14 +123,7 @@ export const BerkeleyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         <h4 className="font-semibold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.jobTitle}</h4>
                         <p className="text-sm text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}</p>
                         {exp.description && (
-                          <ul className="mt-2 space-y-1">
-                            {exp.description.split('\n').filter(line => line.trim()).map((line, idx) => (
-                              <li key={idx} className="text-sm text-gray-700 flex items-start gap-2 break-words" style={{ overflowWrap: 'anywhere' }}>
-                                <span className="text-gray-400 mt-1.5 flex-shrink-0">•</span>
-                                <span>{line.trim().replace(/^[•\-\*]\s*/, '')}</span>
-                              </li>
-                            ))}
-                          </ul>
+                          <div className="mt-2 text-sm text-gray-700 break-words cv-rich-text" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(exp.description) }} />
                         )}
                       </div>
                       <span className="text-sm text-gray-500 whitespace-nowrap flex-shrink-0">

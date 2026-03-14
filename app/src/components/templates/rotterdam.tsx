@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 import { useTranslation } from 'react-i18next';
 import { Award, Folder } from 'lucide-react';
 import type { TemplateProps } from './types';
@@ -133,7 +134,7 @@ export const RotterdamTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         <h4 className="font-semibold text-gray-900 break-words">{exp.jobTitle}</h4>
                         <p className="text-gray-600 text-sm break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
                         {exp.description && (
-                          <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{exp.description}</p>
+                          <div className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(exp.description) }} />
                         )}
                       </div>
                     </div>
@@ -156,7 +157,7 @@ export const RotterdamTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         <h4 className="font-semibold text-gray-900 break-words">{edu.diploma}</h4>
                         <p className="text-gray-600 text-sm break-words" style={{ overflowWrap: 'anywhere' }}>{edu.school}{edu.city ? `, ${edu.city}` : ''}</p>
                         {edu.description && (
-                          <p className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }}>{edu.description}</p>
+                          <div className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(edu.description) }} />
                         )}
                       </div>
                     </div>
@@ -210,7 +211,7 @@ export const RotterdamTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         <Folder className="w-4 h-4 flex-shrink-0" style={{ color: settings.primaryColor }} />
                         <h4 className="font-semibold text-gray-900 truncate">{proj.name}</h4>
                       </div>
-                      <p className="text-sm text-gray-700 mb-1 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{proj.description}</p>
+                      <div className="text-sm text-gray-700 mb-1 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(proj.description || '') }} />
                       {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                           {proj.technologies.slice(0, 15).map((tech, idx) => (

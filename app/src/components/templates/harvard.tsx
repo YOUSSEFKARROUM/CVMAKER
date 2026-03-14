@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 import { MapPin, Phone, Mail, Linkedin, Globe, Github, Award, Star, Square, GraduationCap, Briefcase, CheckCircle, User, Lightbulb, MessageSquare } from 'lucide-react';
 import type { TemplateProps } from './types';
 import { getInitials, formatDate, getOrderedSections, type LayoutSectionId } from './utils';
@@ -73,7 +74,7 @@ const TimelineItem = ({
       <h4 className="font-bold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{title}</h4>
       <p className="text-xs text-gray-600 mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{subtitle}</p>
       {description && (
-        <p className="text-xs text-gray-700 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }}>{description}</p>
+        <div className="text-xs text-gray-700 leading-relaxed break-words cv-rich-text" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }} />
       )}
     </div>
   </div>
