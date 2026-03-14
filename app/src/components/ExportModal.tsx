@@ -144,7 +144,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
     }
 
     const script = document.createElement('script');
-    script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=EUR&intent=CAPTURE`;
+    script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=EUR&components=buttons&locale=fr_FR`;
     script.async = true;
     script.dataset.cvPaypalSdk = 'true';
     script.onload = () => {
