@@ -1,9 +1,9 @@
 import { forwardRef } from 'react';
 import { sanitizeHtml } from '../../utils/sanitize';
 import { useTranslation } from 'react-i18next';
-import { Globe, Award, Folder, Flag, Car } from 'lucide-react';
+import { Globe, Award, Folder, Flag } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { getInitials, formatDate, getOrderedSections } from './utils';
+import { getInitials, formatDate, getOrderedSections, isSectionVisible } from './utils';
 import { SectionTitle, ContactItem } from './components';
 
 export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
@@ -19,12 +19,16 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
       certifications,
       projects,
       interests,
+      references,
+      internships,
+      publications,
+      extracurricular,
     } = cvData;
 
-    const orderedSections = getOrderedSections(settings);
+    const orderedSections = getOrderedSections(settings).filter((id) => isSectionVisible(id, settings));
 
     return (
-      <div 
+      <div
         ref={ref}
         id="cv-preview"
         data-cv-preview
@@ -33,7 +37,7 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
       >
         <div className="flex">
           {/* Left Side with Photo */}
-          <div 
+          <div
             className="w-2/5 relative"
             style={{ backgroundColor: settings.primaryColor }}
           >
@@ -43,7 +47,7 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                   <img src={contact.photo} alt="Profile" className="w-full h-full object-cover" />
                 </div>
               ) : (
-                <div 
+                <div
                   className="w-full aspect-[3/4] mb-6 flex items-center justify-center text-8xl font-bold"
                   style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
                 >
@@ -51,13 +55,13 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 </div>
               )}
 
-              <h1 
+              <h1
                 className="text-3xl font-bold mb-1"
                 style={{ fontFamily: settings.titleFont }}
               >
                 {contact.firstName}
               </h1>
-              <h1 
+              <h1
                 className="text-3xl font-bold mb-4"
                 style={{ fontFamily: settings.titleFont }}
               >
@@ -72,24 +76,27 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               <div className="space-y-3 text-sm">
                 <ContactItem icon="email" value={contact.email} variant="sidebar" />
                 <ContactItem icon="phone" value={contact.phone} variant="sidebar" />
-                <ContactItem 
-                  icon="location" 
-                  value={[contact.city, contact.country].filter(Boolean).join(', ')} 
-                  variant="sidebar" 
+                <ContactItem
+                  icon="location"
+                  value={[contact.city, contact.country].filter(Boolean).join(', ')}
+                  variant="sidebar"
                 />
                 <ContactItem icon="linkedin" value={contact.linkedin} variant="sidebar" />
                 <ContactItem icon="github" value={contact.github} variant="sidebar" />
                 <ContactItem icon="portfolio" value={contact.portfolio} variant="sidebar" />
                 <ContactItem icon="nationality" value={contact.nationality} variant="sidebar" />
                 <ContactItem icon="birthdate" value={contact.birthDate} variant="sidebar" />
+                {contact.drivingLicense && (
+                  <ContactItem icon="driving" value={contact.drivingLicense} variant="sidebar" />
+                )}
               </div>
 
               {/* Skills */}
-              {skills.length > 0 && (
+              {isSectionVisible('skills', settings) && skills.length > 0 && (
                 <div className="mt-8">
-                  <SectionTitle 
-                    titleKey="template.skills" 
-                    variant="sidebar" 
+                  <SectionTitle
+                    titleKey="template.skills"
+                    variant="sidebar"
                   />
                   <div className="flex flex-wrap gap-2">
                     {skills.map((skill) => (
@@ -102,17 +109,18 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               )}
 
               {/* Languages */}
-              {languages.length > 0 && (
+              {isSectionVisible('languages', settings) && languages.length > 0 && (
                 <div className="mt-8">
-                  <SectionTitle 
-                    titleKey="template.languages" 
-                    variant="sidebar" 
+                  <SectionTitle
+                    titleKey="template.languages"
+                    variant="sidebar"
                   />
                   <div className="space-y-1">
                     {languages.map((lang) => (
                       <div key={lang.id} className="flex items-center gap-2">
                         <Flag className="w-4 h-4 opacity-70" />
                         <span className="text-sm">{lang.name}</span>
+                        {lang.level && <span className="text-xs opacity-70">({t(`template.languageLevels.${lang.level}`, lang.level)})</span>}
                       </div>
                     ))}
                   </div>
@@ -120,11 +128,11 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               )}
 
               {/* Certifications */}
-              {certifications.length > 0 && (
+              {isSectionVisible('certifications', settings) && certifications.length > 0 && (
                 <div className="mt-8">
-                  <SectionTitle 
-                    titleKey="template.certifications" 
-                    variant="sidebar" 
+                  <SectionTitle
+                    titleKey="template.certifications"
+                    variant="sidebar"
                   />
                   <div className="space-y-3">
                     {certifications.map((cert) => (
@@ -143,11 +151,11 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               )}
 
               {/* Projects */}
-              {projects.length > 0 && (
+              {isSectionVisible('projects', settings) && projects.length > 0 && (
                 <div className="mt-8">
-                  <SectionTitle 
-                    titleKey="template.projects" 
-                    variant="sidebar" 
+                  <SectionTitle
+                    titleKey="template.projects"
+                    variant="sidebar"
                   />
                   <div className="space-y-3">
                     {projects.slice(0, 3).map((proj) => (
@@ -168,11 +176,11 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               )}
 
               {/* Interests */}
-              {interests.length > 0 && (
+              {isSectionVisible('interests', settings) && interests.length > 0 && (
                 <div className="mt-8">
-                  <SectionTitle 
-                    titleKey="template.interests" 
-                    variant="sidebar" 
+                  <SectionTitle
+                    titleKey="template.interests"
+                    variant="sidebar"
                   />
                   <div className="flex flex-wrap gap-2">
                     {interests.map((interest, idx) => (
@@ -180,20 +188,6 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         {interest}
                       </span>
                     ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Driving License */}
-              {contact.drivingLicense && (
-                <div className="mt-8">
-                  <SectionTitle 
-                    titleKey="template.drivingLicense" 
-                    variant="sidebar" 
-                  />
-                  <div className="flex items-center gap-2 text-sm">
-                    <Car className="w-4 h-4 opacity-70" />
-                    <span>{contact.drivingLicense}</span>
                   </div>
                 </div>
               )}
@@ -337,7 +331,7 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               if (section === 'languages') {
                 if (!languages.length) return null;
                 return (
-                  <div key="languages">
+                  <div key="languages" className="mb-8">
                     <SectionTitle
                       titleKey="template.languages"
                       color={settings.primaryColor}
@@ -346,7 +340,7 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     <div className="space-y-1">
                       {languages.map((lang) => (
                         <p key={lang.id} className="text-sm text-gray-700">
-                          {lang.name}
+                          {lang.name}{lang.level ? ` — ${t(`template.languageLevels.${lang.level}`, lang.level)}` : ''}
                         </p>
                       ))}
                     </div>
@@ -356,6 +350,65 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
               return null;
             })}
+
+            {isSectionVisible('internships', settings) && internships.length > 0 && (
+              <div className="mb-8">
+                <SectionTitle titleKey="template.internships" color={settings.primaryColor} variant="bordered" />
+                <div className="space-y-5">
+                  {internships.map((intern) => (
+                    <div key={intern.id}>
+                      <h4 className="font-semibold text-gray-900">{intern.jobTitle}</h4>
+                      <p className="text-gray-600 text-sm">{intern.employer}</p>
+                      <p className="text-xs text-gray-500 mb-1">
+                        {formatDate(intern.startDate)} -{' '}
+                        {intern.currentlyWorking ? t('common.present') : formatDate(intern.endDate)}
+                      </p>
+                      {intern.description && (
+                        <div className="text-sm text-gray-700 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(intern.description) }} />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {isSectionVisible('publications', settings) && publications.length > 0 && (
+              <div className="mb-8">
+                <SectionTitle titleKey="template.publications" color={settings.primaryColor} variant="bordered" />
+                <div className="space-y-1">
+                  {publications.map((pub, i) => (
+                    <p key={i} className="text-sm text-gray-700">• {pub}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {isSectionVisible('extracurricular', settings) && extracurricular.length > 0 && (
+              <div className="mb-8">
+                <SectionTitle titleKey="template.extracurricular" color={settings.primaryColor} variant="bordered" />
+                <div className="space-y-1">
+                  {extracurricular.map((act, i) => (
+                    <p key={i} className="text-sm text-gray-700">• {act}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {isSectionVisible('references', settings) && references.length > 0 && (
+              <div className="mb-8">
+                <SectionTitle titleKey="template.references" color={settings.primaryColor} variant="bordered" />
+                <div className="grid grid-cols-2 gap-4">
+                  {references.map((ref) => (
+                    <div key={ref.id} className="text-sm">
+                      <p className="font-semibold text-gray-900">{ref.name}</p>
+                      <p className="text-gray-600">{ref.position}{ref.company && `, ${ref.company}`}</p>
+                      {ref.email && <p className="text-gray-500 text-xs">{ref.email}</p>}
+                      {ref.phone && <p className="text-gray-500 text-xs">{ref.phone}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

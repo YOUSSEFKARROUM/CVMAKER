@@ -3,28 +3,32 @@ import { sanitizeHtml } from '../../utils/sanitize';
 import { useTranslation } from 'react-i18next';
 import { Award, Folder, Flag } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { getInitials, formatDate, getOrderedSections } from './utils';
+import { getInitials, formatDate, getOrderedSections, isSectionVisible } from './utils';
 import { SectionTitle } from './components/SectionTitle';
 import { ContactItem } from './components/ContactItem';
 
 export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
     const { t } = useTranslation();
-    const { 
-      contact, 
-      experiences, 
-      educations, 
-      skills, 
-      profile, 
-      languages, 
-      certifications, 
-      projects, 
-      interests 
+    const {
+      contact,
+      experiences,
+      educations,
+      skills,
+      profile,
+      languages,
+      certifications,
+      projects,
+      interests,
+      references,
+      internships,
+      publications,
+      extracurricular,
     } = cvData;
-    const orderedSections = getOrderedSections(settings);
+    const orderedSections = getOrderedSections(settings).filter((id) => isSectionVisible(id, settings));
 
     return (
-      <div 
+      <div
         ref={ref}
         id="cv-preview"
         data-cv-preview
@@ -34,9 +38,9 @@ export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         {/* Header */}
         <div className="text-center mb-10">
           {contact.photo ? (
-            <img 
-              src={contact.photo} 
-              alt="Profile" 
+            <img
+              src={contact.photo}
+              alt="Profile"
               className="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 border-gray-100"
             />
           ) : (
@@ -44,7 +48,7 @@ export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               {getInitials(contact.firstName, contact.lastName)}
             </div>
           )}
-          <h1 
+          <h1
             className="text-4xl font-bold mb-2"
             style={{ fontFamily: settings.titleFont }}
           >
@@ -53,8 +57,7 @@ export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
           {contact.jobTitle && (
             <p className="text-lg text-gray-500">{contact.jobTitle}</p>
           )}
-          
-          {/* Contact Info */}
+
           <div className="flex justify-center gap-4 text-sm text-gray-500 mt-3 flex-wrap">
             {contact.email && (
               <ContactItem icon="email" value={contact.email} variant="inline" />
@@ -63,15 +66,14 @@ export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               <ContactItem icon="phone" value={contact.phone} variant="inline" />
             )}
             {(contact.city || contact.country) && (
-              <ContactItem 
-                icon="location" 
-                value={[contact.city, contact.country].filter(Boolean).join(', ')} 
-                variant="inline" 
+              <ContactItem
+                icon="location"
+                value={[contact.city, contact.country].filter(Boolean).join(', ')}
+                variant="inline"
               />
             )}
           </div>
-          
-          {/* Additional Contact Info */}
+
           <div className="flex justify-center gap-4 text-sm text-gray-500 mt-2 flex-wrap">
             {contact.linkedin && (
               <ContactItem icon="linkedin" value={contact.linkedin} variant="inline" className="break-all" />
@@ -222,7 +224,7 @@ export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                       <div key={lang.id} className="flex items-center gap-2">
                         <Flag className="w-4 h-4" style={{ color: settings.primaryColor }} />
                         <span className="text-sm text-gray-700">{lang.name}</span>
-                        <span className="text-xs text-gray-500">({t(`languages.levels.${lang.level}`)})</span>
+                        {lang.level && <span className="text-xs text-gray-500">({t(`template.languageLevels.${lang.level}`, lang.level)})</span>}
                       </div>
                     ))}
                   </div>
@@ -232,18 +234,18 @@ export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             return null;
           })}
 
-          {skills.length > 0 && (
+          {isSectionVisible('skills', settings) && skills.length > 0 && (
             <div>
-              <SectionTitle 
-                titleKey="template.skills" 
+              <SectionTitle
+                titleKey="template.skills"
                 color={settings.primaryColor}
                 variant="bordered"
                 className="text-center"
               />
               <div className="flex flex-wrap justify-center gap-2">
                 {skills.map((skill) => (
-                  <span 
-                    key={skill.id} 
+                  <span
+                    key={skill.id}
                     className="px-3 py-1 border rounded-full text-sm"
                     style={{ borderColor: settings.primaryColor }}
                   >
@@ -254,22 +256,83 @@ export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             </div>
           )}
 
-          {interests.length > 0 && (
+          {isSectionVisible('interests', settings) && interests.length > 0 && (
             <div>
-              <SectionTitle 
-                titleKey="template.interests" 
+              <SectionTitle
+                titleKey="template.interests"
                 color={settings.primaryColor}
                 variant="bordered"
                 className="text-center"
               />
               <div className="flex flex-wrap justify-center gap-2">
                 {interests.map((interest, idx) => (
-                  <span 
-                    key={idx} 
+                  <span
+                    key={idx}
                     className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700"
                   >
                     {interest}
                   </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {isSectionVisible('internships', settings) && internships.length > 0 && (
+            <div>
+              <SectionTitle titleKey="template.internships" color={settings.primaryColor} variant="bordered" className="text-center" />
+              <div className="space-y-6">
+                {internships.map((intern) => (
+                  <div key={intern.id} className="flex gap-4 min-w-0">
+                    <div className="w-24 flex-shrink-0 text-right">
+                      <p className="text-sm text-gray-500">{formatDate(intern.startDate)}</p>
+                      <p className="text-sm text-gray-500">{intern.currentlyWorking ? t('common.present') : formatDate(intern.endDate)}</p>
+                    </div>
+                    <div className="flex-1 min-w-0 pb-6 border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
+                      <h4 className="font-semibold text-gray-900 break-words">{intern.jobTitle}</h4>
+                      <p className="text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{intern.employer}{intern.city && `, ${intern.city}`}</p>
+                      {intern.description && (
+                        <div className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(intern.description) }} />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {isSectionVisible('publications', settings) && publications.length > 0 && (
+            <div>
+              <SectionTitle titleKey="template.publications" color={settings.primaryColor} variant="bordered" className="text-center" />
+              <div className="space-y-1 text-center">
+                {publications.map((pub, i) => (
+                  <p key={i} className="text-sm text-gray-700">{pub}</p>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {isSectionVisible('extracurricular', settings) && extracurricular.length > 0 && (
+            <div>
+              <SectionTitle titleKey="template.extracurricular" color={settings.primaryColor} variant="bordered" className="text-center" />
+              <div className="flex flex-wrap justify-center gap-2">
+                {extracurricular.map((act, idx) => (
+                  <span key={idx} className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{act}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {isSectionVisible('references', settings) && references.length > 0 && (
+            <div>
+              <SectionTitle titleKey="template.references" color={settings.primaryColor} variant="bordered" className="text-center" />
+              <div className="grid grid-cols-2 gap-4">
+                {references.map((ref) => (
+                  <div key={ref.id} className="text-sm text-center">
+                    <p className="font-semibold text-gray-900">{ref.name}</p>
+                    <p className="text-gray-600">{ref.position}{ref.company && `, ${ref.company}`}</p>
+                    {ref.email && <p className="text-gray-500 text-xs">{ref.email}</p>}
+                    {ref.phone && <p className="text-gray-500 text-xs">{ref.phone}</p>}
+                  </div>
                 ))}
               </div>
             </div>

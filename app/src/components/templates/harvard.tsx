@@ -1,10 +1,11 @@
 import { forwardRef } from 'react';
 import { sanitizeHtml } from '../../utils/sanitize';
-import { MapPin, Phone, Mail, Linkedin, Globe, Github, Award, Star, Square, GraduationCap, Briefcase, CheckCircle, User, Lightbulb, MessageSquare } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { MapPin, Phone, Mail, Linkedin, Globe, Github, Award, Star, Square, GraduationCap, Briefcase, CheckCircle, User, MessageSquare, BookOpen, Users } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { getInitials, formatDate, getOrderedSections, type LayoutSectionId } from './utils';
+import { getInitials, formatDate, getOrderedSections, isSectionVisible, type LayoutSectionId } from './utils';
 
-// Star rating component
+// Star rating component for sidebar
 const StarRating = ({ level, color = 'white' }: { level: string; color?: string }) => {
   const filledStars = level === 'beginner' ? 1 : level === 'intermediate' ? 3 : level === 'advanced' ? 4 : 5;
   return (
@@ -12,10 +13,10 @@ const StarRating = ({ level, color = 'white' }: { level: string; color?: string 
       {[1, 2, 3, 4, 5].map((star) => (
         <Star
           key={star}
-          className={`w-3 h-3 ${star <= filledStars ? `fill-${color} text-${color}` : `text-${color}/30`}`}
-          style={{ 
+          className={`w-3 h-3`}
+          style={{
             fill: star <= filledStars ? color : 'transparent',
-            color: star <= filledStars ? color : `${color}4D`
+            color: star <= filledStars ? color : `${color}4D`,
           }}
         />
       ))}
@@ -35,16 +36,16 @@ const SectionHeader = ({ icon: Icon, title }: { icon: React.ElementType; title: 
   </div>
 );
 
-// Timeline item component
-const TimelineItem = ({ 
-  startDate, 
-  endDate, 
+// Timeline item with i18n for "present"
+const TimelineItemHarvard = ({
+  startDate,
+  endDate,
   currentlyWorking,
-  title, 
-  subtitle, 
+  title,
+  subtitle,
   description,
-  primaryColor 
-}: { 
+  primaryColor,
+}: {
   startDate?: string;
   endDate?: string;
   currentlyWorking?: boolean;
@@ -52,44 +53,45 @@ const TimelineItem = ({
   subtitle: string;
   description?: string;
   primaryColor: string;
-}) => (
-  <div className="relative pl-6 pb-6 last:pb-0">
-    {/* Timeline dot */}
-    <div 
-      className="absolute left-0 top-1 w-3 h-3 rounded-full border-2 border-white shadow-sm"
-      style={{ backgroundColor: primaryColor }}
-    />
-    {/* Timeline line */}
-    <div 
-      className="absolute left-[5px] top-4 bottom-0 w-0.5"
-      style={{ backgroundColor: primaryColor }}
-    />
-    {/* Content */}
-    <div className="min-w-0">
-      {(startDate || endDate) && (
-        <p className="text-xs text-gray-500 mb-1">
-          {startDate && formatDate(startDate)} - {currentlyWorking ? 'Présent' : endDate ? formatDate(endDate) : ''}
-        </p>
-      )}
-      <h4 className="font-bold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{title}</h4>
-      <p className="text-xs text-gray-600 mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{subtitle}</p>
-      {description && (
-        <div className="text-xs text-gray-700 leading-relaxed break-words cv-rich-text" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }} />
-      )}
+}) => {
+  const { t } = useTranslation();
+  return (
+    <div className="relative pl-6 pb-6 last:pb-0">
+      <div
+        className="absolute left-0 top-1 w-3 h-3 rounded-full border-2 border-white shadow-sm"
+        style={{ backgroundColor: primaryColor }}
+      />
+      <div
+        className="absolute left-[5px] top-4 bottom-0 w-0.5"
+        style={{ backgroundColor: primaryColor }}
+      />
+      <div className="min-w-0">
+        {(startDate || endDate) && (
+          <p className="text-xs text-gray-500 mb-1">
+            {startDate && formatDate(startDate)} - {currentlyWorking ? t('common.present') : endDate ? formatDate(endDate) : ''}
+          </p>
+        )}
+        <h4 className="font-bold text-sm text-gray-900 break-words" style={{ overflowWrap: 'anywhere' }}>{title}</h4>
+        <p className="text-xs text-gray-600 mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{subtitle}</p>
+        {description && (
+          <div className="text-xs text-gray-700 leading-relaxed break-words cv-rich-text" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }} />
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
-    const { contact, experiences, educations, skills, profile, languages, interests, certifications } = cvData;
-    const mainSectionIds: LayoutSectionId[] = ['profile', 'education', 'experience', 'certifications'];
+    const { t } = useTranslation();
+    const { contact, experiences, educations, skills, profile, languages, interests, certifications, projects, references, internships, publications, extracurricular } = cvData;
+    const mainSectionIds: LayoutSectionId[] = ['profile', 'education', 'experience', 'certifications', 'projects'];
     const orderedSections = getOrderedSections(settings).filter((id) =>
-      mainSectionIds.includes(id)
+      mainSectionIds.includes(id) && isSectionVisible(id, settings)
     );
 
     return (
-      <div 
+      <div
         ref={ref}
         id="cv-preview"
         data-cv-preview
@@ -97,8 +99,8 @@ export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         style={{ fontFamily: settings.bodyFont }}
       >
         <div className="flex">
-          {/* Left Sidebar - Blue */}
-          <div 
+          {/* Left Sidebar */}
+          <div
             className="w-[35%] p-6 text-white min-h-[297mm]"
             style={{ backgroundColor: settings.primaryColor }}
           >
@@ -115,14 +117,15 @@ export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
             {/* Name */}
             <div className="text-center mb-8">
-              <h1 className="text-xl font-bold mb-1">{contact.firstName}</h1>
-              <h1 className="text-xl font-bold">{contact.lastName}</h1>
+              <h1 className="text-xl font-bold mb-1" style={{ fontFamily: settings.titleFont }}>{contact.firstName}</h1>
+              <h1 className="text-xl font-bold" style={{ fontFamily: settings.titleFont }}>{contact.lastName}</h1>
+              {contact.jobTitle && <p className="text-xs mt-2 opacity-80">{contact.jobTitle}</p>}
             </div>
 
-            {/* Personelles Section */}
+            {/* Personal Info */}
             <div className="mb-6">
               <h3 className="text-xs font-bold uppercase tracking-wider mb-4 border-b-2 border-white/50 pb-2">
-                Personnelles
+                {t('template.personalInfo')}
               </h3>
               <div className="space-y-3 text-xs">
                 {contact.email && (
@@ -176,11 +179,11 @@ export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               </div>
             </div>
 
-            {/* Intérêts */}
-            {interests.length > 0 && (
+            {/* Interests */}
+            {isSectionVisible('interests', settings) && interests.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-xs font-bold uppercase tracking-wider mb-4 border-b-2 border-white/50 pb-2">
-                  Intérêts
+                  {t('template.interests')}
                 </h3>
                 <div className="text-xs space-y-2">
                   {interests.map((interest, idx) => (
@@ -193,11 +196,11 @@ export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               </div>
             )}
 
-            {/* Langues */}
-            {languages.length > 0 && (
+            {/* Languages */}
+            {isSectionVisible('languages', settings) && languages.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-xs font-bold uppercase tracking-wider mb-4 border-b-2 border-white/50 pb-2">
-                  Langues
+                  {t('template.languages')}
                 </h3>
                 <div className="space-y-2">
                   {languages.map((lang) => (
@@ -210,11 +213,11 @@ export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               </div>
             )}
 
-            {/* Compétences - Sidebar */}
-            {skills.length > 0 && (
+            {/* Skills — sidebar only */}
+            {isSectionVisible('skills', settings) && skills.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-xs font-bold uppercase tracking-wider mb-4 border-b-2 border-white/50 pb-2">
-                  Compétences
+                  {t('template.skills')}
                 </h3>
                 <div className="space-y-2">
                   {skills.map((skill) => (
@@ -227,13 +230,23 @@ export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               </div>
             )}
 
-            {/* Références */}
-            <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider mb-4 border-b-2 border-white/50 pb-2">
-                Références
-              </h3>
-              <p className="text-xs opacity-90">Sur demande</p>
-            </div>
+            {/* References — shown only when data exists */}
+            {isSectionVisible('references', settings) && references.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-xs font-bold uppercase tracking-wider mb-4 border-b-2 border-white/50 pb-2">
+                  {t('template.references')}
+                </h3>
+                <div className="space-y-3 text-xs">
+                  {references.map((ref) => (
+                    <div key={ref.id}>
+                      <p className="font-semibold">{ref.name}</p>
+                      <p className="opacity-80">{ref.position}{ref.company && `, ${ref.company}`}</p>
+                      {ref.email && <p className="opacity-70 break-all">{ref.email}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Main Content */}
@@ -242,7 +255,7 @@ export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               if (sectionId === 'profile' && profile) {
                 return (
                   <div className="mb-8" key="profile">
-                    <SectionHeader icon={User} title="Profil" />
+                    <SectionHeader icon={User} title={t('template.profile')} />
                     <p className="text-sm text-gray-700 leading-relaxed pl-10">{profile}</p>
                   </div>
                 );
@@ -251,10 +264,10 @@ export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               if (sectionId === 'education' && educations.length > 0) {
                 return (
                   <div className="mb-8" key="education">
-                    <SectionHeader icon={GraduationCap} title="Enseignement" />
+                    <SectionHeader icon={GraduationCap} title={t('template.education')} />
                     <div className="pl-10">
                       {educations.map((edu) => (
-                        <TimelineItem
+                        <TimelineItemHarvard
                           key={edu.id}
                           startDate={edu.graduationDate}
                           title={edu.diploma}
@@ -271,10 +284,10 @@ export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               if (sectionId === 'experience' && experiences.length > 0) {
                 return (
                   <div className="mb-8" key="experience">
-                    <SectionHeader icon={Briefcase} title="Expérience Professionnelle" />
+                    <SectionHeader icon={Briefcase} title={t('template.experience')} />
                     <div className="pl-10">
                       {experiences.map((exp) => (
-                        <TimelineItem
+                        <TimelineItemHarvard
                           key={exp.id}
                           startDate={exp.startDate}
                           endDate={exp.endDate}
@@ -293,7 +306,7 @@ export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               if (sectionId === 'certifications' && certifications.length > 0) {
                 return (
                   <div className="mb-8" key="certifications">
-                    <SectionHeader icon={Award} title="Certifications" />
+                    <SectionHeader icon={Award} title={t('template.certifications')} />
                     <div className="pl-10 space-y-3">
                       {certifications.map((cert) => (
                         <div key={cert.id} className="flex items-start gap-3">
@@ -312,42 +325,84 @@ export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 );
               }
 
+              if (sectionId === 'projects' && projects.length > 0) {
+                return (
+                  <div className="mb-8" key="projects">
+                    <SectionHeader icon={MessageSquare} title={t('template.projects')} />
+                    <div className="pl-10 space-y-4 min-w-0">
+                      {projects.map((proj) => (
+                        <div key={proj.id} className="min-w-0">
+                          <h4 className="font-bold text-sm text-gray-900 break-words">{proj.name}</h4>
+                          <div className="text-xs text-gray-700 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(proj.description || '') }} />
+                          {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {proj.technologies.slice(0, 12).map((tech, idx) => (
+                                <span key={idx} className="text-[10px] px-1.5 py-0.5 bg-gray-100 rounded text-gray-600">{String(tech)}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
               return null;
             })}
 
-            {/* Compétences - Main content */}
-            {skills.length > 0 && (
+            {/* Internships */}
+            {isSectionVisible('internships', settings) && internships.length > 0 && (
               <div className="mb-8">
-                <SectionHeader icon={Lightbulb} title="Compétences" />
-                <div className="pl-10 space-y-2">
-                  {skills.map((skill) => (
-                    <div key={skill.id} className="flex items-center justify-between text-sm">
-                      <span className="text-gray-700">{skill.name}</span>
-                      <div className="flex gap-0.5">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <Star
-                            key={star}
-                            className="w-4 h-4"
-                            style={{
-                              fill: star <= (skill.level === 'beginner' ? 1 : skill.level === 'intermediate' ? 3 : skill.level === 'advanced' ? 4 : 5)
-                                ? settings.primaryColor : 'transparent',
-                              color: star <= (skill.level === 'beginner' ? 1 : skill.level === 'intermediate' ? 3 : skill.level === 'advanced' ? 4 : 5)
-                                ? settings.primaryColor : '#D1D5DB'
-                            }}
-                          />
-                        ))}
-                      </div>
-                    </div>
+                <SectionHeader icon={Briefcase} title={t('template.internships')} />
+                <div className="pl-10">
+                  {internships.map((intern) => (
+                    <TimelineItemHarvard
+                      key={intern.id}
+                      startDate={intern.startDate}
+                      endDate={intern.endDate}
+                      currentlyWorking={intern.currentlyWorking}
+                      title={intern.jobTitle}
+                      subtitle={`${intern.employer}${intern.city ? `, ${intern.city}` : ''}`}
+                      description={intern.description}
+                      primaryColor={settings.primaryColor}
+                    />
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Références at bottom */}
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <SectionHeader icon={MessageSquare} title="Références" />
-              <p className="text-sm text-gray-600 pl-10">Références disponibles sur demande</p>
-            </div>
+            {/* Publications */}
+            {isSectionVisible('publications', settings) && publications.length > 0 && (
+              <div className="mb-8">
+                <SectionHeader icon={BookOpen} title={t('template.publications')} />
+                <div className="pl-10 space-y-1">
+                  {publications.map((pub, i) => (
+                    <p key={i} className="text-sm text-gray-700">• {pub}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Extracurricular */}
+            {isSectionVisible('extracurricular', settings) && extracurricular.length > 0 && (
+              <div className="mb-8">
+                <SectionHeader icon={BookOpen} title={t('template.extracurricular')} />
+                <div className="pl-10 space-y-1">
+                  {extracurricular.map((act, i) => (
+                    <p key={i} className="text-sm text-gray-700">• {act}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Default references note when no data */}
+            {(!isSectionVisible('references', settings) || references.length === 0) && (
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <SectionHeader icon={Users} title={t('template.references')} />
+                <p className="text-sm text-gray-600 pl-10">{t('template.onRequest')}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

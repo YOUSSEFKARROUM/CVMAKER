@@ -3,19 +3,19 @@ import { sanitizeHtml } from '../../utils/sanitize';
 import { useTranslation } from 'react-i18next';
 import { Award, Folder, Flag } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { getSkillLevelWidth, formatDate, getInitials, getOrderedSections, type LayoutSectionId } from './utils';
+import { getSkillLevelWidth, formatDate, getInitials, getOrderedSections, isSectionVisible, type LayoutSectionId } from './utils';
 import { SectionTitle } from './components/SectionTitle';
 import { ContactItem } from './components/ContactItem';
 
 export const VladivostokTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
     const { t } = useTranslation();
-    const { contact, experiences, educations, skills, profile, languages, certifications, projects, interests } = cvData;
+    const { contact, experiences, educations, skills, profile, languages, certifications, projects, interests, references, internships, publications, extracurricular } = cvData;
     const mainIds: LayoutSectionId[] = ['profile', 'experience', 'education', 'certifications', 'projects'];
-    const orderedSections = getOrderedSections(settings).filter((id) => mainIds.includes(id));
+    const orderedSections = getOrderedSections(settings).filter((id) => mainIds.includes(id) && isSectionVisible(id, settings));
 
     return (
-      <div 
+      <div
         ref={ref}
         id="cv-preview"
         data-cv-preview
@@ -27,7 +27,7 @@ export const VladivostokTemplate = forwardRef<HTMLDivElement, TemplateProps>(
           <div className="w-[70%] p-8">
             {/* Header */}
             <div className="mb-8">
-              <h1 
+              <h1
                 className="text-5xl font-bold mb-2"
                 style={{ fontFamily: settings.titleFont, color: settings.primaryColor }}
               >
@@ -42,7 +42,7 @@ export const VladivostokTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               if (section === 'profile' && profile) {
                 return (
                   <div className="mb-8" key="profile">
-                    <SectionTitle titleKey="profile.title" variant="underline" color={settings.primaryColor} />
+                    <SectionTitle titleKey="template.profile" variant="underline" color={settings.primaryColor} />
                     <p className="text-gray-700 leading-relaxed">{profile}</p>
                   </div>
                 );
@@ -50,7 +50,7 @@ export const VladivostokTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               if (section === 'experience' && experiences.length > 0) {
                 return (
                   <div className="mb-8" key="experience">
-                    <SectionTitle titleKey="experience.title" variant="underline" color={settings.primaryColor} />
+                    <SectionTitle titleKey="template.experience" variant="underline" color={settings.primaryColor} />
                     <div className="space-y-5 min-w-0">
                       {experiences.map((exp) => (
                         <div key={exp.id} className="border-l-2 pl-4 min-w-0" style={{ borderColor: settings.primaryColor }}>
@@ -71,7 +71,7 @@ export const VladivostokTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               if (section === 'education' && educations.length > 0) {
                 return (
                   <div className="mb-8" key="education">
-                    <SectionTitle titleKey="education.title" variant="underline" color={settings.primaryColor} />
+                    <SectionTitle titleKey="template.education" variant="underline" color={settings.primaryColor} />
                     <div className="space-y-4 min-w-0">
                       {educations.map((edu) => (
                         <div key={edu.id} className="border-l-2 pl-4 min-w-0" style={{ borderColor: settings.primaryColor }}>
@@ -90,7 +90,7 @@ export const VladivostokTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               if (section === 'certifications' && certifications.length > 0) {
                 return (
                   <div className="mb-8" key="certifications">
-                    <SectionTitle titleKey="certifications.title" variant="underline" color={settings.primaryColor} />
+                    <SectionTitle titleKey="template.certifications" variant="underline" color={settings.primaryColor} />
                     <div className="space-y-3">
                       {certifications.map((cert) => (
                         <div key={cert.id} className="flex items-start gap-2">
@@ -110,8 +110,8 @@ export const VladivostokTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               }
               if (section === 'projects' && projects.length > 0) {
                 return (
-                  <div key="projects">
-                    <SectionTitle titleKey="projects.title" variant="underline" color={settings.primaryColor} />
+                  <div className="mb-8" key="projects">
+                    <SectionTitle titleKey="template.projects" variant="underline" color={settings.primaryColor} />
                     <div className="space-y-4 min-w-0">
                       {projects.map((proj) => (
                         <div key={proj.id} className="min-w-0 overflow-hidden">
@@ -137,14 +137,70 @@ export const VladivostokTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               }
               return null;
             })}
+
+            {isSectionVisible('internships', settings) && internships.length > 0 && (
+              <div className="mb-8">
+                <SectionTitle titleKey="template.internships" variant="underline" color={settings.primaryColor} />
+                <div className="space-y-5 min-w-0">
+                  {internships.map((intern) => (
+                    <div key={intern.id} className="border-l-2 pl-4 min-w-0" style={{ borderColor: settings.primaryColor }}>
+                      <h4 className="font-semibold text-gray-900 break-words">{intern.jobTitle}</h4>
+                      <p className="text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{intern.employer}{intern.city && `, ${intern.city}`}</p>
+                      <p className="text-sm text-gray-500 mb-1">
+                        {formatDate(intern.startDate)} - {intern.currentlyWorking ? t('common.present') : formatDate(intern.endDate)}
+                      </p>
+                      {intern.description && (
+                        <div className="text-sm text-gray-700 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(intern.description) }} />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {isSectionVisible('publications', settings) && publications.length > 0 && (
+              <div className="mb-8">
+                <SectionTitle titleKey="template.publications" variant="underline" color={settings.primaryColor} />
+                <div className="space-y-1">
+                  {publications.map((pub, i) => (
+                    <p key={i} className="text-sm text-gray-700">• {pub}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {isSectionVisible('extracurricular', settings) && extracurricular.length > 0 && (
+              <div className="mb-8">
+                <SectionTitle titleKey="template.extracurricular" variant="underline" color={settings.primaryColor} />
+                <div className="space-y-1">
+                  {extracurricular.map((act, i) => (
+                    <p key={i} className="text-sm text-gray-700">• {act}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {isSectionVisible('references', settings) && references.length > 0 && (
+              <div className="mb-8">
+                <SectionTitle titleKey="template.references" variant="underline" color={settings.primaryColor} />
+                <div className="space-y-3">
+                  {references.map((ref) => (
+                    <div key={ref.id}>
+                      <p className="font-medium text-gray-900">{ref.name}</p>
+                      <p className="text-sm text-gray-600">{ref.position}{ref.company && `, ${ref.company}`}</p>
+                      {ref.email && <p className="text-xs text-gray-500">{ref.email}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Sidebar - 30% */}
-          <div 
+          <div
             className="w-[30%] p-6 text-white"
             style={{ backgroundColor: settings.primaryColor }}
           >
-            {/* Photo or Initials */}
             {contact.photo ? (
               <div className="w-full aspect-square mb-6 overflow-hidden">
                 <img src={contact.photo} alt="Profile" className="w-full h-full object-cover" />
@@ -155,9 +211,8 @@ export const VladivostokTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               </div>
             )}
 
-            {/* Contact Info */}
             <div className="mb-6">
-              <SectionTitle titleKey="contact.title" variant="sidebar" />
+              <SectionTitle titleKey="template.contact" variant="sidebar" />
               <div className="space-y-2">
                 {contact.email && (
                   <ContactItem icon="email" value={contact.email} variant="sidebar" />
@@ -166,10 +221,10 @@ export const VladivostokTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                   <ContactItem icon="phone" value={contact.phone} variant="sidebar" />
                 )}
                 {(contact.city || contact.country) && (
-                  <ContactItem 
-                    icon="location" 
-                    value={[contact.city, contact.country].filter(Boolean).join(', ')} 
-                    variant="sidebar" 
+                  <ContactItem
+                    icon="location"
+                    value={[contact.city, contact.country].filter(Boolean).join(', ')}
+                    variant="sidebar"
                   />
                 )}
                 {contact.linkedin && (
@@ -193,16 +248,16 @@ export const VladivostokTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               </div>
             </div>
 
-            {skills.length > 0 && (
+            {isSectionVisible('skills', settings) && skills.length > 0 && (
               <div className="mb-6">
-                <SectionTitle titleKey="skills.title" variant="sidebar" />
+                <SectionTitle titleKey="template.skills" variant="sidebar" />
                 <div className="space-y-2">
                   {skills.map((skill) => (
                     <div key={skill.id}>
                       <p className="text-sm">{skill.name}</p>
                       {!settings.showSkillsAsTags && settings.showSkillLevels && (
                         <div className="w-full h-1 bg-white/30 rounded mt-1">
-                          <div 
+                          <div
                             className="h-full bg-white rounded"
                             style={{ width: getSkillLevelWidth(skill.level) }}
                           />
@@ -214,23 +269,24 @@ export const VladivostokTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               </div>
             )}
 
-            {languages.length > 0 && (
+            {isSectionVisible('languages', settings) && languages.length > 0 && (
               <div className="mb-6">
-                <SectionTitle titleKey="languages.title" variant="sidebar" />
+                <SectionTitle titleKey="template.languages" variant="sidebar" />
                 <div className="space-y-2 text-sm">
                   {languages.map((lang) => (
                     <div key={lang.id} className="flex items-center gap-2">
                       <Flag className="w-4 h-4 opacity-70" />
                       <span>{lang.name}</span>
+                      {lang.level && <span className="opacity-70 text-xs">({t(`template.languageLevels.${lang.level}`, lang.level)})</span>}
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {interests.length > 0 && (
+            {isSectionVisible('interests', settings) && interests.length > 0 && (
               <div className="mb-6">
-                <SectionTitle titleKey="interests.title" variant="sidebar" />
+                <SectionTitle titleKey="template.interests" variant="sidebar" />
                 <div className="flex flex-wrap gap-2">
                   {interests.map((interest, idx) => (
                     <span key={idx} className="text-xs px-2 py-1 bg-white/20 rounded">

@@ -1,29 +1,21 @@
 import { forwardRef } from 'react';
 import { sanitizeHtml } from '../../utils/sanitize';
+import { useTranslation } from 'react-i18next';
 import { MapPin, Phone, Mail, Linkedin, Globe, Github, Flag, Car } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { getInitials, getSkillLevelWidth, formatDate, getOrderedSections, type LayoutSectionId } from './utils';
+import { getInitials, getSkillLevelWidth, formatDate, getOrderedSections, isSectionVisible, type LayoutSectionId } from './utils';
 
 export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
-    const { contact, experiences, educations, skills, profile, languages, interests, certifications } = cvData;
-    const mainIds: LayoutSectionId[] = ['profile', 'experience', 'education', 'certifications'];
-    const orderedSections = getOrderedSections(settings).filter((id) => mainIds.includes(id));
-
-    // Helper function to get language level text
-    const getLanguageLevelText = (level: string) => {
-      switch (level) {
-        case 'native': return 'Langue maternelle';
-        case 'fluent': return 'Courant';
-        case 'advanced': return 'Avancé';
-        case 'intermediate': return 'Intermédiaire';
-        case 'beginner': return 'Débutant';
-        default: return level;
-      }
-    };
+    const { t } = useTranslation();
+    const { contact, experiences, educations, skills, profile, languages, interests, certifications, projects, references, internships, publications, extracurricular } = cvData;
+    const mainIds: LayoutSectionId[] = ['profile', 'experience', 'education', 'certifications', 'projects'];
+    const orderedSections = getOrderedSections(settings).filter(
+      (id) => mainIds.includes(id) && isSectionVisible(id, settings)
+    );
 
     return (
-      <div 
+      <div
         ref={ref}
         id="cv-preview"
         data-cv-preview
@@ -31,12 +23,12 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         style={{ fontFamily: settings.bodyFont }}
       >
         <div className="flex">
-          {/* Left Sidebar - Dark Charcoal */}
-          <div 
+          {/* Left Sidebar - Dark Charcoal (design intent: fixed dark) */}
+          <div
             className="w-[32%] p-6 text-white min-h-[297mm]"
             style={{ backgroundColor: '#4A4A4A' }}
           >
-            {/* Photo - Large Circular */}
+            {/* Photo */}
             {contact.photo ? (
               <div className="w-32 h-32 mx-auto mb-5 rounded-full overflow-hidden border-4 border-white/30">
                 <img src={contact.photo} alt="Profile" className="w-full h-full object-cover" />
@@ -53,10 +45,10 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               <h1 className="text-2xl font-bold leading-tight">{contact.lastName}</h1>
             </div>
 
-            {/* Contact Section - Personelles */}
+            {/* Contact Section */}
             <div className="mb-6">
               <h3 className="text-xs uppercase tracking-wider mb-3 text-gray-300 border-b border-gray-500 pb-1">
-                Personnelles
+                {t('template.personalInfo')}
               </h3>
               <div className="space-y-2 text-xs">
                 {contact.phone && (
@@ -110,11 +102,11 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               </div>
             </div>
 
-            {/* Interests - Intérêts */}
-            {interests.length > 0 && (
+            {/* Interests */}
+            {isSectionVisible('interests', settings) && interests.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-xs uppercase tracking-wider mb-3 text-gray-300 border-b border-gray-500 pb-1">
-                  Intérêts
+                  {t('template.interests')}
                 </h3>
                 <div className="text-xs space-y-1">
                   {interests.map((interest, idx) => (
@@ -124,28 +116,30 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               </div>
             )}
 
-            {/* Languages - Langues with text levels */}
-            {languages.length > 0 && (
+            {/* Languages */}
+            {isSectionVisible('languages', settings) && languages.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-xs uppercase tracking-wider mb-3 text-gray-300 border-b border-gray-500 pb-1">
-                  Langues
+                  {t('template.languages')}
                 </h3>
                 <div className="space-y-2 text-xs">
                   {languages.map((lang) => (
                     <div key={lang.id}>
                       <span className="font-medium">{lang.name}</span>
-                      <span className="text-gray-400 block">{getLanguageLevelText(lang.level)}</span>
+                      <span className="text-gray-400 block">
+                        {t(`template.languageLevels.${lang.level}`, lang.level)}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Skills - Compétences with horizontal bars */}
-            {skills.length > 0 && (
+            {/* Skills */}
+            {isSectionVisible('skills', settings) && skills.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-xs uppercase tracking-wider mb-3 text-gray-300 border-b border-gray-500 pb-1">
-                  Compétences
+                  {t('template.skills')}
                 </h3>
                 <div className="space-y-3">
                   {skills.map((skill) => (
@@ -153,7 +147,7 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                       <p className="text-xs mb-1.5">{skill.name}</p>
                       {!settings.showSkillsAsTags && settings.showSkillLevels && (
                         <div className="w-full h-2 bg-gray-600 rounded-full overflow-hidden">
-                          <div 
+                          <div
                             className="h-full bg-white rounded-full"
                             style={{ width: getSkillLevelWidth(skill.level) }}
                           />
@@ -171,7 +165,7 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             )}
           </div>
 
-          {/* Main Content - White */}
+          {/* Main Content */}
           <div className="w-[68%] p-8">
             {orderedSections.map((section) => {
               if (section === 'profile' && profile) {
@@ -184,7 +178,9 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               if (section === 'education' && educations.length > 0) {
                 return (
                   <div className="mb-6" key="education">
-                    <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">Enseignement</h3>
+                    <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">
+                      {t('template.education')}
+                    </h3>
                     <div className="space-y-3">
                       {educations.map((edu) => (
                         <div key={edu.id}>
@@ -205,14 +201,16 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               if (section === 'experience' && experiences.length > 0) {
                 return (
                   <div className="mb-6" key="experience">
-                    <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">Expérience professionnelle</h3>
+                    <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">
+                      {t('template.experience')}
+                    </h3>
                     <div className="space-y-4">
                       {experiences.map((exp) => (
                         <div key={exp.id}>
                           <div className="flex justify-between items-start mb-1">
                             <h4 className="font-semibold text-sm text-gray-900">{exp.jobTitle}</h4>
                             <span className="text-xs text-gray-500">
-                              {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
+                              {formatDate(exp.startDate)} - {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
                             </span>
                           </div>
                           <p className="text-xs text-gray-600 mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city && `, ${exp.city}`}</p>
@@ -228,7 +226,9 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               if (section === 'certifications' && certifications.length > 0) {
                 return (
                   <div className="mb-6" key="certifications">
-                    <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">Certificats</h3>
+                    <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">
+                      {t('template.certifications')}
+                    </h3>
                     <div className="space-y-2">
                       {certifications.map((cert) => (
                         <div key={cert.id} className="flex justify-between">
@@ -243,26 +243,53 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                   </div>
                 );
               }
+              if (section === 'projects' && projects.length > 0) {
+                return (
+                  <div className="mb-6" key="projects">
+                    <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">
+                      {t('template.projects')}
+                    </h3>
+                    <div className="space-y-3 min-w-0">
+                      {projects.map((proj) => (
+                        <div key={proj.id} className="min-w-0">
+                          <h4 className="font-semibold text-sm text-gray-900 break-words">{proj.name}</h4>
+                          <div className="text-xs text-gray-700 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(proj.description || '') }} />
+                          {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {proj.technologies.slice(0, 12).map((tech, idx) => (
+                                <span key={idx} className="text-[10px] px-1.5 py-0.5 bg-gray-100 rounded text-gray-600">
+                                  {String(tech)}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
               return null;
             })}
 
-            {/* Skills repeated in main content with bar charts - fixed */}
-            {skills.length > 0 && !settings.showSkillsAsTags && (
+            {/* Internships */}
+            {isSectionVisible('internships', settings) && internships.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">Compétences</h3>
-                <div className="space-y-3">
-                  {skills.map((skill) => (
-                    <div key={`main-${skill.id}`}>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-xs text-gray-700">{skill.name}</span>
+                <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">
+                  {t('template.internships')}
+                </h3>
+                <div className="space-y-4">
+                  {internships.map((intern) => (
+                    <div key={intern.id}>
+                      <div className="flex justify-between items-start mb-1">
+                        <h4 className="font-semibold text-sm text-gray-900">{intern.jobTitle}</h4>
+                        <span className="text-xs text-gray-500">
+                          {formatDate(intern.startDate)} - {intern.currentlyWorking ? t('common.present') : formatDate(intern.endDate)}
+                        </span>
                       </div>
-                      {settings.showSkillLevels && (
-                        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full"
-                            style={{ width: getSkillLevelWidth(skill.level), backgroundColor: '#4A4A4A' }}
-                          />
-                        </div>
+                      <p className="text-xs text-gray-600 mb-1 break-words" style={{ overflowWrap: 'anywhere' }}>{intern.employer}{intern.city && `, ${intern.city}`}</p>
+                      {intern.description && (
+                        <div className="text-xs text-gray-700 leading-relaxed break-words" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(intern.description) }} />
                       )}
                     </div>
                   ))}
@@ -270,15 +297,43 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               </div>
             )}
 
-            {/* References - Références */}
-            {contact.references && contact.references.length > 0 && (
+            {/* Publications */}
+            {isSectionVisible('publications', settings) && publications.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">
-                  Références
+                  {t('template.publications')}
+                </h3>
+                <div className="space-y-1">
+                  {publications.map((pub, i) => (
+                    <p key={i} className="text-xs text-gray-700">• {pub}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Extracurricular */}
+            {isSectionVisible('extracurricular', settings) && extracurricular.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">
+                  {t('template.extracurricular')}
+                </h3>
+                <div className="space-y-1">
+                  {extracurricular.map((act, i) => (
+                    <p key={i} className="text-xs text-gray-700">• {act}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* References */}
+            {isSectionVisible('references', settings) && references.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-gray-800 border-b-2 border-gray-800 pb-1">
+                  {t('template.references')}
                 </h3>
                 <div className="space-y-3">
-                  {contact.references.map((ref, idx) => (
-                    <div key={idx} className="text-xs">
+                  {references.map((ref) => (
+                    <div key={ref.id} className="text-xs">
                       <p className="font-medium text-gray-900">{ref.name}</p>
                       <p className="text-gray-600">{ref.position}{ref.company && `, ${ref.company}`}</p>
                       {ref.phone && <p className="text-gray-500">{ref.phone}</p>}

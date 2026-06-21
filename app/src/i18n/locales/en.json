@@ -25,7 +25,23 @@
     "interests": "Interests",
     "contact": "Contact",
     "drivingLicense": "Driving License",
-    "technicalSkills": "Technical Skills"
+    "technicalSkills": "Technical Skills",
+    "references": "References",
+    "internships": "Internships",
+    "publications": "Publications",
+    "extracurricular": "Extracurricular Activities",
+    "personalInfo": "Personal Information",
+    "gender": "Gender",
+    "maritalStatus": "Marital Status",
+    "birthPlace": "Place of Birth",
+    "onRequest": "Upon request",
+    "languageLevels": {
+      "native": "Native",
+      "fluent": "Fluent",
+      "advanced": "Advanced",
+      "intermediate": "Intermediate",
+      "beginner": "Beginner"
+    }
   },
   "autoSave": {
     "saving": "Saving...",

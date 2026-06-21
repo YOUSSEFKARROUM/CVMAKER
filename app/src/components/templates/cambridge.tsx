@@ -1,8 +1,9 @@
 import { forwardRef } from 'react';
 import { sanitizeHtml } from '../../utils/sanitize';
-import { MapPin, Phone, Mail, Linkedin, Globe, Github, User, Calendar, Flag, Heart, Car } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { MapPin, Phone, Mail, Linkedin, Globe, Github, User, Calendar, Flag, Heart, Car, Award, Folder } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { formatDate, getOrderedSections, type LayoutSectionId } from './utils';
+import { formatDate, getOrderedSections, isSectionVisible, type LayoutSectionId } from './utils';
 
 const getLevelDots = (level: string) => {
   const levelMap: Record<string, number> = {
@@ -10,29 +11,30 @@ const getLevelDots = (level: string) => {
     'intermediate': 2,
     'advanced': 3,
     'expert': 4,
-    'native': 5
+    'native': 5,
   };
   return levelMap[level] || 3;
 };
 
 export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
-    const { contact, experiences, educations, skills, profile, languages, interests, references } = cvData;
-    const mainSectionIds: LayoutSectionId[] = ['education', 'experience'];
+    const { t } = useTranslation();
+    const { contact, experiences, educations, skills, profile, languages, interests, references, certifications, projects, internships, publications, extracurricular } = cvData;
+    const mainSectionIds: LayoutSectionId[] = ['education', 'experience', 'certifications', 'projects'];
     const orderedSections = getOrderedSections(settings).filter((id) =>
-      mainSectionIds.includes(id)
+      mainSectionIds.includes(id) && isSectionVisible(id, settings)
     );
 
     return (
-      <div 
+      <div
         ref={ref}
         id="cv-preview"
         data-cv-preview
         className={`bg-white w-[210mm] min-h-[297mm] shadow-xl overflow-hidden ${className}`}
         style={{ fontFamily: settings.bodyFont }}
       >
-        {/* Header - Blue Bar with "Curriculum Vitae" centered */}
-        <div 
+        {/* Header */}
+        <div
           className="py-4 text-center"
           style={{ backgroundColor: settings.primaryColor }}
         >
@@ -97,7 +99,7 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
           </div>
 
           {/* Profile paragraph */}
-          {profile && (
+          {isSectionVisible('profile', settings) && profile && (
             <div className="mb-6">
               <p className="text-sm text-gray-700 leading-relaxed text-justify">{profile}</p>
             </div>
@@ -105,7 +107,7 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
           {/* Two-column layout */}
           <div className="grid grid-cols-2 gap-8 min-w-0">
-            {/* Left Column: sections re-orderable (Enseignement, Expérience) */}
+            {/* Left Column: orderedSections */}
             <div className="space-y-6 min-w-0">
               {orderedSections.map((sectionId) => {
                 if (sectionId === 'education' && educations.length > 0) {
@@ -115,7 +117,7 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         className="text-sm font-bold uppercase tracking-wider mb-4 pb-1 border-b-2"
                         style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
                       >
-                        Enseignement
+                        {t('template.education')}
                       </h3>
                       <div className="space-y-4">
                         {educations.map((edu) => (
@@ -142,13 +144,13 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         className="text-sm font-bold uppercase tracking-wider mb-4 pb-1 border-b-2"
                         style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
                       >
-                        Expérience Professionnelle
+                        {t('template.experience')}
                       </h3>
                       <div className="space-y-4">
                         {experiences.map((exp) => (
                           <div key={exp.id} className="min-w-0">
                             <p className="text-xs text-gray-500 mb-0.5">
-                              {formatDate(exp.startDate)} - {exp.currentlyWorking ? 'Présent' : formatDate(exp.endDate)}
+                              {formatDate(exp.startDate)} - {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
                             </p>
                             <h4 className="font-semibold text-sm text-gray-900 break-words">{exp.jobTitle}</h4>
                             <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{exp.employer}{exp.city ? `, ${exp.city}` : ''}</p>
@@ -162,19 +164,120 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                   );
                 }
 
+                if (sectionId === 'certifications' && certifications.length > 0) {
+                  return (
+                    <div className="min-w-0" key="certifications">
+                      <h3
+                        className="text-sm font-bold uppercase tracking-wider mb-4 pb-1 border-b-2"
+                        style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
+                      >
+                        {t('template.certifications')}
+                      </h3>
+                      <div className="space-y-3">
+                        {certifications.map((cert) => (
+                          <div key={cert.id} className="flex items-start gap-2">
+                            <Award className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: settings.primaryColor }} />
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">{cert.name}</p>
+                              <p className="text-xs text-gray-600">{cert.organization}</p>
+                              <p className="text-xs text-gray-500">{formatDate(cert.date)}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (sectionId === 'projects' && projects.length > 0) {
+                  return (
+                    <div className="min-w-0" key="projects">
+                      <h3
+                        className="text-sm font-bold uppercase tracking-wider mb-4 pb-1 border-b-2"
+                        style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
+                      >
+                        {t('template.projects')}
+                      </h3>
+                      <div className="space-y-3">
+                        {projects.map((proj) => (
+                          <div key={proj.id} className="min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5 min-w-0">
+                              <Folder className="w-3.5 h-3.5 flex-shrink-0" style={{ color: settings.primaryColor }} />
+                              <h4 className="font-semibold text-sm text-gray-900 truncate">{proj.name}</h4>
+                            </div>
+                            <div className="text-xs text-gray-700 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(proj.description || '') }} />
+                            {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {proj.technologies.slice(0, 10).map((tech, idx) => (
+                                  <span key={idx} className="text-[10px] px-1.5 py-0.5 bg-gray-100 rounded text-gray-600">
+                                    {String(tech)}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
                 return null;
               })}
+
+              {/* Internships */}
+              {isSectionVisible('internships', settings) && internships.length > 0 && (
+                <div className="min-w-0">
+                  <h3
+                    className="text-sm font-bold uppercase tracking-wider mb-4 pb-1 border-b-2"
+                    style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
+                  >
+                    {t('template.internships')}
+                  </h3>
+                  <div className="space-y-4">
+                    {internships.map((intern) => (
+                      <div key={intern.id} className="min-w-0">
+                        <p className="text-xs text-gray-500 mb-0.5">
+                          {formatDate(intern.startDate)} - {intern.currentlyWorking ? t('common.present') : formatDate(intern.endDate)}
+                        </p>
+                        <h4 className="font-semibold text-sm text-gray-900 break-words">{intern.jobTitle}</h4>
+                        <p className="text-xs text-gray-600 break-words" style={{ overflowWrap: 'anywhere' }}>{intern.employer}{intern.city ? `, ${intern.city}` : ''}</p>
+                        {intern.description && (
+                          <div className="text-xs text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(intern.description) }} />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Publications */}
+              {isSectionVisible('publications', settings) && publications.length > 0 && (
+                <div className="min-w-0">
+                  <h3
+                    className="text-sm font-bold uppercase tracking-wider mb-4 pb-1 border-b-2"
+                    style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
+                  >
+                    {t('template.publications')}
+                  </h3>
+                  <div className="space-y-1">
+                    {publications.map((pub, i) => (
+                      <p key={i} className="text-xs text-gray-700">• {pub}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Right Column: PERSONNELLES, INTÉRÊTS, LANGUES, COMPÉTENCES, RÉFÉRENCES */}
+            {/* Right Column */}
             <div className="space-y-5">
-              {/* Personal Info - PERSONNELLES with icons */}
+              {/* Personal Info */}
               <div>
-                <h3 
+                <h3
                   className="text-sm font-bold uppercase tracking-wider mb-3 pb-1 border-b-2"
                   style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
                 >
-                  Personnelles
+                  {t('template.personalInfo')}
                 </h3>
                 <div className="space-y-2 text-xs text-gray-700">
                   {contact.birthDate && (
@@ -210,27 +313,27 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 </div>
               </div>
 
-              {/* Interests - INTÉRÊTS */}
-              {interests.length > 0 && (
+              {/* Interests */}
+              {isSectionVisible('interests', settings) && interests.length > 0 && (
                 <div>
-                  <h3 
+                  <h3
                     className="text-sm font-bold uppercase tracking-wider mb-3 pb-1 border-b-2"
                     style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
                   >
-                    Intérêts
+                    {t('template.interests')}
                   </h3>
                   <p className="text-xs text-gray-700">{interests.join(', ')}</p>
                 </div>
               )}
 
-              {/* Languages - LANGUES with 5 dots */}
-              {languages.length > 0 && (
+              {/* Languages */}
+              {isSectionVisible('languages', settings) && languages.length > 0 && (
                 <div>
-                  <h3 
+                  <h3
                     className="text-sm font-bold uppercase tracking-wider mb-3 pb-1 border-b-2"
                     style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
                   >
-                    Langues
+                    {t('template.languages')}
                   </h3>
                   <div className="space-y-2">
                     {languages.map((lang) => (
@@ -238,16 +341,10 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         <span className="text-gray-700">{lang.name}</span>
                         <div className="flex gap-1">
                           {[1, 2, 3, 4, 5].map((dot) => (
-                            <div 
+                            <div
                               key={dot}
-                              className={`w-2 h-2 rounded-full ${
-                                dot <= getLevelDots(lang.level) 
-                                  ? '' 
-                                  : 'bg-gray-200'
-                              }`}
-                              style={{ 
-                                backgroundColor: dot <= getLevelDots(lang.level) ? settings.primaryColor : undefined 
-                              }}
+                              className={`w-2 h-2 rounded-full ${dot <= getLevelDots(lang.level) ? '' : 'bg-gray-200'}`}
+                              style={{ backgroundColor: dot <= getLevelDots(lang.level) ? settings.primaryColor : undefined }}
                             />
                           ))}
                         </div>
@@ -257,14 +354,14 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 </div>
               )}
 
-              {/* Skills - COMPÉTENCES with 5 dots */}
-              {skills.length > 0 && (
+              {/* Skills */}
+              {isSectionVisible('skills', settings) && skills.length > 0 && (
                 <div>
-                  <h3 
+                  <h3
                     className="text-sm font-bold uppercase tracking-wider mb-3 pb-1 border-b-2"
                     style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
                   >
-                    Compétences
+                    {t('template.skills')}
                   </h3>
                   <div className="space-y-2">
                     {skills.map((skill) => (
@@ -272,16 +369,10 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         <span className="text-gray-700">{skill.name}</span>
                         <div className="flex gap-1">
                           {[1, 2, 3, 4, 5].map((dot) => (
-                            <div 
+                            <div
                               key={dot}
-                              className={`w-2 h-2 rounded-full ${
-                                dot <= getLevelDots(skill.level) 
-                                  ? '' 
-                                  : 'bg-gray-200'
-                              }`}
-                              style={{ 
-                                backgroundColor: dot <= getLevelDots(skill.level) ? settings.primaryColor : undefined 
-                              }}
+                              className={`w-2 h-2 rounded-full ${dot <= getLevelDots(skill.level) ? '' : 'bg-gray-200'}`}
+                              style={{ backgroundColor: dot <= getLevelDots(skill.level) ? settings.primaryColor : undefined }}
                             />
                           ))}
                         </div>
@@ -291,14 +382,31 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 </div>
               )}
 
-              {/* References - RÉFÉRENCES */}
-              {references.length > 0 && (
+              {/* Extracurricular */}
+              {isSectionVisible('extracurricular', settings) && extracurricular.length > 0 && (
                 <div>
-                  <h3 
+                  <h3
                     className="text-sm font-bold uppercase tracking-wider mb-3 pb-1 border-b-2"
                     style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
                   >
-                    Références
+                    {t('template.extracurricular')}
+                  </h3>
+                  <div className="space-y-1">
+                    {extracurricular.map((act, i) => (
+                      <p key={i} className="text-xs text-gray-700">• {act}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* References */}
+              {isSectionVisible('references', settings) && references.length > 0 && (
+                <div>
+                  <h3
+                    className="text-sm font-bold uppercase tracking-wider mb-3 pb-1 border-b-2"
+                    style={{ borderColor: settings.primaryColor, color: settings.primaryColor }}
+                  >
+                    {t('template.references')}
                   </h3>
                   <div className="space-y-3">
                     {references.map((ref) => (

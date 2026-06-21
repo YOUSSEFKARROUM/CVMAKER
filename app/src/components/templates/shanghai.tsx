@@ -1,20 +1,20 @@
 import { forwardRef } from 'react';
 import { sanitizeHtml } from '../../utils/sanitize';
 import { useTranslation } from 'react-i18next';
-import { Award, Folder, Calendar } from 'lucide-react';
+import { Award, Folder } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { formatDate, getInitials, getOrderedSections, type LayoutSectionId } from './utils';
+import { formatDate, getInitials, getOrderedSections, isSectionVisible, type LayoutSectionId } from './utils';
 import { SectionTitle, ContactItem } from './components';
 
 export const ShanghaiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
     const { t } = useTranslation();
-    const { contact, experiences, educations, skills, profile, languages, certifications, projects, interests } = cvData;
+    const { contact, experiences, educations, skills, profile, languages, certifications, projects, interests, references, internships, publications, extracurricular } = cvData;
     const rightColumnIds: LayoutSectionId[] = ['experience', 'education', 'projects'];
-    const orderedRight = getOrderedSections(settings).filter((id) => rightColumnIds.includes(id));
+    const orderedRight = getOrderedSections(settings).filter((id) => rightColumnIds.includes(id) && isSectionVisible(id, settings));
 
     return (
-      <div 
+      <div
         ref={ref}
         id="cv-preview"
         data-cv-preview
@@ -22,15 +22,15 @@ export const ShanghaiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         style={{ fontFamily: settings.bodyFont }}
       >
         {/* Header Band */}
-        <div 
+        <div
           className="p-8 text-white"
           style={{ backgroundColor: settings.primaryColor }}
         >
           <div className="flex items-center gap-6">
             {contact.photo ? (
-              <img 
-                src={contact.photo} 
-                alt="Profile" 
+              <img
+                src={contact.photo}
+                alt="Profile"
                 className="w-28 h-28 rounded-full object-cover border-4 border-white/30"
               />
             ) : (
@@ -39,7 +39,7 @@ export const ShanghaiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               </div>
             )}
             <div>
-              <h1 
+              <h1
                 className="text-4xl font-bold mb-1"
                 style={{ fontFamily: settings.titleFont }}
               >
@@ -63,10 +63,10 @@ export const ShanghaiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               <ContactItem icon="phone" value={contact.phone} variant="inline" />
             )}
             {(contact.city || contact.country) && (
-              <ContactItem 
-                icon="location" 
-                value={[contact.city, contact.country].filter(Boolean).join(', ')} 
-                variant="inline" 
+              <ContactItem
+                icon="location"
+                value={[contact.city, contact.country].filter(Boolean).join(', ')}
+                variant="inline"
               />
             )}
             {contact.linkedin && (
@@ -82,10 +82,7 @@ export const ShanghaiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               <ContactItem icon="nationality" value={contact.nationality} variant="inline" />
             )}
             {contact.birthDate && (
-              <div className="inline-flex items-center gap-1 text-sm">
-                <Calendar className="w-3 h-3" />
-                <span>{contact.birthDate}</span>
-              </div>
+              <ContactItem icon="birthdate" value={formatDate(contact.birthDate)} variant="inline" />
             )}
             {contact.drivingLicense && (
               <ContactItem icon="driving" value={contact.drivingLicense} variant="inline" />
@@ -95,10 +92,10 @@ export const ShanghaiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
           <div className="grid grid-cols-3 gap-8">
             {/* Left Column */}
             <div className="col-span-1 space-y-6">
-              {profile && (
+              {isSectionVisible('profile', settings) && profile && (
                 <div>
-                  <SectionTitle 
-                    titleKey="template.profile" 
+                  <SectionTitle
+                    titleKey="template.profile"
                     variant="underline"
                     color={settings.primaryColor}
                     className="text-sm uppercase"
@@ -107,10 +104,10 @@ export const ShanghaiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 </div>
               )}
 
-              {skills.length > 0 && (
+              {isSectionVisible('skills', settings) && skills.length > 0 && (
                 <div>
-                  <SectionTitle 
-                    titleKey="template.skills" 
+                  <SectionTitle
+                    titleKey="template.skills"
                     variant="underline"
                     color={settings.primaryColor}
                     className="text-sm uppercase"
@@ -123,26 +120,29 @@ export const ShanghaiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 </div>
               )}
 
-              {languages.length > 0 && (
+              {isSectionVisible('languages', settings) && languages.length > 0 && (
                 <div>
-                  <SectionTitle 
-                    titleKey="template.languages" 
+                  <SectionTitle
+                    titleKey="template.languages"
                     variant="underline"
                     color={settings.primaryColor}
                     className="text-sm uppercase"
                   />
                   <div className="space-y-1">
                     {languages.map((lang) => (
-                      <p key={lang.id} className="text-sm text-gray-700">• {lang.name}</p>
+                      <div key={lang.id}>
+                        <p className="text-sm text-gray-700">• {lang.name}</p>
+                        {lang.level && <p className="text-xs text-gray-500 pl-3">{t(`template.languageLevels.${lang.level}`, lang.level)}</p>}
+                      </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {certifications.length > 0 && (
+              {isSectionVisible('certifications', settings) && certifications.length > 0 && (
                 <div>
-                  <SectionTitle 
-                    titleKey="template.certifications" 
+                  <SectionTitle
+                    titleKey="template.certifications"
                     variant="underline"
                     color={settings.primaryColor}
                     className="text-sm uppercase"
@@ -164,10 +164,10 @@ export const ShanghaiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 </div>
               )}
 
-              {interests.length > 0 && (
+              {isSectionVisible('interests', settings) && interests.length > 0 && (
                 <div>
-                  <SectionTitle 
-                    titleKey="template.interests" 
+                  <SectionTitle
+                    titleKey="template.interests"
                     variant="underline"
                     color={settings.primaryColor}
                     className="text-sm uppercase"
@@ -177,6 +177,26 @@ export const ShanghaiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                       <span key={idx} className="text-xs px-2 py-1 bg-gray-100 rounded text-gray-700">
                         {interest}
                       </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {isSectionVisible('references', settings) && references.length > 0 && (
+                <div>
+                  <SectionTitle
+                    titleKey="template.references"
+                    variant="underline"
+                    color={settings.primaryColor}
+                    className="text-sm uppercase"
+                  />
+                  <div className="space-y-3">
+                    {references.map((ref) => (
+                      <div key={ref.id}>
+                        <p className="text-sm font-medium text-gray-900">{ref.name}</p>
+                        <p className="text-xs text-gray-600">{ref.position}{ref.company && `, ${ref.company}`}</p>
+                        {ref.email && <p className="text-xs text-gray-500">{ref.email}</p>}
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -259,6 +279,50 @@ export const ShanghaiTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 }
                 return null;
               })}
+
+              {isSectionVisible('internships', settings) && internships.length > 0 && (
+                <div>
+                  <SectionTitle titleKey="template.internships" variant="underline" color={settings.primaryColor} className="text-sm uppercase" />
+                  <div className="space-y-4">
+                    {internships.map((intern) => (
+                      <div key={intern.id}>
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-semibold text-gray-900">{intern.jobTitle}</h4>
+                          <span className="text-sm text-gray-500">
+                            {formatDate(intern.startDate)} - {intern.currentlyWorking ? t('common.present') : formatDate(intern.endDate)}
+                          </span>
+                        </div>
+                        <p className="text-gray-600 text-sm break-words" style={{ overflowWrap: 'anywhere' }}>{intern.employer}{intern.city && `, ${intern.city}`}</p>
+                        {intern.description && (
+                          <div className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(intern.description) }} />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {isSectionVisible('publications', settings) && publications.length > 0 && (
+                <div>
+                  <SectionTitle titleKey="template.publications" variant="underline" color={settings.primaryColor} className="text-sm uppercase" />
+                  <div className="space-y-1">
+                    {publications.map((pub, i) => (
+                      <p key={i} className="text-sm text-gray-700">• {pub}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {isSectionVisible('extracurricular', settings) && extracurricular.length > 0 && (
+                <div>
+                  <SectionTitle titleKey="template.extracurricular" variant="underline" color={settings.primaryColor} className="text-sm uppercase" />
+                  <div className="space-y-1">
+                    {extracurricular.map((act, i) => (
+                      <p key={i} className="text-sm text-gray-700">• {act}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

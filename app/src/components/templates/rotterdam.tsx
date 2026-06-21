@@ -3,26 +3,25 @@ import { sanitizeHtml } from '../../utils/sanitize';
 import { useTranslation } from 'react-i18next';
 import { Award, Folder } from 'lucide-react';
 import type { TemplateProps } from './types';
-import { formatDate, getOrderedSections, type LayoutSectionId } from './utils';
+import { formatDate, getOrderedSections, isSectionVisible, type LayoutSectionId } from './utils';
 import { SectionTitle, ContactItem } from './components';
 
 export const RotterdamTemplate = forwardRef<HTMLDivElement, TemplateProps>(
   ({ cvData, settings, className = '' }, ref) => {
     const { t } = useTranslation();
-    const { contact, experiences, educations, skills, profile, languages, certifications, projects, interests } = cvData;
-    const orderedSections = getOrderedSections(settings);
+    const { contact, experiences, educations, skills, profile, languages, certifications, projects, interests, references, internships, publications, extracurricular } = cvData;
+    const orderedSections = getOrderedSections(settings).filter((id) => isSectionVisible(id, settings));
 
-    // Generate fallback initials when no photo is provided
-    const initials = contact.firstName && contact.lastName 
+    const initials = contact.firstName && contact.lastName
       ? `${contact.firstName.charAt(0)}${contact.lastName.charAt(0)}`.toUpperCase()
-      : contact.firstName 
+      : contact.firstName
         ? contact.firstName.charAt(0).toUpperCase()
-        : contact.lastName 
+        : contact.lastName
           ? contact.lastName.charAt(0).toUpperCase()
           : '';
 
     return (
-      <div 
+      <div
         ref={ref}
         id="cv-preview"
         data-cv-preview
@@ -32,7 +31,7 @@ export const RotterdamTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         {/* Header */}
         <div className="flex items-start justify-between mb-8 border-b-2 pb-6" style={{ borderColor: settings.primaryColor }}>
           <div>
-            <h1 
+            <h1
               className="text-5xl font-bold mb-2"
               style={{ fontFamily: settings.titleFont, color: settings.primaryColor }}
             >
@@ -43,14 +42,14 @@ export const RotterdamTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             )}
           </div>
           {contact.photo ? (
-            <img 
-              src={contact.photo} 
-              alt="Profile" 
+            <img
+              src={contact.photo}
+              alt="Profile"
               className="w-28 h-28 object-cover"
               style={{ border: `3px solid ${settings.primaryColor}` }}
             />
           ) : initials ? (
-            <div 
+            <div
               className="w-28 h-28 flex items-center justify-center text-3xl font-bold text-white"
               style={{ backgroundColor: settings.primaryColor }}
             >
@@ -68,10 +67,10 @@ export const RotterdamTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             <ContactItem icon="phone" value={contact.phone} variant="inline" />
           )}
           {(contact.city || contact.country) && (
-            <ContactItem 
-              icon="location" 
-              value={[contact.city, contact.country].filter(Boolean).join(', ')} 
-              variant="inline" 
+            <ContactItem
+              icon="location"
+              value={[contact.city, contact.country].filter(Boolean).join(', ')}
+              variant="inline"
             />
           )}
           {contact.linkedin && (
@@ -95,7 +94,7 @@ export const RotterdamTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         </div>
 
         {/* Skills Section - fixed position */}
-        {skills.length > 0 && (
+        {isSectionVisible('skills', settings) && skills.length > 0 && (
           <div className="mb-8">
             <SectionTitle titleKey="template.technicalSkills" color={settings.primaryColor} variant="underline" className="uppercase" />
             <div className="grid grid-cols-3 gap-4">
@@ -173,8 +172,8 @@ export const RotterdamTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 <div className="grid grid-cols-3 gap-4">
                   {languages.map((lang) => (
                     <div key={lang.id} className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: settings.primaryColor }} />
-                      <span className="text-gray-700">{lang.name}</span>
+                      <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: settings.primaryColor }} />
+                      <span className="text-gray-700">{lang.name}{lang.level ? ` (${t(`template.languageLevels.${lang.level}`, lang.level)})` : ''}</span>
                     </div>
                   ))}
                 </div>
@@ -230,8 +229,70 @@ export const RotterdamTemplate = forwardRef<HTMLDivElement, TemplateProps>(
           return null;
         })}
 
+        {isSectionVisible('internships', settings) && internships.length > 0 && (
+          <div className="mb-8">
+            <SectionTitle titleKey="template.internships" color={settings.primaryColor} variant="underline" className="uppercase" />
+            <div className="space-y-4">
+              {internships.map((intern) => (
+                <div key={intern.id} className="grid grid-cols-4 gap-4">
+                  <div className="col-span-1">
+                    <p className="text-sm text-gray-500">
+                      {formatDate(intern.startDate)} - {intern.currentlyWorking ? t('common.present') : formatDate(intern.endDate)}
+                    </p>
+                  </div>
+                  <div className="col-span-3">
+                    <h4 className="font-semibold text-gray-900 break-words">{intern.jobTitle}</h4>
+                    <p className="text-gray-600 text-sm break-words" style={{ overflowWrap: 'anywhere' }}>{intern.employer}{intern.city && `, ${intern.city}`}</p>
+                    {intern.description && (
+                      <div className="text-sm text-gray-700 mt-1 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(intern.description) }} />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {isSectionVisible('publications', settings) && publications.length > 0 && (
+          <div className="mb-8">
+            <SectionTitle titleKey="template.publications" color={settings.primaryColor} variant="underline" className="uppercase" />
+            <div className="space-y-1">
+              {publications.map((pub, i) => (
+                <p key={i} className="text-sm text-gray-700">• {pub}</p>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {isSectionVisible('extracurricular', settings) && extracurricular.length > 0 && (
+          <div className="mb-8">
+            <SectionTitle titleKey="template.extracurricular" color={settings.primaryColor} variant="underline" className="uppercase" />
+            <div className="space-y-1">
+              {extracurricular.map((act, i) => (
+                <p key={i} className="text-sm text-gray-700">• {act}</p>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {isSectionVisible('references', settings) && references.length > 0 && (
+          <div className="mb-8">
+            <SectionTitle titleKey="template.references" color={settings.primaryColor} variant="underline" className="uppercase" />
+            <div className="grid grid-cols-2 gap-4">
+              {references.map((ref) => (
+                <div key={ref.id}>
+                  <p className="font-medium text-gray-900">{ref.name}</p>
+                  <p className="text-sm text-gray-600">{ref.position}{ref.company && `, ${ref.company}`}</p>
+                  {ref.email && <p className="text-xs text-gray-500">{ref.email}</p>}
+                  {ref.phone && <p className="text-xs text-gray-500">{ref.phone}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Interests Section - fixed position */}
-        {interests.length > 0 && (
+        {isSectionVisible('interests', settings) && interests.length > 0 && (
           <div>
             <SectionTitle titleKey="template.interests" color={settings.primaryColor} variant="underline" className="uppercase" />
             <div className="flex flex-wrap gap-2">
