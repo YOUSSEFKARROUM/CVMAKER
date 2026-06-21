@@ -30,7 +30,7 @@ export function FloatingActions({
   if (actions.length === 0) return null;
 
   return (
-    <div className={`fixed right-5 bottom-5 z-40 flex flex-col items-end gap-2 ${showInZenMode ? '' : 'zen:hidden'}`}>
+    <div className={`fixed right-5 bottom-5 z-40 flex flex-col items-end gap-2 lg:hidden ${showInZenMode ? '' : 'zen:hidden'}`}>
       <AnimatePresence>
         {isExpanded && (
           <motion.div

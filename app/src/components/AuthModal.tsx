@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Eye, EyeOff, Mail, Lock, User, ArrowRight, Check, AlertCircle, LayoutTemplate, FileDown, Gift } from 'lucide-react';
+import { X, Eye, EyeOff, Mail, Lock, User, Check, AlertCircle, LayoutTemplate, FileDown, Gift } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -273,58 +273,72 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
                 {/* Password */}
                 {mode !== 'forgot' && (
-                  <FormField
-                    label={t('auth.password')}
-                    error={touched.password && fieldErrors.password ? fieldErrors.password : undefined}
-                    isValid={!fieldErrors.password && !!touched.password && !!formData.password}
-                    required
-                  >
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                      <Input
-                        type={showPassword ? 'text' : 'password'}
-                        aria-label={t('auth.password')}
-                        value={formData.password}
-                        onChange={e => setFormData({ ...formData, password: e.target.value })}
-                        onBlur={() => setTouched({ ...touched, password: true })}
-                        className="pl-9 pr-9"
-                        placeholder={t('auth.passwordPlaceholder')}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(v => !v)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none"
-                      >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                    {/* Strength bar (register only) */}
-                    {mode === 'register' && formData.password && (
-                      <div className="space-y-1 pt-1">
-                        <div className="flex gap-1 h-1">
-                          {[1,2,3,4,5].map(l => (
-                            <div
-                              key={l}
-                              className={`flex-1 rounded-full transition-colors duration-200 ${
-                                l <= passwordStrength ? strengthColors[passwordStrength - 1] : 'bg-border'
-                              }`}
-                            />
-                          ))}
+                  <div>
+                    <FormField
+                      label={t('auth.password')}
+                      error={touched.password && fieldErrors.password ? fieldErrors.password : undefined}
+                      isValid={!fieldErrors.password && !!touched.password && !!formData.password}
+                      required
+                    >
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          aria-label={t('auth.password')}
+                          value={formData.password}
+                          onChange={e => setFormData({ ...formData, password: e.target.value })}
+                          onBlur={() => setTouched({ ...touched, password: true })}
+                          className="pl-9 pr-9"
+                          placeholder={t('auth.passwordPlaceholder')}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(v => !v)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      {/* Strength bar (register only) */}
+                      {mode === 'register' && formData.password && (
+                        <div className="space-y-1 pt-1">
+                          <div className="flex gap-1 h-1">
+                            {[1,2,3,4,5].map(l => (
+                              <div
+                                key={l}
+                                className={`flex-1 rounded-full transition-colors duration-200 ${
+                                  l <= passwordStrength ? strengthColors[passwordStrength - 1] : 'bg-border'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            Force :{' '}
+                            <span className={
+                              passwordStrength >= 4 ? 'text-success'
+                              : passwordStrength === 3 ? 'text-info'
+                              : passwordStrength === 2 ? 'text-warning'
+                              : 'text-destructive'
+                            }>
+                              {strengthLabels[passwordStrength - 1] ?? 'Très faible'}
+                            </span>
+                          </p>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                          Force :{' '}
-                          <span className={
-                            passwordStrength >= 4 ? 'text-success'
-                            : passwordStrength === 3 ? 'text-info'
-                            : passwordStrength === 2 ? 'text-warning'
-                            : 'text-destructive'
-                          }>
-                            {strengthLabels[passwordStrength - 1] ?? 'Très faible'}
-                          </span>
-                        </p>
+                      )}
+                    </FormField>
+                    {/* Mot de passe oublié — aligné à droite, visible uniquement en mode login */}
+                    {mode === 'login' && (
+                      <div className="flex justify-end mt-1.5">
+                        <button
+                          type="button"
+                          onClick={() => switchMode('forgot')}
+                          className="text-xs text-blue hover:text-blue/80 hover:underline underline-offset-4 transition-colors focus-visible:outline-none"
+                        >
+                          {t('auth.forgotLink')}
+                        </button>
                       </div>
                     )}
-                  </FormField>
+                  </div>
                 )}
 
                 {/* Auth unavailable warning */}
@@ -357,7 +371,6 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
                       {mode === 'login'    && t('auth.loginButton')}
                       {mode === 'register' && t('auth.registerButton')}
                       {mode === 'forgot'   && t('auth.resetButton')}
-                      <ArrowRight className="w-4 h-4" />
                     </>
                   )}
                 </Button>
@@ -366,15 +379,10 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
               {/* Mode switchers */}
               <div className="mt-5 text-center space-y-2 text-sm">
                 {mode === 'login' && (
-                  <>
-                    <p className="text-muted-foreground">
-                      {t('auth.noAccount')}{' '}
-                      <ModeLink onClick={() => switchMode('register')}>{t('auth.registerLink')}</ModeLink>
-                    </p>
-                    <p>
-                      <ModeLink onClick={() => switchMode('forgot')}>{t('auth.forgotLink')}</ModeLink>
-                    </p>
-                  </>
+                  <p className="text-muted-foreground">
+                    {t('auth.noAccount')}{' '}
+                    <ModeLink onClick={() => switchMode('register')}>{t('auth.registerLink')}</ModeLink>
+                  </p>
                 )}
                 {mode === 'register' && (
                   <p className="text-muted-foreground">

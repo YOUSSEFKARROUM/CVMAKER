@@ -257,20 +257,6 @@ export function CVGalleryPage({ onLoadCV, onCreateNew, onImport }: CVGalleryPage
               </Button>
             </div>
 
-            {/* Feature pills */}
-            <div className="flex items-center gap-3 flex-wrap justify-center mb-8">
-              {[
-                { value: '19', label: 'templates' },
-                { value: '100%', label: 'gratuit' },
-                { value: 'PDF', label: 'haute qualité' },
-              ].map(({ value, label }) => (
-                <span key={label} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-2 border border-border text-xs text-muted-foreground">
-                  <span className="font-semibold text-foreground">{value}</span>
-                  {label}
-                </span>
-              ))}
-            </div>
-
             {/* Drag hint */}
             <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-dashed border-border text-xs text-muted-foreground/60">
               <FileText className="w-3.5 h-3.5" />

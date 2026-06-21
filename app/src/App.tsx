@@ -791,7 +791,6 @@ function App() {
               updateContact={updateContact}
               onNext={() => setCurrentStep('download')}
               onBack={handleBack}
-              onReset={handleReset}
               onExport={handleExport}
             />
           );
@@ -839,8 +838,8 @@ function App() {
     <ErrorBoundary>
       <div className="min-h-screen bg-background transition-colors duration-300">
         {showProgress && (
-          <ProgressBar 
-            steps={steps} 
+          <ProgressBar
+            steps={steps}
             currentStep={currentStep as Exclude<Step, 'landing' | 'download'>}
             cvData={cvData}
             settings={settings}
@@ -851,6 +850,10 @@ function App() {
             }}
             onEditCV={handleEditCV}
             onCreateNew={goToLanding}
+            isZenMode={isZenMode}
+            onZenToggle={() => setIsZenMode(!isZenMode)}
+            onExport={handleExport}
+            onReset={handleReset}
             onHomeClick={() => {
               const hasData = cvData.contact.firstName || 
                               cvData.contact.lastName || 
@@ -962,8 +965,10 @@ function App() {
           onReset={handleReset}
         />
 
-        {/* Keyboard Shortcuts Help */}
-        <KeyboardShortcutsHelp />
+        {/* Keyboard Shortcuts Help — mobile only (desktop: access via ?) */}
+        <div className="lg:hidden">
+          <KeyboardShortcutsHelp />
+        </div>
 
         {/* Modals */}
         {modalState.type === 'delete' && (

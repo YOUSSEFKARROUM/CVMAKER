@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, ArrowLeft, LayoutGrid, User, Check, RotateCcw, FileJson } from 'lucide-react';
+import { ArrowRight, ArrowLeft, LayoutGrid, User, Check, FileJson } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -19,7 +19,6 @@ interface FinishFormProps {
   updateContact: (field: keyof ContactInfo, value: string) => void;
   onNext: () => void;
   onBack: () => void;
-  onReset: () => void;
   onExport: () => void;
 }
 
@@ -40,7 +39,7 @@ const labelCls = LABEL_CLASS;
 
 
 export function FinishForm({
-  cvData, settings, setSettings, updateContact, onNext, onBack, onReset, onExport,
+  cvData, settings, setSettings, updateContact, onNext, onBack, onExport,
 }: FinishFormProps) {
   const { t } = useTranslation();
 
@@ -70,15 +69,9 @@ export function FinishForm({
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-semibold text-foreground tracking-tight">{t('finishForm.title')}</h2>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={onExport}>
-            <FileJson className="w-3.5 h-3.5" /> {t('finishForm.export')}
-          </Button>
-          <Button variant="outline" size="sm" onClick={onReset}
-            className="text-muted-foreground hover:text-foreground">
-            <RotateCcw className="w-3.5 h-3.5" /> {t('finishForm.reset')}
-          </Button>
-        </div>
+        <Button variant="outline" size="sm" onClick={onExport}>
+          <FileJson className="w-3.5 h-3.5" /> {t('finishForm.export')}
+        </Button>
       </div>
 
       {/* Optimize tip */}

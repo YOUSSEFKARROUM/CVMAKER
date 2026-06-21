@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Smartphone, X, Eye, EyeOff, ChevronUp } from 'lucide-react';
+import { Smartphone, X, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 
@@ -28,16 +28,10 @@ export function MobilePreviewToggle({
       >
         <Button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="shadow-lg rounded-full px-4 py-2 flex items-center gap-2 bg-blue text-blue-foreground hover:bg-blue/90"
+          className="shadow-lg rounded-full px-4 py-2 flex items-center gap-2 bg-muted text-muted-foreground hover:bg-muted/80 border border-border"
         >
-          <Smartphone className="w-4 h-4" />
+          <Eye className="w-4 h-4" />
           <span>{t('preview.mobile') || 'Aperçu CV'}</span>
-          <motion.div
-            animate={{ rotate: isExpanded ? 180 : 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ChevronUp className="w-4 h-4" />
-          </motion.div>
         </Button>
       </motion.div>
 

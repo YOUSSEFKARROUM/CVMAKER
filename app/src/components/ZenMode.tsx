@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Maximize2, Minimize2, Eye, EyeOff, Moon, Sun } from 'lucide-react';
+import { Minimize2, Eye, EyeOff, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 
@@ -71,24 +71,6 @@ export function ZenMode({
 
   return (
     <>
-      {/* Zen Mode Toggle Button (visible quand inactif) */}
-      {!isActive && (
-        <motion.button
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={onToggle}
-          className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-full shadow-lg border border-slate-200 dark:border-slate-700 hover:shadow-xl transition-shadow"
-        >
-          <Maximize2 className="w-4 h-4" />
-          <span className="text-sm font-medium hidden sm:inline">Mode Zen</span>
-          <kbd className="hidden md:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono bg-slate-100 dark:bg-slate-700 rounded">
-            F11
-          </kbd>
-        </motion.button>
-      )}
-
       {/* Zen Mode Overlay */}
       <AnimatePresence>
         {isActive && (
