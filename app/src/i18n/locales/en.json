@@ -107,10 +107,10 @@
       "aiBadge": "AI Assisted"
     },
     "stats": {
-      "cvsCreated": "CVs created",
+      "cvsCreated": "to create your CV",
       "rating": "Average rating",
-      "templates": "Templates",
-      "free": "Free"
+      "templates": "professional templates",
+      "free": "Free — no sign-up needed"
     },
     "templatesSection": {
       "badge": "Our templates",
@@ -217,7 +217,7 @@
         "terms": "Terms of use"
       },
       "copyright": "© 2026 cvmaker. All rights reserved.",
-      "madeWith": "Made with ❤️ for job seekers"
+      "madeWith": "© 2025 CV Maker. All rights reserved."
     },
     "templates": {
       "title": "Professional templates, ready to use",
@@ -277,6 +277,8 @@
     }
   },
   "experience": {
+    "emptyState": "Add your first work experience",
+    "emptyStateDesc": "Describe your roles, responsibilities and achievements",
     "title": "about your experience",
     "titleHighlight": "Tell us",
     "subtitle": "Write your jobs (most recent) with brief bullet points of what you did.",
@@ -303,6 +305,8 @@
     "aiSuggestions": "AI suggestions for description"
   },
   "education": {
+    "emptyState": "Add your academic background",
+    "emptyStateDesc": "Degrees, certifications and training completed",
     "title": "about your education",
     "titleHighlight": "Tell us",
     "subtitle": "List your degrees and training to show your academic background.",
@@ -331,6 +335,8 @@
     "nextStep": "Go to Skills"
   },
   "skills": {
+    "emptyState": "Add your key skills",
+    "emptyStateDesc": "Technical, software, languages and soft skills",
     "title": "about your skills",
     "titleHighlight": "Tell us",
     "subtitle": "Choose 6 skills that match the job posting.",
@@ -352,6 +358,8 @@
     "nextStep": "Go to Languages"
   },
   "languages": {
+    "emptyState": "Add the languages you speak",
+    "emptyStateDesc": "Indicate your level for each language",
     "title": "about your languages",
     "titleHighlight": "Tell us",
     "subtitle": "List the languages you speak and your proficiency level.",
@@ -380,6 +388,8 @@
     "nextStep": "Go to Certifications"
   },
   "certifications": {
+    "emptyState": "Add your professional certifications",
+    "emptyStateDesc": "Certifications, accreditations and certified training",
     "title": "about your certifications",
     "titleHighlight": "Tell us",
     "subtitle": "Add your professional certifications to strengthen your CV.",
@@ -397,6 +407,8 @@
     "nextStep": "Go to Projects"
   },
   "projects": {
+    "emptyState": "Add your standout projects",
+    "emptyStateDesc": "Personal, academic or professional projects",
     "title": "projects",
     "titleHighlight": "Your personal",
     "subtitle": "Showcase your personal projects, open-source contributions, or significant achievements.",
@@ -415,6 +427,8 @@
     "nextStep": "Go to Interests"
   },
   "interests": {
+    "emptyState": "Add your interests",
+    "emptyStateDesc": "Hobbies, activities and passions",
     "title": "interests",
     "titleHighlight": "Your",
     "subtitle": "Share your passions and hobbies. This humanizes your CV and can be a great talking point in interviews.",
@@ -564,20 +578,20 @@
     "reset": "Reset",
     "optimizeText": "You can optimize this CV for a specific role to improve your chances of getting the job.",
     "optimize": "Optimize",
-    "layoutTitle": "CV Layout",
-    "template": "TEMPLATE",
-    "primaryColor": "PRIMARY COLOR",
-    "titleFont": "TITLE FONT",
-    "bodyFont": "BODY FONT",
-    "cvLanguage": "CV LANGUAGE",
-    "personalData": "Personal Data",
-    "jobTitle": "JOB TITLE",
+    "layoutTitle": "CV layout",
+    "template": "Template",
+    "primaryColor": "Primary color",
+    "titleFont": "Title font",
+    "bodyFont": "Body font",
+    "cvLanguage": "CV language",
+    "personalData": "Personal data",
+    "jobTitle": "Job title",
     "jobTitlePlaceholder": "Project Manager",
-    "firstName": "FIRST NAME",
-    "lastName": "LAST NAME",
-    "email": "EMAIL",
-    "phone": "PHONE NUMBER",
-    "address": "ADDRESS",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "phone": "Phone number",
+    "address": "Address",
     "addressPlaceholder": "Enter your address",
     "nextStep": "Download CV"
   }

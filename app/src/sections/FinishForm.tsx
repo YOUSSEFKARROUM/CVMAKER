@@ -75,7 +75,7 @@ export function FinishForm({
             <FileJson className="w-3.5 h-3.5" /> {t('finishForm.export')}
           </Button>
           <Button variant="outline" size="sm" onClick={onReset}
-            className="text-destructive hover:bg-destructive/8 hover:border-destructive/40">
+            className="text-muted-foreground hover:text-foreground">
             <RotateCcw className="w-3.5 h-3.5" /> {t('finishForm.reset')}
           </Button>
         </div>

@@ -28,7 +28,7 @@ export function MobilePreviewToggle({
       >
         <Button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="shadow-lg rounded-full px-4 py-2 flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+          className="shadow-lg rounded-full px-4 py-2 flex items-center gap-2 bg-blue text-blue-foreground hover:bg-blue/90"
         >
           <Smartphone className="w-4 h-4" />
           <span>{t('preview.mobile') || 'Aperçu CV'}</span>

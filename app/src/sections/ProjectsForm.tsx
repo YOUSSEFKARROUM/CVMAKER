@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, ArrowLeft, Plus, Trash2, ChevronUp, Folder, Link as LinkIcon, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,7 +33,7 @@ const commonTechnologies = [
   'TensorFlow', 'PyTorch', 'Pandas', 'NumPy', 'Scikit-learn',
 ];
 
-const labelCls = 'block text-xs font-medium uppercase tracking-wider text-muted-foreground';
+const labelCls = 'block text-sm font-medium text-foreground mb-1';
 
 export function ProjectsForm({
   projects, onAdd, onUpdate, onDelete, onReorder, onNext, onBack, onSkip,

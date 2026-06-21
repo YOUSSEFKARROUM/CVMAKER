@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, ArrowLeft, Bold, Italic, Underline, Strikethrough, List, ListOrdered, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,7 @@ interface ProfileFormProps {
   onSkip: () => void;
 }
 
-const labelCls = 'block text-xs font-medium uppercase tracking-wider text-muted-foreground';
+const labelCls = 'block text-sm font-medium text-foreground mb-1';
 
 export function ProfileForm({ profile, onUpdate, onNext, onBack, onSkip }: ProfileFormProps) {
   const { t } = useTranslation();

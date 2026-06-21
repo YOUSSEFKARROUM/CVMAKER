@@ -140,7 +140,6 @@ export function CVGalleryPage({ onLoadCV, onCreateNew, onImport }: CVGalleryPage
               <div>
                 <h1 className="text-2xl font-bold text-foreground tracking-tight">Mes CVs</h1>
                 <p className="text-sm text-muted-foreground mt-0.5">
-                  {user?.email} ·{' '}
                   <span className={loading ? '' : cvs.length > 0 ? 'text-blue font-medium' : ''}>
                     {loading
                       ? 'Chargement…'

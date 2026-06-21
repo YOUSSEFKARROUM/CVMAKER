@@ -117,7 +117,7 @@ export function AutocompleteInput({
                 onClick={() => handleSuggestionClick(suggestion)}
                 className={`px-3 py-2 cursor-pointer text-sm ${
                   index === highlightedIndex
-                    ? 'bg-indigo-600 text-white'
+                    ? 'bg-blue text-blue-foreground'
                     : 'hover:bg-gray-100'
                 }`}
               >

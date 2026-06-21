@@ -107,10 +107,10 @@
       "aiBadge": "IA Assistée"
     },
     "stats": {
-      "cvsCreated": "CV créés",
+      "cvsCreated": "pour créer votre CV",
       "rating": "Note moyenne",
-      "templates": "Templates",
-      "free": "Gratuit"
+      "templates": "templates professionnels",
+      "free": "Gratuit — sans inscription"
     },
     "templatesSection": {
       "badge": "Nos modèles",
@@ -217,7 +217,7 @@
         "terms": "Conditions d'utilisation"
       },
       "copyright": "© 2026 cvmaker. Tous droits réservés.",
-      "madeWith": "Fait avec ❤️ pour les chercheurs d'emploi"
+      "madeWith": "© 2025 CV Maker. Tous droits réservés."
     },
     "templates": {
       "title": "Des modèles professionnels, prêts à l'emploi",
@@ -277,6 +277,8 @@
     }
   },
   "experience": {
+    "emptyState": "Ajoutez votre première expérience professionnelle",
+    "emptyStateDesc": "Décrivez vos postes, responsabilités et réalisations",
     "title": "de votre expérience",
     "titleHighlight": "Parlez-nous",
     "subtitle": "Écrivez vos emplois (les plus récents) avec de courts points de ce que vous avez fait.",
@@ -303,6 +305,8 @@
     "aiSuggestions": "Suggestions IA pour la description"
   },
   "education": {
+    "emptyState": "Ajoutez votre formation académique",
+    "emptyStateDesc": "Diplômes, certifications et formations suivies",
     "title": "de votre formation",
     "titleHighlight": "Parlez-nous",
     "subtitle": "Indiquez vos diplômes et formations pour montrer votre parcours académique.",
@@ -331,6 +335,8 @@
     "nextStep": "Aller à Compétences"
   },
   "skills": {
+    "emptyState": "Ajoutez vos compétences clés",
+    "emptyStateDesc": "Techniques, logiciels, langages et soft skills",
     "title": "de vos compétences",
     "titleHighlight": "Parlez-nous",
     "subtitle": "Choisissez 6 compétences qui correspondent à l'annonce d'emploi.",
@@ -352,6 +358,8 @@
     "nextStep": "Aller à Langues"
   },
   "languages": {
+    "emptyState": "Ajoutez les langues que vous parlez",
+    "emptyStateDesc": "Indiquez votre niveau pour chaque langue",
     "title": "de vos langues",
     "titleHighlight": "Parlez-nous",
     "subtitle": "Indiquez les langues que vous maîtrisez et votre niveau de compétence.",
@@ -380,6 +388,8 @@
     "nextStep": "Aller aux Certifications"
   },
   "certifications": {
+    "emptyState": "Ajoutez vos certifications professionnelles",
+    "emptyStateDesc": "Certifications, accréditations et formations certifiantes",
     "title": "de vos certifications",
     "titleHighlight": "Parlez-nous",
     "subtitle": "Ajoutez vos certifications professionnelles pour renforcer votre CV.",
@@ -397,6 +407,8 @@
     "nextStep": "Aller aux Projets"
   },
   "projects": {
+    "emptyState": "Ajoutez vos projets marquants",
+    "emptyStateDesc": "Projets personnels, académiques ou professionnels",
     "title": "personnels",
     "titleHighlight": "Vos projets",
     "subtitle": "Présentez vos projets personnels, contributions open-source ou réalisations importantes.",
@@ -415,6 +427,8 @@
     "nextStep": "Aller aux Centres d'intérêt"
   },
   "interests": {
+    "emptyState": "Ajoutez vos centres d'intérêt",
+    "emptyStateDesc": "Hobbies, activités et passions",
     "title": "d'intérêt",
     "titleHighlight": "Vos centres",
     "subtitle": "Partagez vos passions et hobbies. Cela humanise votre CV et peut être un excellent point de discussion en entretien.",
@@ -564,20 +578,20 @@
     "reset": "Réinitialiser",
     "optimizeText": "Vous pouvez optimiser ce CV pour un rôle spécifique afin d'améliorer vos chances d'obtenir le poste.",
     "optimize": "Optimiser",
-    "layoutTitle": "Mise En Page Du CV",
-    "template": "MODÈLE",
-    "primaryColor": "COULEUR PRINCIPALE",
-    "titleFont": "POLICE DU TITRE",
-    "bodyFont": "POLICE DU TEXTE",
-    "cvLanguage": "LANGUE DU CV",
-    "personalData": "Données Personnelles",
-    "jobTitle": "INTITULÉ DU POSTE",
+    "layoutTitle": "Mise en page du CV",
+    "template": "Modèle",
+    "primaryColor": "Couleur principale",
+    "titleFont": "Police du titre",
+    "bodyFont": "Police du texte",
+    "cvLanguage": "Langue du CV",
+    "personalData": "Données personnelles",
+    "jobTitle": "Intitulé du poste",
     "jobTitlePlaceholder": "Chef de projet",
-    "firstName": "PRÉNOM",
-    "lastName": "NOM",
-    "email": "E-MAIL",
-    "phone": "NUMÉRO DE TÉLÉPHONE",
-    "address": "ADRESSE",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "E-mail",
+    "phone": "Numéro de téléphone",
+    "address": "Adresse",
     "addressPlaceholder": "Entrez votre adresse",
     "nextStep": "Télécharger le CV"
   }

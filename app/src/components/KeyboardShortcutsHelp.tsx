@@ -37,7 +37,7 @@ const shortcuts: Shortcut[] = [
 const categories = {
   navigation: { label: 'Navigation', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
   editing: { label: 'Édition', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
-  file: { label: 'Fichier', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' },
+  file: { label: 'Fichier', color: 'bg-blue/10 text-blue dark:bg-blue/20 dark:text-blue' },
   view: { label: 'Affichage', color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' },
 };
 
@@ -118,8 +118,8 @@ export function KeyboardShortcutsHelp() {
               {/* Header */}
               <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-                    <Command className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  <div className="w-10 h-10 rounded-xl bg-blue/10 dark:bg-blue/20 flex items-center justify-center">
+                    <Command className="w-5 h-5 text-blue" />
                   </div>
                   <div>
                     <h2 className="text-lg font-semibold text-slate-900 dark:text-white">

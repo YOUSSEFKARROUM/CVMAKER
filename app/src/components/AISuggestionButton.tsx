@@ -51,7 +51,7 @@ export function AISuggestionButton({
         size="sm"
         onClick={handleClick}
         disabled={isLoading}
-        className="mt-2 text-purple-600 border-purple-300 bg-purple-50/50 hover:bg-purple-100 hover:border-purple-400 font-medium"
+        className="mt-2 text-blue border-blue/30 bg-blue/5 hover:bg-blue/10 hover:border-blue/50 font-medium"
       >
         {isLoading ? (
           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -65,7 +65,7 @@ export function AISuggestionButton({
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Wand2 className="w-5 h-5 text-purple-600" />
+              <Wand2 className="w-5 h-5 text-blue" />
               {dialogTitle}
             </DialogTitle>
             <DialogDescription>
@@ -76,7 +76,7 @@ export function AISuggestionButton({
           <div className="space-y-3 mt-4">
             {isLoading ? (
               <div className="flex flex-col items-center justify-center py-8">
-                <Loader2 className="w-8 h-8 animate-spin text-purple-600 mb-4" />
+                <Loader2 className="w-8 h-8 animate-spin text-blue mb-4" />
                 <p className="text-gray-500">Génération des suggestions...</p>
               </div>
             ) : (
@@ -84,7 +84,7 @@ export function AISuggestionButton({
                 <button
                   key={index}
                   onClick={() => handleApply(suggestion)}
-                  className="w-full text-left p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors"
+                  className="w-full text-left p-4 border border-border rounded-lg hover:border-blue/40 hover:bg-blue/5 transition-colors"
                 >
                   <p className="text-sm text-gray-700">{suggestion}</p>
                 </button>

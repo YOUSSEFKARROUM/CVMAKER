@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+﻿import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { fadeInUp, staggerContainer } from '../styles/design-system';
@@ -228,8 +228,7 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
             >
               {t('landing.hero.title1')}
               <br />
-              {/* Accent word — gradient from white to blue */}
-              <span className="bg-gradient-to-br from-white to-blue bg-clip-text text-transparent">
+              <span className="text-blue-400">
                 {t('landing.hero.title2')}
               </span>
             </motion.h1>
@@ -253,7 +252,6 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
               transition={{ delay: 0.18 }}
             >
               <Button variant="blue" size="xl" onClick={onCreateNew}>
-                <FilePlus />
                 {t('landing.hero.cta')}
                 <ArrowRight />
               </Button>
@@ -281,9 +279,9 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
           <div className="max-w-4xl mx-auto px-6 py-8">
             <div className="grid grid-cols-3 gap-6 text-center">
               {[
-                { value: '50K+',  labelKey: 'landing.stats.cvsCreated' },
-                { value: '4.9/5', labelKey: 'landing.stats.rating'     },
-                { value: '19',    labelKey: 'landing.stats.templates'   },
+                { value: '19',     labelKey: 'landing.stats.templates'   },
+                { value: '15 min', labelKey: 'landing.stats.cvsCreated'  },
+                { value: '100%',   labelKey: 'landing.stats.free'        },
               ].map((stat, i) => (
                 <motion.div
                   key={i}
@@ -570,7 +568,7 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
               <motion.div variants={fadeInUp}>
                 <Card variant="marketing" className="h-full flex flex-col">
                   <div className="mb-6">
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Plan</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Plan</p>
                     <h3 className="text-xl font-bold text-foreground">Gratuit</h3>
                     <p className="mt-3">
                       <span className="text-4xl font-bold text-foreground">0 €</span>
@@ -601,7 +599,7 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
                 </div>
                 <Card variant="marketing" className="h-full flex flex-col border-blue">
                   <div className="mb-6">
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Plan</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Plan</p>
                     <h3 className="text-xl font-bold text-foreground">Téléchargement PDF</h3>
                     <p className="mt-3">
                       <span className="text-4xl font-bold text-blue">2 €</span>
@@ -749,9 +747,8 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
                 </ul>
               </div>
             </div>
-            <div className="pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
+            <div className="pt-6 border-t border-border flex items-center justify-center gap-3 text-xs text-muted-foreground">
               <p>{t('landing.footer.copyright')}</p>
-              <p>{t('landing.footer.madeWith')}</p>
             </div>
           </div>
         </footer>

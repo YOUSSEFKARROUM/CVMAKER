@@ -411,7 +411,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
                       onClick={() => setImageFormat(format)}
                       className={`py-2 px-4 rounded-lg border transition-colors uppercase ${
                         imageFormat === format
-                          ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400'
+                          ? 'border-blue bg-blue/5 dark:bg-blue/10 text-blue'
                           : 'border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500'
                       }`}
                     >
@@ -478,7 +478,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
             <Button
               onClick={handleExportPDF}
               disabled={isExporting || mustPayBeforeDownload}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              className="bg-blue hover:bg-blue/90 text-blue-foreground"
             >
               {isExporting ? (
                 <>
@@ -497,7 +497,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
             <Button
               onClick={handleExportImage}
               disabled={isExporting}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              className="bg-blue hover:bg-blue/90 text-blue-foreground"
             >
               {isExporting ? (
                 <>
@@ -513,7 +513,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
             </Button>
           )}
           {activeTab === 'print' && (
-            <Button onClick={handlePrint} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+            <Button onClick={handlePrint} className="bg-blue hover:bg-blue/90 text-blue-foreground">
               <Printer className="w-4 h-4 mr-2" />
               Ouvrir l'aperçu
             </Button>

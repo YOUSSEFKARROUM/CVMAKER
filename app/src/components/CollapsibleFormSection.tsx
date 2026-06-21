@@ -44,7 +44,7 @@ export function CollapsibleFormSection({
   const getStatusColor = () => {
     if (hasErrors) return 'border-red-200 dark:border-red-800/50 bg-red-50/50 dark:bg-red-900/10';
     if (isCompleted) return 'border-green-200 dark:border-green-800/50 bg-green-50/50 dark:bg-green-900/10';
-    if (isExpanded) return 'border-indigo-200 dark:border-indigo-800/50 bg-indigo-50/30 dark:bg-indigo-900/10';
+    if (isExpanded) return 'border-blue/20 dark:border-blue/30 bg-blue/5 dark:bg-blue/5';
     return 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50';
   };
 
@@ -68,7 +68,7 @@ export function CollapsibleFormSection({
             : isCompleted
             ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
             : isExpanded
-            ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
+            ? 'bg-blue/10 dark:bg-blue/20 text-blue'
             : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
           }
         `}>
@@ -97,7 +97,7 @@ export function CollapsibleFormSection({
                     ? 'bg-red-500' 
                     : isCompleted 
                     ? 'bg-green-500' 
-                    : 'bg-indigo-500'
+                    : 'bg-blue'
                 }`}
                 initial={{ width: 0 }}
                 animate={{ width: `${completionPercent}%` }}

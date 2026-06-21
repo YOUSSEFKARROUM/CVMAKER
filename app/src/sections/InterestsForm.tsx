@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, ArrowLeft, Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,7 @@ const suggestedInterests = [
   'Investissement', 'Crypto-monnaies', 'Blockchain', 'Intelligence artificielle',
 ];
 
-const labelCls = 'block text-xs font-medium uppercase tracking-wider text-muted-foreground';
+const labelCls = 'block text-sm font-medium text-foreground mb-1';
 
 export function InterestsForm({ interests, onUpdate, onNext, onBack, onSkip }: InterestsFormProps) {
   const { t } = useTranslation();

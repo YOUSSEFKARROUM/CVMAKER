@@ -140,7 +140,7 @@ export const BODY_FONTS = [
 
 // ─── Label style — shared across form sections ─────────────────────────────
 
-export const LABEL_CLASS = 'block text-xs font-medium uppercase tracking-wider text-muted-foreground';
+export const LABEL_CLASS = 'block text-sm font-medium text-foreground mb-1';
 
 // ─── Legacy export — kept for ExportModal and any remaining consumers ──────
 

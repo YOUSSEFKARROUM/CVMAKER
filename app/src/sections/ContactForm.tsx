@@ -107,7 +107,6 @@ export function ContactForm({
 
         {/* Job title */}
         <div>
-          <p className={labelCls}>{t('contact.jobTitle')}</p>
           <AutocompleteInput
             value={contact.jobTitle || ''}
             onChange={v => handleChange('jobTitle', v)}

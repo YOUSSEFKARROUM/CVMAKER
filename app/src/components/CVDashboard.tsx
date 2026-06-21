@@ -158,16 +158,16 @@ export function CVDashboard({
 
   const getTemplateColor = useCallback((template: string) => {
     const colors: Record<string, string> = {
-      budapest: 'from-blue-500 to-indigo-600',
-      chicago: 'from-purple-500 to-pink-600',
+      budapest: 'from-blue-500 to-blue-700',
+      chicago: 'from-blue-400 to-blue-600',
       brunei: 'from-emerald-500 to-teal-600',
       vladivostok: 'from-orange-500 to-red-600',
       sydney: 'from-cyan-500 to-blue-600',
       shanghai: 'from-rose-500 to-pink-600',
-      kiev: 'from-violet-500 to-purple-600',
+      kiev: 'from-blue-600 to-blue-800',
       rotterdam: 'from-amber-500 to-orange-600',
       tokyo: 'from-gray-600 to-gray-800',
-      modern: 'from-indigo-500 to-purple-600',
+      modern: 'from-blue-500 to-blue-700',
     };
     return colors[template] || colors.modern;
   }, []);
@@ -209,7 +209,7 @@ export function CVDashboard({
         <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-center gap-4">
             <div 
-              className="w-12 h-12 rounded-xl flex items-center justify-center text-white bg-gradient-to-br from-indigo-500 to-purple-600"
+              className="w-12 h-12 rounded-xl flex items-center justify-center text-white bg-blue"
             >
               <FolderOpen className="w-6 h-6" />
             </div>
@@ -224,7 +224,7 @@ export function CVDashboard({
           <div className="flex items-center gap-3">
             <Button
               onClick={onCreateNew}
-              className="gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+              className="gap-2 bg-blue hover:bg-blue/90 text-blue-foreground"
             >
               <Plus className="w-4 h-4" />
               <span className="hidden sm:inline">{t('landing.createCV') || 'Créer un CV'}</span>
@@ -317,14 +317,14 @@ export function CVDashboard({
               <p className="text-slate-500 dark:text-slate-400 text-sm max-w-sm mb-4">
                 {cloudError || "Le stockage cloud n'est pas configuré. Vos CV sont sauvegardés localement dans votre navigateur."}
               </p>
-              <Button onClick={onCreateNew} className="bg-gradient-to-r from-indigo-500 to-purple-600">
+              <Button onClick={onCreateNew} className="bg-blue hover:bg-blue/90 text-blue-foreground">
                 <Plus className="w-4 h-4 mr-2" />
                 {t('landing.createCV') || 'Créer un CV'}
               </Button>
             </motion.div>
           ) : loading ? (
             <div className="flex items-center justify-center h-64">
-              <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-blue/30 border-t-blue rounded-full animate-spin" />
             </div>
           ) : filteredCVs.length === 0 ? (
             <motion.div
@@ -346,7 +346,7 @@ export function CVDashboard({
                 }
               </p>
               {!searchQuery && (
-                <Button onClick={onCreateNew} className="bg-gradient-to-r from-indigo-500 to-purple-600">
+                <Button onClick={onCreateNew} className="bg-blue hover:bg-blue/90 text-blue-foreground">
                   <Plus className="w-4 h-4 mr-2" />
                   {t('landing.createCV') || 'Créer un CV'}
                 </Button>

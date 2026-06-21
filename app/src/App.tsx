@@ -520,7 +520,7 @@ function App() {
     const currentIndex = steps.indexOf(currentStep as Exclude<Step, 'landing' | 'download'>);
     if (currentIndex < steps.length - 1) {
       setCurrentStep(steps[currentIndex + 1]);
-      success(`Étape ${steps[currentIndex + 1]} atteinte`);
+      success(t(`steps.${steps[currentIndex + 1]}`));
     }
   };
 
