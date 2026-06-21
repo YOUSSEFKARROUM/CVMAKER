@@ -4,7 +4,6 @@ import { Plus, Trash2, Loader2, FileText, Edit3, Upload } from 'lucide-react';
 import { useCloudCV } from '../hooks/useCloudCV';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { useToast } from '../hooks/useToast';
 import { staggerContainer, fadeInUp } from '../styles/design-system';
 import { ConfirmationModal } from '../components/ConfirmationModal';
