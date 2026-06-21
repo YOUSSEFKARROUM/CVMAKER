@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { validateImportedData } from '../utils/validationSchemas';
+import { validateImportedData, normalizeForImport } from '../utils/validationSchemas';
 import type { CVData, CVSettings, Step } from '../types/cv';
 
 // Clés de stockage dynamiques basées sur l'ID utilisateur
@@ -174,8 +174,9 @@ export function useCVStorage(
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
-          const parsed = JSON.parse(e.target?.result as string);
-          
+          const raw = JSON.parse(e.target?.result as string);
+          const parsed = normalizeForImport(raw);
+
           // Validation avec Zod
           const validation = validateImportedData(parsed);
           if (!validation.valid) {

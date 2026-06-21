@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "CV Maker",
+    "name": "cvmaker",
     "tagline": "Create your professional CV in minutes"
   },
   "common": {
@@ -136,30 +136,72 @@
       "subtitle": "A full set of tools to create the perfect CV with no hassle"
     },
     "features": {
-      "ai": { "title": "AI Assistance", "description": "Get smart suggestions to improve your CV content" },
-      "fast": { "title": "Lightning Fast", "description": "Create your professional CV in just 10 minutes" },
-      "preview": { "title": "Live Preview", "description": "See changes in real-time as you edit your CV" },
-      "export": { "title": "PDF Export", "description": "Download your CV in high quality PDF format" },
-      "lang": { "title": "Multilingual", "description": "Create your CV in multiple languages easily" },
-      "privacy": { "title": "Privacy First", "description": "Your data stays on your device, always secure" }
+      "ai": {
+        "title": "AI Assistance",
+        "description": "Get smart suggestions to improve your CV content"
+      },
+      "fast": {
+        "title": "Lightning Fast",
+        "description": "Create your professional CV in just 10 minutes"
+      },
+      "preview": {
+        "title": "Live Preview",
+        "description": "See changes in real-time as you edit your CV"
+      },
+      "export": {
+        "title": "PDF Export",
+        "description": "Download your CV in high quality PDF format"
+      },
+      "lang": {
+        "title": "Multilingual",
+        "description": "Create your CV in multiple languages easily"
+      },
+      "privacy": {
+        "title": "Privacy First",
+        "description": "Your data stays on your device, always secure"
+      }
     },
     "testimonialsSection": {
       "badge": "Testimonials",
       "title": "What our users say",
       "subtitle": "Join thousands who have transformed their career"
     },
-    "testimonial1": { "name": "Sophie Martin", "role": "Project Manager", "content": "I landed 3 interviews in a week thanks to my new CV. The tool is incredibly easy to use." },
-    "testimonial2": { "name": "Karim Benali", "role": "Full Stack Developer", "content": "The templates are modern and professional. In 10 minutes I had a perfect CV for startup applications." },
-    "testimonial3": { "name": "Emma Dubois", "role": "Marketing Manager", "content": "The best CV builder I've used. Free, fast, and the results are spot on." },
+    "testimonial1": {
+      "name": "Sophie Martin",
+      "role": "Project Manager",
+      "content": "I landed 3 interviews in a week thanks to my new CV. The tool is incredibly easy to use."
+    },
+    "testimonial2": {
+      "name": "Karim Benali",
+      "role": "Full Stack Developer",
+      "content": "The templates are modern and professional. In 10 minutes I had a perfect CV for startup applications."
+    },
+    "testimonial3": {
+      "name": "Emma Dubois",
+      "role": "Marketing Manager",
+      "content": "The best CV builder I've used. Free, fast, and the results are spot on."
+    },
     "faqSection": {
       "badge": "FAQ",
       "title": "Frequently asked questions",
       "subtitle": "Everything you need to know about CV Maker"
     },
-    "faq1": { "question": "Is CV Maker really free?", "answer": "Yes, CV Maker is 100% free. You can create, edit and download your CV as PDF at no cost." },
-    "faq2": { "question": "Can I edit my CV after creating it?", "answer": "Absolutely! Your CVs are saved automatically and you can edit them anytime." },
-    "faq3": { "question": "Are templates ATS-compatible?", "answer": "Yes, all our templates are optimized for Applicant Tracking Systems used by recruiters." },
-    "faq4": { "question": "Can I create multiple CV versions?", "answer": "Yes, you can create as many CVs as you like and tailor them for each application." },
+    "faq1": {
+      "question": "Is CV Maker really free?",
+      "answer": "Yes, CV Maker is 100% free. You can create, edit and download your CV as PDF at no cost."
+    },
+    "faq2": {
+      "question": "Can I edit my CV after creating it?",
+      "answer": "Absolutely! Your CVs are saved automatically and you can edit them anytime."
+    },
+    "faq3": {
+      "question": "Are templates ATS-compatible?",
+      "answer": "Yes, all our templates are optimized for Applicant Tracking Systems used by recruiters."
+    },
+    "faq4": {
+      "question": "Can I create multiple CV versions?",
+      "answer": "Yes, you can create as many CVs as you like and tailor them for each application."
+    },
     "cta": {
       "title": "Ready to create your CV?",
       "subtitle": "Join 50,000+ users who have already created their professional CV with our tool.",
@@ -169,9 +211,18 @@
       "tagline": "Create your professional CV in minutes. Free, fast, no sign-up required.",
       "navigation": "Navigation",
       "legal": "Legal",
-      "legalLinks": { "mentions": "Legal notice", "privacy": "Privacy", "terms": "Terms of use" },
-      "copyright": "© 2026 CV Maker. All rights reserved.",
+      "legalLinks": {
+        "mentions": "Legal notice",
+        "privacy": "Privacy",
+        "terms": "Terms of use"
+      },
+      "copyright": "© 2026 cvmaker. All rights reserved.",
       "madeWith": "Made with ❤️ for job seekers"
+    },
+    "templates": {
+      "title": "Professional templates, ready to use",
+      "subtitle": "19 templates designed to maximize your chances. Choose, customize, download.",
+      "showAll": "View {count} more templates"
     }
   },
   "steps": {

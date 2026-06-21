@@ -1,26 +1,16 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { 
-  FilePlus, 
-  Sparkles, 
-  Zap, 
-  Globe, 
-  ChevronRight,
-  Star,
-  Shield,
-  Download,
-  Palette,
-  Eye,
-  ArrowRight,
-  MousePointerClick,
-  Clock,
-  FileCheck,
-  ChevronDown,
-  Menu,
-  X
+import { fadeInUp, staggerContainer } from '../styles/design-system';
+import {
+  FilePlus, Sparkles, Zap, Globe, Star, Shield, Download,
+  Palette, Eye, ArrowRight, MousePointerClick, Clock,
+  FileCheck, ChevronDown, Menu, X, Check,
 } from 'lucide-react';
 import { Logo } from '../components/Logo';
+import { Button } from '../components/ui/button';
+import { Card } from '../components/ui/card';
+import TemplateShowcase from '../components/TemplateShowcase';
 
 interface LandingPageProps {
   onCreateNew: () => void;
@@ -29,224 +19,87 @@ interface LandingPageProps {
   isAuthenticated: boolean;
 }
 
-// Template Preview Components
-function BudapestPreview() {
+// ─── Hero mock CV — premium Harvard-style preview ─────────────────────────────
+function HeroMockCV() {
   return (
-    <div className="h-full flex">
-      <div className="w-1/3 bg-emerald-600 p-3 text-white">
-        <div className="w-10 h-10 rounded-full bg-white/20 mx-auto mb-3 flex items-center justify-center text-sm font-bold">JD</div>
-        <div className="space-y-2">
-          <div className="h-2 bg-white/30 rounded w-full" />
-          <div className="h-2 bg-white/30 rounded w-3/4" />
+    <div className="flex bg-white min-h-[220px]">
+      <div className="w-2/5 bg-[#1e40af] p-5 flex flex-col">
+        <div className="w-12 h-12 rounded-full bg-white/20 mx-auto mb-3 flex items-center justify-center text-white text-xs font-bold shrink-0">
+          JD
+        </div>
+        <div className="text-center space-y-1.5 mb-5">
+          <div className="h-2.5 bg-white/90 rounded-full w-3/4 mx-auto" />
+          <div className="h-1.5 bg-white/50 rounded-full w-1/2 mx-auto" />
+        </div>
+        <div className="space-y-2 mt-auto">
+          <div className="text-[7px] text-white/50 uppercase tracking-widest mb-1">Compétences</div>
+          {(['w-4/5', 'w-2/3', 'w-3/4'] as const).map((w, i) => (
+            <div key={i} className="h-1.5 bg-white/20 rounded-full overflow-hidden">
+              <div className={`h-1.5 bg-white/70 rounded-full ${w}`} />
+            </div>
+          ))}
         </div>
       </div>
-      <div className="flex-1 p-3 bg-white">
-        <div className="h-4 bg-slate-800 rounded w-3/4 mb-2" />
-        <div className="h-3 bg-emerald-500 rounded w-1/2 mb-4" />
-        <div className="h-2 bg-slate-200 rounded w-full" />
-      </div>
-    </div>
-  );
-}
-
-function StanfordPreview() {
-  return (
-    <div className="h-full flex">
-      <div className="w-1/3 bg-slate-700 p-3 text-white">
-        <div className="w-10 h-10 rounded-full bg-white/20 mx-auto mb-3 flex items-center justify-center text-sm font-bold">JD</div>
-        <div className="h-2 bg-white/30 rounded w-full mb-1" />
-        <div className="h-2 bg-white/30 rounded w-3/4" />
-      </div>
-      <div className="flex-1 p-3 bg-white">
-        <div className="h-3 bg-slate-800 rounded w-1/3 mb-2" />
-        <div className="h-2 bg-slate-200 rounded w-full mb-1" />
-        <div className="h-2 bg-slate-200 rounded w-5/6" />
-      </div>
-    </div>
-  );
-}
-
-function CambridgePreview() {
-  return (
-    <div className="h-full bg-white">
-      <div className="bg-blue-600 p-2 text-white text-center text-xs font-bold mb-3">Curriculum Vitae</div>
-      <div className="px-3">
-        <div className="h-3 bg-slate-800 rounded w-2/3 mb-2" />
-        <div className="h-2 bg-blue-500 rounded w-1/3 mb-3" />
-        <div className="grid grid-cols-2 gap-2">
-          <div className="h-2 bg-slate-200 rounded" />
-          <div className="h-2 bg-slate-200 rounded" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function OxfordPreview() {
-  return (
-    <div className="h-full flex">
-      <div className="flex-1 p-3 bg-white">
-        <div className="h-3 bg-slate-800 rounded w-1/2 mb-2" />
-        <div className="border-l-2 border-gray-300 pl-2">
-          <div className="h-2 bg-slate-200 rounded w-full" />
-        </div>
-      </div>
-      <div className="w-1/3 p-3 border-l border-gray-200">
-        <div className="text-xs font-bold mb-2">CV</div>
-        <div className="h-2 bg-gray-300 rounded w-full mb-1" />
-        <div className="h-2 bg-gray-300 rounded w-3/4" />
-      </div>
-    </div>
-  );
-}
-
-function OtagoPreview() {
-  return (
-    <div className="h-full bg-white p-3">
-      <div className="flex justify-between items-start border-b-2 border-gray-800 pb-2 mb-3">
-        <div>
-          <div className="h-4 bg-slate-800 rounded w-24 mb-1" />
-          <div className="h-2 bg-gray-500 rounded w-16" />
-        </div>
-        <div className="w-8 h-8 bg-gray-800 text-white flex items-center justify-center text-xs font-bold">CV</div>
-      </div>
-      <div className="grid grid-cols-4 gap-1 mb-3">
-        <div className="h-2 bg-slate-200 rounded" />
-        <div className="h-2 bg-slate-200 rounded" />
-        <div className="h-2 bg-slate-200 rounded" />
-        <div className="h-2 bg-slate-200 rounded" />
-      </div>
-      <div className="h-2 bg-slate-200 rounded w-full" />
-    </div>
-  );
-}
-
-function BerkeleyPreview() {
-  return (
-    <div className="h-full bg-white p-3">
-      <div className="flex items-center gap-3 mb-3 border-b-2 pb-2" style={{borderColor: '#6366f1'}}>
-        <div className="w-10 h-10 rounded-full bg-indigo-500 flex-shrink-0" />
-        <div>
-          <div className="h-3 bg-slate-800 rounded w-24 mb-1" />
-          <div className="h-2 bg-indigo-500 rounded w-16" />
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="h-2 bg-slate-200 rounded" />
-        <div className="h-2 bg-slate-200 rounded" />
-      </div>
-    </div>
-  );
-}
-
-function HarvardPreview() {
-  return (
-    <div className="h-full flex">
-      <div className="w-1/3 bg-blue-600 p-3 text-white">
-        <div className="w-10 h-10 rounded-full bg-white/20 mx-auto mb-3" />
-        <div className="h-2 bg-white/40 rounded w-full mb-1" />
-        <div className="h-2 bg-white/30 rounded w-3/4" />
-        <div className="mt-3 space-y-1">
-          <div className="h-1.5 bg-white/30 rounded-full w-full" />
-          <div className="h-1.5 bg-white/30 rounded-full w-4/5" />
-        </div>
-      </div>
-      <div className="flex-1 p-3 bg-white">
-        <div className="h-3 bg-slate-800 rounded w-1/3 mb-2" />
-        <div className="flex gap-2">
-          <div className="w-12 h-2 bg-slate-300 rounded" />
-          <div className="flex-1 border-l-2 border-blue-500 pl-2">
-            <div className="h-2 bg-slate-200 rounded w-full" />
+      <div className="flex-1 p-5 bg-white">
+        <div className="mb-4">
+          <div className="h-2 bg-gray-700 rounded w-5/12 mb-2" />
+          <div className="space-y-1.5">
+            <div className="h-1.5 bg-gray-200 rounded w-full" />
+            <div className="h-1.5 bg-gray-200 rounded w-5/6" />
+            <div className="h-1.5 bg-gray-200 rounded w-4/6" />
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function AucklandPreview() {
-  return (
-    <div className="h-full bg-white p-3">
-      <div className="border-2 border-gray-800 p-2 mb-3 text-center">
-        <div className="h-3 bg-slate-800 rounded w-2/3 mx-auto" />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <div className="h-2 bg-slate-800 rounded w-1/2 mb-2" />
-          <div className="h-2 bg-slate-200 rounded w-full" />
-        </div>
-        <div>
-          <div className="h-2 bg-slate-800 rounded w-1/2 mb-2" />
-          <div className="flex gap-1">
-            <div className="h-2 w-2 rounded-full bg-gray-700" />
-            <div className="h-2 w-2 rounded-full bg-gray-700" />
-            <div className="h-2 w-2 rounded-full bg-gray-300" />
+        <div className="border-t border-gray-100 pt-3 mb-3">
+          <div className="h-2 bg-gray-700 rounded w-1/4 mb-2" />
+          <div className="space-y-1.5">
+            {[true, true, false].map((full, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <div className="w-1 h-1 rounded-full bg-blue-700 shrink-0" />
+                <div className={`h-1.5 bg-gray-200 rounded ${full ? 'w-full' : 'w-3/4'}`} />
+              </div>
+            ))}
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function EdinburghPreview() {
-  return (
-    <div className="h-full">
-      <div className="bg-indigo-800 p-3 text-white flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-white/20 flex-shrink-0" />
-        <div className="h-3 bg-white rounded w-24" />
-      </div>
-      <div className="flex">
-        <div className="w-1/3 p-3 border-r border-gray-200">
-          <div className="h-2 bg-slate-800 rounded w-3/4 mb-2" />
-          <div className="h-2 bg-gray-300 rounded w-full mb-1" />
-          <div className="h-2 bg-gray-300 rounded w-4/5" />
-        </div>
-        <div className="flex-1 p-3">
-          <div className="h-2 bg-slate-800 rounded w-1/2 mb-2" />
-          <div className="h-2 bg-slate-200 rounded w-full" />
+        <div className="flex gap-1.5 flex-wrap">
+          {['React', 'Node.js', 'Python'].map(tag => (
+            <span key={tag} className="text-[7px] px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded font-medium">
+              {tag}
+            </span>
+          ))}
         </div>
       </div>
     </div>
   );
 }
 
-function PrincetonPreview() {
-  return (
-    <div className="h-full bg-white p-3">
-      <div className="text-center mb-3">
-        <div className="w-10 h-10 rounded-full bg-gray-200 mx-auto mb-2" />
-        <div className="h-3 bg-slate-800 rounded w-16 mx-auto" />
-      </div>
-      <div className="border-b border-gray-200 pb-2 mb-3">
-        <div className="h-2 bg-slate-800 rounded w-1/3 mb-2" />
-        <div className="grid grid-cols-2 gap-2">
-          <div className="h-2 bg-slate-200 rounded" />
-          <div className="h-2 bg-slate-200 rounded" />
-        </div>
-      </div>
-      <div className="border-l-2 border-gray-300 pl-3">
-        <div className="h-2 bg-slate-700 rounded w-1/2 mb-1" />
-        <div className="h-2 bg-slate-200 rounded w-full" />
-      </div>
-    </div>
-  );
-}
+// ─── Data ─────────────────────────────────────────────────────────────────────
 
-const templates = [
-  { name: 'Budapest', color: 'from-emerald-500 to-teal-600', users: '12K+', Preview: BudapestPreview },
-  { name: 'Stanford', color: 'from-slate-600 to-gray-700', users: '9K+', Preview: StanfordPreview },
-  { name: 'Cambridge', color: 'from-blue-600 to-blue-700', users: '11K+', Preview: CambridgePreview },
-  { name: 'Oxford', color: 'from-indigo-600 to-purple-700', users: '7K+', Preview: OxfordPreview },
-  { name: 'Otago', color: 'from-gray-600 to-slate-700', users: '5K+', Preview: OtagoPreview },
-  { name: 'Berkeley', color: 'from-indigo-500 to-blue-600', users: '8K+', Preview: BerkeleyPreview },
-  { name: 'Harvard', color: 'from-blue-700 to-indigo-800', users: '13K+', Preview: HarvardPreview },
-  { name: 'Auckland', color: 'from-teal-600 to-emerald-700', users: '6K+', Preview: AucklandPreview },
-  { name: 'Edinburgh', color: 'from-indigo-800 to-slate-800', users: '7K+', Preview: EdinburghPreview },
-  { name: 'Princeton', color: 'from-slate-700 to-gray-800', users: '8K+', Preview: PrincetonPreview },
+const FEATURES = [
+  { icon: Sparkles,          titleKey: 'landing.features.ai.title',      descKey: 'landing.features.ai.description'      },
+  { icon: Zap,               titleKey: 'landing.features.fast.title',    descKey: 'landing.features.fast.description'    },
+  { icon: Eye,               titleKey: 'landing.features.preview.title', descKey: 'landing.features.preview.description' },
+  { icon: Download,          titleKey: 'landing.features.export.title',  descKey: 'landing.features.export.description'  },
+  { icon: Globe,             titleKey: 'landing.features.lang.title',    descKey: 'landing.features.lang.description'    },
+  { icon: Shield,            titleKey: 'landing.features.privacy.title', descKey: 'landing.features.privacy.description' },
 ];
 
 const TESTIMONIAL_KEYS = ['testimonial1', 'testimonial2', 'testimonial3'] as const;
-const FAQ_KEYS = ['faq1', 'faq2', 'faq3', 'faq4'] as const;
+const FAQ_KEYS         = ['faq1', 'faq2', 'faq3', 'faq4'] as const;
+
+const FREE_FEATURES     = ['Création illimitée de CV', 'Auto-sauvegarde cloud', 'Aperçu en temps réel', '19 templates disponibles', 'Export JSON'];
+const PREMIUM_FEATURES  = ['Tout du plan gratuit', 'PDF haute définition', 'Optimisé ATS', 'Sans filigrane', 'Téléchargement instantané'];
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function SectionBadge({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center px-3 py-1 rounded-md bg-muted text-muted-foreground text-xs font-medium tracking-wide uppercase mb-4">
+      {children}
+    </span>
+  );
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingPageProps) {
   const { t } = useTranslation();
@@ -255,693 +108,662 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!isAuthenticated) {
-      onCreateNew();
-      return;
-    }
+    if (!isAuthenticated) { onCreateNew(); return; }
     const file = e.target.files?.[0];
-    if (file) {
-      await onImport(file);
-    }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    if (file) await onImport(file);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    element?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     setMobileMenuOpen(false);
   };
 
+  const NAV_SECTIONS = ['templates', 'features', 'testimonials', 'faq'] as const;
+
   return (
-    <div className="relative min-h-screen bg-white overflow-x-hidden">
-      {/* Navigation */}
-      <motion.nav 
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100"
-      >
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="flex items-center justify-between h-16">
-            <Logo animated={true} showText={true} size="md" />
-            
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-8">
-              <button onClick={() => scrollToSection('templates')} className="text-slate-600 hover:text-slate-900 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded">
-                {t('landing.nav.templates')}
-              </button>
-              <button onClick={() => scrollToSection('features')} className="text-slate-600 hover:text-slate-900 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded">
-                {t('landing.nav.features')}
-              </button>
-              <button onClick={() => scrollToSection('testimonials')} className="text-slate-600 hover:text-slate-900 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded">
-                {t('landing.nav.testimonials')}
-              </button>
-              <button onClick={() => scrollToSection('faq')} className="text-slate-600 hover:text-slate-900 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded">
-                {t('landing.nav.faq')}
-              </button>
-            </div>
+    // Force dark mode on the entire landing page for a premium dark aesthetic
+    <div className="dark">
+      <div className="relative min-h-screen bg-background overflow-x-hidden">
 
-            <div className="hidden lg:flex items-center gap-4">
-              <motion.button
-                onClick={onCreateNew}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-emerald-500"
+        {/* ── Navigation ──────────────────────────────────────────────────── */}
+        <motion.nav
+          variants={fadeInUp}
+          initial="hidden"
+          animate="visible"
+          className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border"
+        >
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="flex items-center justify-between h-14">
+              <Logo animated size="md" showText />
+
+              <div className="hidden lg:flex items-center gap-6">
+                {NAV_SECTIONS.map(key => (
+                  <button
+                    key={key}
+                    onClick={() => scrollToSection(key)}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+                  >
+                    {t(`landing.nav.${key}`)}
+                  </button>
+                ))}
+              </div>
+
+              <div className="hidden lg:block">
+                <Button variant="blue" size="sm" onClick={onCreateNew}>
+                  {t('landing.createCV')}
+                  <ArrowRight />
+                </Button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(v => !v)}
+                aria-expanded={mobileMenuOpen}
+                className="lg:hidden p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                {t('landing.createCV')}
-              </motion.button>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              type="button"
-              className="lg:hidden p-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-expanded={mobileMenuOpen}
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="lg:hidden bg-white border-t border-slate-100 py-4"
-          >
-            <div className="max-w-7xl mx-auto px-6 space-y-3">
-              <button onClick={() => scrollToSection('templates')} className="block w-full text-left py-2 text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.nav.templates')}</button>
-              <button onClick={() => scrollToSection('features')} className="block w-full text-left py-2 text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.nav.features')}</button>
-              <button onClick={() => scrollToSection('testimonials')} className="block w-full text-left py-2 text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.nav.testimonials')}</button>
-              <button onClick={() => scrollToSection('faq')} className="block w-full text-left py-2 text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.nav.faq')}</button>
-              <button onClick={onCreateNew} className="w-full py-3 bg-emerald-500 text-white font-semibold rounded-xl mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-emerald-500">
-                {t('landing.createCV')}
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
-          </motion.div>
-        )}
-      </motion.nav>
+          </div>
 
-      {/* Hero Section - Green Background */}
-      <section className="relative bg-emerald-500 pt-32 pb-48 overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-            backgroundSize: '40px 40px'
-          }} />
-        </div>
-        
-        {/* Decorative Elements */}
-        <motion.div
-          animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-32 left-10 w-20 h-20 bg-white/10 rounded-2xl"
-        />
-        <motion.div
-          animate={{ y: [0, 20, 0], rotate: [0, -5, 0] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-          className="absolute bottom-40 right-10 w-16 h-16 bg-white/10 rounded-full"
-        />
-        <motion.div
-          animate={{ scale: [1, 1.2, 1] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute top-48 right-1/4 w-8 h-8 bg-white/20 rounded-lg"
-        />
-
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight"
-          >
-            {t('landing.hero.title1')}
-            <br />
-            {t('landing.hero.title2')}
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-lg sm:text-xl text-emerald-50 mb-10 max-w-3xl mx-auto leading-relaxed"
-          >
-            {t('landing.hero.subtitle')}
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <motion.button
-              onClick={onCreateNew}
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center gap-3 px-10 py-5 bg-violet-600 hover:bg-violet-700 text-white text-lg font-semibold rounded-xl shadow-2xl shadow-violet-600/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-violet-600"
+          {mobileMenuOpen && (
+            <motion.div
+              variants={fadeInUp}
+              initial="hidden"
+              animate="visible"
+              className="lg:hidden bg-background border-t border-border py-4"
             >
-              <FilePlus className="w-6 h-6" />
-              {t('landing.hero.cta')}
-            </motion.button>
-          </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-8 text-emerald-100 font-medium"
-          >
-            {t('landing.hero.boost', { percent: '65' })}
-          </motion.p>
-        </div>
-
-        {/* Wave Transition */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white"/>
-          </svg>
-        </div>
-      </section>
-
-      {/* Feature Card - Overlapping */}
-      <section className="relative z-20 -mt-32 pb-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-white rounded-3xl shadow-2xl shadow-slate-200/50 p-8 lg:p-12"
-          >
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-violet-100 text-violet-700 rounded-full text-sm font-medium mb-6">
-                  <MousePointerClick className="w-4 h-4" />
-                  {t('landing.featureCard.badge')}
-                </div>
-                <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-6">
-                  {t('landing.featureCard.title')}
-                </h2>
-                <p className="text-lg text-slate-600 leading-relaxed mb-8">
-                  {t('landing.featureCard.description')}
-                </p>
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center gap-2 text-slate-700">
-                    <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                      <Clock className="w-5 h-5 text-emerald-600" />
-                    </div>
-                    <span className="font-medium">{t('landing.featureCard.15min')}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-700">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                      <FileCheck className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <span className="font-medium">{t('landing.featureCard.free')}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-700">
-                    <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center">
-                      <Download className="w-5 h-5 text-violet-600" />
-                    </div>
-                    <span className="font-medium">{t('landing.featureCard.pdf')}</span>
-                  </div>
+              <div className="max-w-6xl mx-auto px-6 space-y-1">
+                {NAV_SECTIONS.map(key => (
+                  <button
+                    key={key}
+                    onClick={() => scrollToSection(key)}
+                    className="block w-full text-left px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors"
+                  >
+                    {t(`landing.nav.${key}`)}
+                  </button>
+                ))}
+                <div className="pt-2">
+                  <Button variant="blue" className="w-full" onClick={onCreateNew}>
+                    {t('landing.createCV')}
+                  </Button>
                 </div>
               </div>
-              <div className="relative">
+            </motion.div>
+          )}
+        </motion.nav>
+
+        {/* ── Hero ────────────────────────────────────────────────────────── */}
+        <section className="relative pt-36 pb-20 overflow-hidden">
+          {/* Grid texture */}
+          <div className="pointer-events-none absolute inset-0 hero-grid-pattern" />
+          {/* Blue radial glow */}
+          <div className="pointer-events-none absolute inset-0 hero-glow" />
+
+          <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+
+            {/* Social proof pill */}
+            <motion.div
+              variants={fadeInUp}
+              initial="hidden"
+              animate="visible"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-surface-1 text-muted-foreground text-xs mb-8"
+            >
+              <div className="flex -space-x-1">
+                <div className="w-4 h-4 rounded-full border border-background bg-blue" />
+                <div className="w-4 h-4 rounded-full border border-background bg-success" />
+                <div className="w-4 h-4 rounded-full border border-background bg-warning" />
+              </div>
+              {t('landing.hero.boost', { percent: '65' })}
+            </motion.div>
+
+            {/* Title */}
+            <motion.h1
+              variants={fadeInUp}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.06 }}
+              className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground mb-6 leading-[1.08]"
+            >
+              {t('landing.hero.title1')}
+              <br />
+              {/* Accent word — gradient from white to blue */}
+              <span className="bg-gradient-to-br from-white to-blue bg-clip-text text-transparent">
+                {t('landing.hero.title2')}
+              </span>
+            </motion.h1>
+
+            {/* Subtitle */}
+            <motion.p
+              variants={fadeInUp}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.12 }}
+              className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed"
+            >
+              {t('landing.hero.subtitle')}
+            </motion.p>
+
+            {/* Single dominant CTA */}
+            <motion.div
+              variants={fadeInUp}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.18 }}
+            >
+              <Button variant="blue" size="xl" onClick={onCreateNew}>
+                <FilePlus />
+                {t('landing.hero.cta')}
+                <ArrowRight />
+              </Button>
+            </motion.div>
+
+            {/* Hero mock CV — tilted 3-D card */}
+            <motion.div
+              variants={fadeInUp}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.28, duration: 0.4 }}
+              className="relative mx-auto mt-16 max-w-xl"
+            >
+              <div className="[transform:perspective(1200px)_rotateX(4deg)_rotateY(-2deg)] rounded-xl overflow-hidden border border-border shadow-overlay">
+                <HeroMockCV />
+              </div>
+              {/* Subtle glow under the card */}
+              <div className="pointer-events-none absolute -bottom-6 left-1/2 -translate-x-1/2 w-2/3 h-10 bg-blue/15 blur-2xl rounded-full" />
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ── Stats bar ───────────────────────────────────────────────────── */}
+        <section className="border-y border-border bg-surface-1">
+          <div className="max-w-4xl mx-auto px-6 py-8">
+            <div className="grid grid-cols-3 gap-6 text-center">
+              {[
+                { value: '50K+',  labelKey: 'landing.stats.cvsCreated' },
+                { value: '4.9/5', labelKey: 'landing.stats.rating'     },
+                { value: '19',    labelKey: 'landing.stats.templates'   },
+              ].map((stat, i) => (
                 <motion.div
-                  whileHover={{ y: -5 }}
-                  className="bg-slate-50 rounded-2xl p-6 border border-slate-100"
+                  key={i}
+                  variants={fadeInUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.06 }}
                 >
-                  {/* CV Preview Mock */}
-                  <div className="bg-white rounded-xl shadow-lg p-6">
-                    <div className="flex gap-4 mb-6">
-                      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-xl">
-                        JD
-                      </div>
-                      <div className="flex-1">
-                        <div className="h-5 bg-slate-800 rounded w-3/4 mb-2" />
-                        <div className="h-3 bg-emerald-500 rounded w-1/2" />
-                      </div>
+                  <div className="text-3xl font-bold text-blue">{stat.value}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{t(stat.labelKey)}</div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Feature showcase card ────────────────────────────────────────── */}
+        <section className="py-20">
+          <div className="max-w-6xl mx-auto px-6">
+            <motion.div
+              variants={fadeInUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
+              <Card variant="marketing">
+                <div className="grid lg:grid-cols-2 gap-12 items-center">
+                  <div>
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue/10 text-blue text-xs font-medium mb-5">
+                      <MousePointerClick className="w-3.5 h-3.5" />
+                      {t('landing.featureCard.badge')}
                     </div>
-                    <div className="space-y-3">
-                      <div className="h-2 bg-slate-100 rounded w-full" />
-                      <div className="h-2 bg-slate-100 rounded w-5/6" />
-                      <div className="h-2 bg-slate-100 rounded w-4/6" />
-                    </div>
-                    <div className="mt-6 pt-6 border-t border-slate-100">
-                      <div className="flex gap-2">
-                        {['React', 'TypeScript', 'Node.js'].map((skill, i) => (
-                          <span key={i} className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-medium">
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
+                    <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-4 tracking-tight">
+                      {t('landing.featureCard.title')}
+                    </h2>
+                    <p className="text-muted-foreground leading-relaxed mb-8">
+                      {t('landing.featureCard.description')}
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                      {[
+                        { icon: Clock,     key: 'featureCard.15min' },
+                        { icon: FileCheck, key: 'featureCard.free'  },
+                        { icon: Download,  key: 'featureCard.pdf'   },
+                      ].map(({ icon: Icon, key }) => (
+                        <div key={key} className="flex items-center gap-2 text-sm">
+                          <div className="w-8 h-8 rounded-lg bg-blue/10 flex items-center justify-center">
+                            <Icon className="w-4 h-4 text-blue" />
+                          </div>
+                          <span className="text-foreground font-medium">{t(`landing.${key}`)}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                  
-                  {/* Floating Badge */}
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.3 }}
-                    className="absolute -top-4 -right-4 bg-violet-600 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg"
-                  >
-                    <div className="flex items-center gap-1">
-                      <Sparkles className="w-4 h-4" />
+
+                  {/* Mock CV preview */}
+                  <div className="relative">
+                    <div className="rounded-lg border border-border bg-background p-6">
+                      <div className="bg-white rounded-md shadow-sm p-5">
+                        <div className="flex gap-4 mb-5">
+                          <div className="w-14 h-14 rounded-lg bg-blue/10 flex items-center justify-center text-blue font-bold text-lg shrink-0">
+                            JD
+                          </div>
+                          <div className="flex-1 pt-1">
+                            <div className="h-4 bg-gray-800 rounded w-3/4 mb-2" />
+                            <div className="h-2.5 bg-blue-200 rounded w-1/2" />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="h-2 bg-gray-100 rounded w-full" />
+                          <div className="h-2 bg-gray-100 rounded w-5/6" />
+                          <div className="h-2 bg-gray-100 rounded w-4/6" />
+                        </div>
+                        <div className="mt-5 pt-5 border-t border-gray-100 flex gap-2 flex-wrap">
+                          {['React', 'TypeScript', 'Node.js'].map(s => (
+                            <span key={s} className="px-2.5 py-1 bg-gray-50 border border-gray-200 text-gray-600 rounded text-xs font-medium">
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="absolute -top-3 -right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue text-blue-foreground text-xs font-medium shadow-md">
+                      <Sparkles className="w-3.5 h-3.5" />
                       {t('landing.featureCard.aiBadge')}
                     </div>
-                  </motion.div>
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Stats Bar */}
-      <section className="py-16 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { value: '50K+', labelKey: 'landing.stats.cvsCreated', icon: FilePlus },
-              { value: '4.9/5', labelKey: 'landing.stats.rating', icon: Star },
-              { value: '10+', labelKey: 'landing.stats.templates', icon: Palette },
-              { value: '100%', labelKey: 'landing.stats.free', icon: Shield },
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="text-center"
-              >
-                <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-white shadow-md flex items-center justify-center">
-                  <stat.icon className="w-7 h-7 text-emerald-500" />
-                </div>
-                <div className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</div>
-                <div className="text-slate-600">{t(stat.labelKey)}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Templates Section */}
-      <section id="templates" className="py-24">
-        <div className="max-w-6xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <span className="inline-block px-4 py-1 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium mb-4">
-              {t('landing.templatesSection.badge')}
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-              {t('landing.templatesSection.title')}
-            </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              {t('landing.templatesSection.subtitle')}
-            </p>
-          </motion.div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {templates.map((template, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -10 }}
-                onClick={onCreateNew}
-                className="group cursor-pointer"
-              >
-                <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-100 hover:shadow-2xl transition-all">
-                  {/* Template Preview */}
-                  <div className={`h-48 bg-gradient-to-br ${template.color} p-4`}>
-                    <div className="bg-white rounded-xl shadow-md overflow-hidden h-full">
-                      <template.Preview />
-                    </div>
-                  </div>
-                  
-                  {/* Template Info */}
-                  <div className="p-5">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-bold text-slate-900">{template.name}</h3>
-                        <p className="text-sm text-slate-500">{template.users} {t('landing.templatesSection.users')}</p>
-                      </div>
-                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                        <ArrowRight className="w-5 h-5" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-emerald-500/90 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span className="text-white font-semibold flex items-center gap-2">
-                      <Eye className="w-5 h-5" />
-                      {t('landing.templatesSection.useTemplate')}
-                    </span>
                   </div>
                 </div>
-              </motion.div>
-            ))}
+              </Card>
+            </motion.div>
           </div>
+        </section>
 
-          <div className="text-center mt-12">
-            <motion.button
-              onClick={onCreateNew}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+        {/* ── Templates ───────────────────────────────────────────────────── */}
+        <section id="templates" className="py-20 bg-surface-1">
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.div
+              variants={fadeInUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="text-center mb-14"
             >
-              {t('landing.templatesSection.viewAll')}
-              <ChevronRight className="w-5 h-5" />
-            </motion.button>
-          </div>
-        </div>
-      </section>
-
-      {/* How it Works */}
-      <section className="py-24 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <span className="inline-block px-4 py-1 rounded-full bg-violet-100 text-violet-700 text-sm font-medium mb-4">
-              {t('landing.howItWorks.badge')}
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">
-              {t('landing.howItWorks.title')}
-            </h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { number: '1', titleKey: 'landing.howItWorks.step1Title', descKey: 'landing.howItWorks.step1Desc', icon: FilePlus, color: 'bg-emerald-500' },
-              { number: '2', titleKey: 'landing.howItWorks.step2Title', descKey: 'landing.howItWorks.step2Desc', icon: Palette, color: 'bg-violet-500' },
-              { number: '3', titleKey: 'landing.howItWorks.step3Title', descKey: 'landing.howItWorks.step3Desc', icon: Download, color: 'bg-blue-500' },
-            ].map((step, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="relative"
-              >
-                <div className="bg-white rounded-3xl p-8 shadow-lg border border-slate-100 hover:shadow-xl transition-shadow h-full">
-                  <div className={`w-16 h-16 ${step.color} rounded-2xl flex items-center justify-center text-white text-2xl font-bold mb-6 shadow-lg`}>
-                    <step.icon className="w-8 h-8" />
-                  </div>
-                  <div className="text-5xl font-bold text-slate-100 absolute top-6 right-6">
-                    {step.number}
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-3">{t(step.titleKey)}</h3>
-                  <p className="text-slate-600">{t(step.descKey)}</p>
-                </div>
-                {index < 2 && (
-                  <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-emerald-500 to-violet-500" />
-                )}
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section id="features" className="py-24">
-        <div className="max-w-6xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <span className="inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium mb-4">
-              {t('landing.featuresSection.badge')}
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-              {t('landing.featuresSection.title')}
-            </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              {t('landing.featuresSection.subtitle')}
-            </p>
-          </motion.div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { icon: Sparkles, title: 'landing.features.ai.title', desc: 'landing.features.ai.description', color: 'from-violet-500 to-purple-600' },
-              { icon: Zap, title: 'landing.features.fast.title', desc: 'landing.features.fast.description', color: 'from-amber-500 to-orange-600' },
-              { icon: Eye, title: 'landing.features.preview.title', desc: 'landing.features.preview.description', color: 'from-blue-500 to-cyan-600' },
-              { icon: Download, title: 'landing.features.export.title', desc: 'landing.features.export.description', color: 'from-emerald-500 to-teal-600' },
-              { icon: Globe, title: 'landing.features.lang.title', desc: 'landing.features.lang.description', color: 'from-pink-500 to-rose-600' },
-              { icon: Shield, title: 'landing.features.privacy.title', desc: 'landing.features.privacy.description', color: 'from-indigo-500 to-blue-600' },
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="group p-8 rounded-3xl bg-white border border-slate-100 shadow-sm hover:shadow-xl transition-all cursor-pointer"
-              >
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white mb-6 shadow-lg`}>
-                  <feature.icon className="w-7 h-7" />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-3">
-                  {t(feature.title)}
-                </h3>
-                <p className="text-slate-600 leading-relaxed">
-                  {t(feature.desc)}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section id="testimonials" className="py-24 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <span className="inline-block px-4 py-1 rounded-full bg-amber-100 text-amber-700 text-sm font-medium mb-4">
-              {t('landing.testimonialsSection.badge')}
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-              {t('landing.testimonialsSection.title')}
-            </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              {t('landing.testimonialsSection.subtitle')}
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {TESTIMONIAL_KEYS.map((key, index) => (
-              <motion.div
-                key={key}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-3xl p-8 shadow-lg border border-slate-100"
-              >
-                <div className="flex gap-1 mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <p className="text-slate-700 mb-6 leading-relaxed">
-                  "{t(`landing.${key}.content`)}"
-                </p>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold">
-                    {t(`landing.${key}.name`).slice(0, 2).toUpperCase()}
-                  </div>
-                  <div>
-                    <div className="font-semibold text-slate-900">{t(`landing.${key}.name`)}</div>
-                    <div className="text-sm text-slate-500">{t(`landing.${key}.role`)}</div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section id="faq" className="py-24">
-        <div className="max-w-3xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <span className="inline-block px-4 py-1 rounded-full bg-slate-100 text-slate-700 text-sm font-medium mb-4">
-              {t('landing.faqSection.badge')}
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-              {t('landing.faqSection.title')}
-            </h2>
-            <p className="text-lg text-slate-600">
-              {t('landing.faqSection.subtitle')}
-            </p>
-          </motion.div>
-
-          <div className="space-y-4">
-            {FAQ_KEYS.map((key, index) => (
-              <motion.div
-                key={key}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-2xl border border-slate-200 overflow-hidden"
-              >
-                <button
-                  type="button"
-                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                  className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-inset"
-                >
-                  <span className="font-semibold text-slate-900 pr-8">{t(`landing.${key}.question`)}</span>
-                  <ChevronDown
-                    className={`w-5 h-5 text-slate-500 flex-shrink-0 transition-transform ${openFaq === index ? 'rotate-180' : ''}`}
-                  />
-                </button>
-                {openFaq === index && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    className="px-6 pb-6"
-                  >
-                    <p className="text-slate-600 leading-relaxed">{t(`landing.${key}.answer`)}</p>
-                  </motion.div>
-                )}
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-24">
-        <div className="max-w-5xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 p-12 lg:p-16 text-center"
-          >
-            {/* Background pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute inset-0" style={{
-                backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-                backgroundSize: '32px 32px'
-              }} />
-            </div>
-            
-            <div className="relative z-10">
-              <motion.h2
-                className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-              >
-                {t('landing.cta.title')}
-              </motion.h2>
-              <motion.p
-                className="text-lg text-emerald-100 mb-8 max-w-2xl mx-auto"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-              >
-                {t('landing.cta.subtitle')}
-              </motion.p>
-              <motion.button
-                onClick={onCreateNew}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-3 px-10 py-5 bg-white text-emerald-600 font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-              >
-                <FilePlus className="w-6 h-6" />
-                <span>{t('landing.cta.button')}</span>
-                <ChevronRight className="w-5 h-5" />
-              </motion.button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-16 bg-slate-900 text-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
-            <div className="md:col-span-2">
-              <Logo size="md" showText={true} animated={false} className="mb-6" />
-              <p className="text-slate-400 mb-6 max-w-md">
-                {t('landing.footer.tagline')}
+              <SectionBadge>{t('landing.templatesSection.badge')}</SectionBadge>
+              <h2 className="text-2xl sm:text-4xl font-bold text-foreground mb-4 tracking-tight">
+                {t('landing.templates.title', 'Des modèles professionnels, prêts à l\'emploi')}
+              </h2>
+              <p className="text-base text-muted-foreground max-w-2xl mx-auto">
+                {t('landing.templates.subtitle', '19 templates conçus pour maximiser vos chances. Choisissez, personnalisez, téléchargez.')}
               </p>
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-emerald-500 transition-colors cursor-pointer focus-within:ring-2 focus-within:ring-emerald-500 focus-within:ring-offset-2 focus-within:ring-offset-slate-900" tabIndex={0} role="button">
-                  <Globe className="w-5 h-5" />
+            </motion.div>
+
+            <TemplateShowcase onSelectTemplate={() => onCreateNew()} />
+          </div>
+        </section>
+
+        {/* ── How it works ────────────────────────────────────────────────── */}
+        <section className="py-20">
+          <div className="max-w-5xl mx-auto px-6">
+            <motion.div
+              variants={fadeInUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <SectionBadge>{t('landing.howItWorks.badge')}</SectionBadge>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+                {t('landing.howItWorks.title')}
+              </h2>
+            </motion.div>
+
+            <motion.div
+              className="grid md:grid-cols-3 gap-4"
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-40px' }}
+            >
+              {[
+                { num: '01', titleKey: 'landing.howItWorks.step1Title', descKey: 'landing.howItWorks.step1Desc', icon: FilePlus  },
+                { num: '02', titleKey: 'landing.howItWorks.step2Title', descKey: 'landing.howItWorks.step2Desc', icon: Palette   },
+                { num: '03', titleKey: 'landing.howItWorks.step3Title', descKey: 'landing.howItWorks.step3Desc', icon: Download  },
+              ].map((step, i) => (
+                <motion.div key={i} variants={fadeInUp}>
+                  <Card variant="standard" className="relative h-full">
+                    <div className="text-5xl font-bold text-muted/20 absolute top-4 right-5 select-none">{step.num}</div>
+                    <div className="w-10 h-10 rounded-lg bg-blue/10 flex items-center justify-center text-blue mb-5">
+                      <step.icon className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-base font-semibold text-foreground mb-2">{t(step.titleKey)}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{t(step.descKey)}</p>
+                    {i < 2 && (
+                      <div className="hidden md:block absolute top-1/2 -right-2.5 w-5 h-px bg-border z-10" />
+                    )}
+                  </Card>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ── Features grid ───────────────────────────────────────────────── */}
+        <section id="features" className="py-20 bg-surface-1">
+          <div className="max-w-6xl mx-auto px-6">
+            <motion.div
+              variants={fadeInUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <SectionBadge>{t('landing.featuresSection.badge')}</SectionBadge>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 tracking-tight">
+                {t('landing.featuresSection.title')}
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                {t('landing.featuresSection.subtitle')}
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-40px' }}
+            >
+              {FEATURES.map((f, i) => (
+                <motion.div key={i} variants={fadeInUp}>
+                  <Card variant="standard" hover className="h-full">
+                    <div className="w-9 h-9 rounded-lg bg-blue/10 flex items-center justify-center text-blue mb-4">
+                      <f.icon className="w-[18px] h-[18px]" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-foreground mb-1.5">{t(f.titleKey)}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{t(f.descKey)}</p>
+                  </Card>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ── Testimonials ────────────────────────────────────────────────── */}
+        <section id="testimonials" className="py-20">
+          <div className="max-w-6xl mx-auto px-6">
+            <motion.div
+              variants={fadeInUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <SectionBadge>{t('landing.testimonialsSection.badge')}</SectionBadge>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 tracking-tight">
+                {t('landing.testimonialsSection.title')}
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                {t('landing.testimonialsSection.subtitle')}
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="grid md:grid-cols-3 gap-4"
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
+              {TESTIMONIAL_KEYS.map((key, i) => (
+                <motion.div key={key} variants={fadeInUp}>
+                  <Card variant="standard" className="h-full flex flex-col">
+                    <div className="flex gap-0.5 mb-4">
+                      {[...Array(5)].map((_, j) => (
+                        <Star key={j} className="w-4 h-4 fill-warning text-warning" />
+                      ))}
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed flex-1 mb-5">
+                      "{t(`landing.${key}.content`)}"
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-blue/10 flex items-center justify-center text-blue text-xs font-bold shrink-0">
+                        {t(`landing.${key}.name`).slice(0, 2).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-foreground">{t(`landing.${key}.name`)}</div>
+                        <div className="text-xs text-muted-foreground">{t(`landing.${key}.role`)}</div>
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ── Pricing ─────────────────────────────────────────────────────── */}
+        <section id="pricing" className="py-20 bg-surface-1">
+          <div className="max-w-5xl mx-auto px-6">
+            <motion.div
+              variants={fadeInUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <SectionBadge>Tarifs</SectionBadge>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 tracking-tight">
+                Simple et transparent
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                Créez votre CV gratuitement. Payez uniquement quand vous êtes prêt à télécharger.
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto"
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
+              {/* Free */}
+              <motion.div variants={fadeInUp}>
+                <Card variant="marketing" className="h-full flex flex-col">
+                  <div className="mb-6">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Plan</p>
+                    <h3 className="text-xl font-bold text-foreground">Gratuit</h3>
+                    <p className="mt-3">
+                      <span className="text-4xl font-bold text-foreground">0 €</span>
+                      <span className="text-sm text-muted-foreground"> / toujours</span>
+                    </p>
+                  </div>
+                  <ul className="space-y-3 mb-8 flex-1">
+                    {FREE_FEATURES.map(f => (
+                      <li key={f} className="flex items-center gap-2.5 text-sm">
+                        <Check className="w-4 h-4 text-success shrink-0" />
+                        <span className="text-foreground">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button variant="outline" size="lg" className="w-full" onClick={onCreateNew}>
+                    Commencer gratuitement
+                  </Button>
+                </Card>
+              </motion.div>
+
+              {/* Premium */}
+              <motion.div variants={fadeInUp} className="relative">
+                {/* Popular badge */}
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
+                  <span className="px-3 py-1 bg-blue text-blue-foreground text-xs font-semibold rounded-full whitespace-nowrap">
+                    Le + populaire
+                  </span>
                 </div>
+                <Card variant="marketing" className="h-full flex flex-col border-blue">
+                  <div className="mb-6">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Plan</p>
+                    <h3 className="text-xl font-bold text-foreground">Téléchargement PDF</h3>
+                    <p className="mt-3">
+                      <span className="text-4xl font-bold text-blue">2 €</span>
+                      <span className="text-sm text-muted-foreground"> / CV</span>
+                    </p>
+                  </div>
+                  <ul className="space-y-3 mb-8 flex-1">
+                    {PREMIUM_FEATURES.map(f => (
+                      <li key={f} className="flex items-center gap-2.5 text-sm">
+                        <Check className="w-4 h-4 text-success shrink-0" />
+                        <span className="text-foreground">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button variant="blue" size="lg" className="w-full" onClick={onCreateNew}>
+                    Créer mon CV
+                    <ArrowRight />
+                  </Button>
+                </Card>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ── FAQ ─────────────────────────────────────────────────────────── */}
+        <section id="faq" className="py-20">
+          <div className="max-w-2xl mx-auto px-6">
+            <motion.div
+              variants={fadeInUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <SectionBadge>{t('landing.faqSection.badge')}</SectionBadge>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 tracking-tight">
+                {t('landing.faqSection.title')}
+              </h2>
+              <p className="text-muted-foreground">{t('landing.faqSection.subtitle')}</p>
+            </motion.div>
+
+            <div className="space-y-2">
+              {FAQ_KEYS.map((key, i) => (
+                <motion.div
+                  key={key}
+                  variants={fadeInUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                  className="rounded-lg border border-border bg-card overflow-hidden"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                    className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                  >
+                    <span className="text-sm font-medium text-foreground pr-6">{t(`landing.${key}.question`)}</span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-150 ${openFaq === i ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                  {openFaq === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.15 }}
+                      className="px-5 pb-4"
+                    >
+                      <p className="text-sm text-muted-foreground leading-relaxed">{t(`landing.${key}.answer`)}</p>
+                    </motion.div>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── CTA banner ──────────────────────────────────────────────────── */}
+        <section className="py-20">
+          <div className="max-w-5xl mx-auto px-6">
+            <motion.div
+              variants={fadeInUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="relative rounded-xl bg-surface-2 border border-border p-12 lg:p-16 text-center overflow-hidden"
+            >
+              {/* Reuse hero-glow class — no inline style needed */}
+              <div className="pointer-events-none absolute inset-0 hero-glow" />
+              <div className="relative z-10">
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-4 tracking-tight">
+                  {t('landing.cta.title')}
+                </h2>
+                <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+                  {t('landing.cta.subtitle')}
+                </p>
+                <Button variant="blue" size="xl" onClick={onCreateNew}>
+                  <FilePlus />
+                  {t('landing.cta.button')}
+                  <ArrowRight />
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ── Footer ──────────────────────────────────────────────────────── */}
+        <footer className="py-12 bg-surface-1 border-t border-border">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="grid md:grid-cols-4 gap-10 mb-10">
+              <div className="md:col-span-2">
+                <Logo size="md" showText animated={false} className="mb-4" />
+                <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
+                  {t('landing.footer.tagline')}
+                </p>
+              </div>
+              <div>
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-4">
+                  {t('landing.footer.navigation')}
+                </h4>
+                <ul className="space-y-2.5 text-sm text-muted-foreground">
+                  {NAV_SECTIONS.map(key => (
+                    <li key={key}>
+                      <button
+                        type="button"
+                        onClick={() => scrollToSection(key)}
+                        className="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+                      >
+                        {t(`landing.nav.${key}`)}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-4">
+                  {t('landing.footer.legal')}
+                </h4>
+                <ul className="space-y-2.5 text-sm text-muted-foreground">
+                  <li><a href="#" className="hover:text-foreground transition-colors">{t('landing.footer.legalLinks.mentions')}</a></li>
+                  <li><a href="#" className="hover:text-foreground transition-colors">{t('landing.footer.legalLinks.privacy')}</a></li>
+                  <li><a href="#" className="hover:text-foreground transition-colors">{t('landing.footer.legalLinks.terms')}</a></li>
+                </ul>
               </div>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4">{t('landing.footer.navigation')}</h4>
-              <ul className="space-y-3 text-slate-400">
-                <li><button type="button" onClick={() => scrollToSection('templates')} className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.nav.templates')}</button></li>
-                <li><button type="button" onClick={() => scrollToSection('features')} className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.nav.features')}</button></li>
-                <li><button type="button" onClick={() => scrollToSection('testimonials')} className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.nav.testimonials')}</button></li>
-                <li><button type="button" onClick={() => scrollToSection('faq')} className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.nav.faq')}</button></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">{t('landing.footer.legal')}</h4>
-              <ul className="space-y-3 text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.footer.legalLinks.mentions')}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.footer.legalLinks.privacy')}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded">{t('landing.footer.legalLinks.terms')}</a></li>
-              </ul>
+            <div className="pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
+              <p>{t('landing.footer.copyright')}</p>
+              <p>{t('landing.footer.madeWith')}</p>
             </div>
           </div>
-          <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-slate-400 text-sm">{t('landing.footer.copyright')}</p>
-            <p className="text-slate-500 text-sm">{t('landing.footer.madeWith')}</p>
-          </div>
-        </div>
-      </footer>
+        </footer>
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".json,application/json"
-        onChange={handleFileChange}
-        className="hidden"
-      />
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json,application/json"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+      </div>
     </div>
   );
 }
