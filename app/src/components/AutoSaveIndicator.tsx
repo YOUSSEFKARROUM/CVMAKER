@@ -18,11 +18,7 @@ interface AutoSaveIndicatorProps {
 }
 
 export function AutoSaveIndicator({
-  lastSaved,
-  isSaving = false,
-  isCloudEnabled = false,
-  versions = [],
-  onRestore,
+  lastSaved, isSaving = false, isCloudEnabled = false, versions = [], onRestore,
 }: AutoSaveIndicatorProps) {
   const { t } = useTranslation();
   const [showHistory, setShowHistory] = useState(false);
@@ -30,28 +26,17 @@ export function AutoSaveIndicator({
 
   useEffect(() => {
     const updateTimeAgo = () => {
-      if (!lastSaved) {
-        setTimeAgo('');
-        return;
-      }
-      
-      const now = new Date();
-      const diff = now.getTime() - lastSaved.getTime();
+      if (!lastSaved) { setTimeAgo(''); return; }
+      const diff    = Date.now() - lastSaved.getTime();
       const seconds = Math.floor(diff / 1000);
       const minutes = Math.floor(seconds / 60);
-      const hours = Math.floor(minutes / 60);
+      const hours   = Math.floor(minutes / 60);
 
-      if (seconds < 10) {
-        setTimeAgo(t('autoSave.justNow') || 'À l\'instant');
-      } else if (seconds < 60) {
-        setTimeAgo(`${seconds}s`);
-      } else if (minutes < 60) {
-        setTimeAgo(`${minutes}min`);
-      } else if (hours < 24) {
-        setTimeAgo(`${hours}h`);
-      } else {
-        setTimeAgo(lastSaved.toLocaleDateString());
-      }
+      if (seconds < 10)    setTimeAgo(t('autoSave.justNow') || 'À l\'instant');
+      else if (seconds < 60) setTimeAgo(`${seconds}s`);
+      else if (minutes < 60) setTimeAgo(`${minutes}min`);
+      else if (hours < 24)   setTimeAgo(`${hours}h`);
+      else                   setTimeAgo(lastSaved.toLocaleDateString());
     };
 
     updateTimeAgo();
@@ -61,74 +46,60 @@ export function AutoSaveIndicator({
 
   return (
     <div className="relative">
-      <div className="flex items-center gap-3">
-        {/* Auto-save status */}
-        <motion.div
-          initial={false}
-          animate={{ opacity: 1 }}
-          className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400"
-        >
+      <div className="flex items-center gap-2">
+        {/* Status */}
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <AnimatePresence mode="wait">
             {isSaving ? (
-              <motion.div
-                key="saving"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400"
+              <motion.div key="saving"
+                initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.15 }}
+                className="flex items-center gap-1.5 text-blue"
               >
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <Loader2 className="w-3 h-3 animate-spin" />
                 <span>{t('autoSave.saving') || 'Sauvegarde...'}</span>
               </motion.div>
             ) : lastSaved ? (
-              <motion.div
-                key="saved"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
+              <motion.div key="saved"
+                initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.15 }}
                 className="flex items-center gap-1.5"
               >
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 20 }}
                 >
-                  <Check className="w-3.5 h-3.5 text-green-500" />
+                  <Check className="w-3 h-3 text-success" strokeWidth={2.5} />
                 </motion.div>
                 <span>
-                  {t('autoSave.saved') || 'Sauvegardé'} {timeAgo && `• ${timeAgo}`}
+                  {t('autoSave.saved') || 'Sauvegardé'}{timeAgo && ` · ${timeAgo}`}
                 </span>
-                {isCloudEnabled ? (
-                  <Cloud className="w-3.5 h-3.5 text-blue-500" />
-                ) : (
-                  <CloudOff className="w-3.5 h-3.5 text-slate-400" />
-                )}
+                {isCloudEnabled
+                  ? <Cloud className="w-3 h-3 text-blue" />
+                  : <CloudOff className="w-3 h-3 text-muted-foreground/50" />}
               </motion.div>
             ) : (
-              <motion.div
-                key="unsaved"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400"
+              <motion.div key="unsaved"
+                initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.15 }}
+                className="flex items-center gap-1.5 text-warning"
               >
                 <span>{t('autoSave.unsaved') || 'Modifications non sauvegardées'}</span>
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
+        </div>
 
         {/* History button */}
         {versions.length > 0 && (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setShowHistory(!showHistory)}
-            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+          <button
+            onClick={() => setShowHistory(o => !o)}
+            className="flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-muted-foreground bg-muted hover:bg-accent rounded-md transition-colors"
           >
             <History className="w-3 h-3" />
             <span>{versions.length}</span>
-          </motion.button>
+          </button>
         )}
       </div>
 
@@ -136,13 +107,14 @@ export function AutoSaveIndicator({
       <AnimatePresence>
         {showHistory && versions.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            initial={{ opacity: 0, y: 6, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute top-full right-0 mt-2 w-72 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 z-50 overflow-hidden"
+            exit={{ opacity: 0, y: 6, scale: 0.97 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+            className="absolute top-full right-0 mt-2 w-72 bg-card border border-border rounded-lg shadow-overlay z-50 overflow-hidden"
           >
-            <div className="p-3 border-b border-slate-200 dark:border-slate-700">
-              <h4 className="text-sm font-semibold text-slate-900 dark:text-white">
+            <div className="px-3 py-2 border-b border-border">
+              <h4 className="text-xs font-semibold text-foreground">
                 {t('autoSave.history') || 'Historique'}
               </h4>
             </div>
@@ -150,25 +122,18 @@ export function AutoSaveIndicator({
               {versions.map((version, index) => (
                 <motion.button
                   key={version.id}
-                  initial={{ opacity: 0, x: -10 }}
+                  initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  onClick={() => {
-                    onRestore?.(version);
-                    setShowHistory(false);
-                  }}
-                  className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors text-left border-b border-slate-100 dark:border-slate-700/50 last:border-0"
+                  transition={{ delay: index * 0.04 }}
+                  onClick={() => { onRestore?.(version); setShowHistory(false); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-accent transition-colors text-left border-b border-border/50 last:border-0"
                 >
-                  <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center flex-shrink-0">
-                    <RotateCcw className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <div className="w-7 h-7 rounded-md bg-blue/10 flex items-center justify-center flex-shrink-0">
+                    <RotateCcw className="w-3.5 h-3.5 text-blue" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
-                      {version.changes}
-                    </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {version.timestamp.toLocaleTimeString()}
-                    </p>
+                    <p className="text-sm font-medium text-foreground truncate">{version.changes}</p>
+                    <p className="text-xs text-muted-foreground">{version.timestamp.toLocaleTimeString()}</p>
                   </div>
                 </motion.button>
               ))}

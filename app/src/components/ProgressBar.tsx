@@ -6,6 +6,7 @@ import { Logo } from './Logo';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeToggle } from './ThemeToggle';
 import { UserMenu } from './UserMenu';
+import { fadeIn } from '../styles/design-system';
 
 interface ProgressBarProps {
   steps: Exclude<Step, 'landing' | 'download'>[];
@@ -19,81 +20,83 @@ interface ProgressBarProps {
   onCreateNew?: () => void;
 }
 
-
-
-export function ProgressBar({ steps, currentStep, onHomeClick, cvData, settings, setSettings, onLoadCV, onEditCV, onCreateNew }: ProgressBarProps) {
+export function ProgressBar({
+  steps,
+  currentStep,
+  onHomeClick,
+  cvData,
+  settings,
+  setSettings,
+  onLoadCV,
+  onEditCV,
+  onCreateNew,
+}: ProgressBarProps) {
   const { t } = useTranslation();
   const currentIndex = steps.indexOf(currentStep);
-  const progress = ((currentIndex + 1) / steps.length) * 100;
+  const progress     = ((currentIndex + 1) / steps.length) * 100;
 
   const getStepLabel = (step: Exclude<Step, 'landing' | 'download'>): string => {
     const labelMap: Record<Exclude<Step, 'landing' | 'download'>, string> = {
-      contact: t('steps.contact'),
-      experience: t('steps.experience'),
-      education: t('steps.education'),
-      skills: t('steps.skills'),
-      languages: t('steps.languages'),
+      contact:        t('steps.contact'),
+      experience:     t('steps.experience'),
+      education:      t('steps.education'),
+      skills:         t('steps.skills'),
+      languages:      t('steps.languages'),
       certifications: t('steps.certifications'),
-      projects: t('steps.projects'),
-      interests: t('steps.interests'),
-      profile: t('steps.profile'),
-      finish: t('steps.finish'),
+      projects:       t('steps.projects'),
+      interests:      t('steps.interests'),
+      profile:        t('steps.profile'),
+      finish:         t('steps.finish'),
     };
     return labelMap[step];
   };
 
   return (
     <motion.header
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700"
+      variants={fadeIn}
+      initial="hidden"
+      animate="visible"
+      className="sticky top-0 z-40 bg-background border-b border-border"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
-          {/* Left - Logo & Home */}
-          <motion.button
+      {/* Progress bar — h-1 at the very top of the header */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-surface-2 overflow-hidden">
+        <div
+          className="h-full bg-blue transition-all duration-[250ms] ease-out"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between h-14 gap-4">
+
+          {/* Left — logo / home */}
+          <button
             onClick={onHomeClick}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex items-center gap-2 px-2 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex-shrink-0"
+            className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-accent transition-colors flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             title={t('nav.home')}
           >
-            <Logo size="sm" animated={false} showText={false} />
-            <span className="hidden sm:block font-semibold text-slate-700 dark:text-slate-200">CV Maker</span>
-          </motion.button>
+            <Logo size="sm" animated={false} showText className="text-foreground" />
+          </button>
 
-          {/* Center - Current Step Info */}
-          <div className="flex-1 flex flex-col items-center justify-center min-w-0 px-4">
-            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-1">
-              <span className="hidden sm:inline">{t('common.step')}</span>
-              <span className="font-medium text-slate-900 dark:text-white">
-                {currentIndex + 1} / {steps.length}
-              </span>
-              <ChevronRight className="w-4 h-4 hidden sm:inline" />
-              <span className="font-medium text-indigo-600 dark:text-indigo-400 truncate max-w-[150px] sm:max-w-[200px]">
-                {getStepLabel(currentStep)}
-              </span>
-            </div>
-            
-            {/* Progress Bar */}
-            <div className="w-full max-w-xs sm:max-w-sm h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-600"
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.4, ease: "easeInOut" }}
-              />
-            </div>
+          {/* Center — step indicator */}
+          <div className="flex-1 flex items-center justify-center gap-2 min-w-0">
+            <span className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground tabular-nums">
+              {t('common.step')}
+              <span className="font-medium text-foreground">{currentIndex + 1}</span>
+              <span>/</span>
+              <span className="font-medium text-foreground">{steps.length}</span>
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 text-border hidden sm:block" />
+            <span className="text-sm font-medium text-blue truncate max-w-[140px] sm:max-w-[220px]">
+              {getStepLabel(currentStep)}
+            </span>
           </div>
 
-          {/* Right - Actions */}
-          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+          {/* Right — actions */}
+          <div className="flex items-center gap-1 flex-shrink-0">
             <ThemeToggle />
             {settings && setSettings && (
-              <LanguageSwitcher 
-                settings={settings} 
-                setSettings={setSettings} 
-              />
+              <LanguageSwitcher settings={settings} setSettings={setSettings} />
             )}
             {cvData && settings && onLoadCV && onEditCV && onCreateNew && (
               <UserMenu

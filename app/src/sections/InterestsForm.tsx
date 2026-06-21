@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, ArrowLeft, Plus, X, Heart } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Card } from '@/components/ui/card';
 
 interface InterestsFormProps {
   interests: string[];
@@ -21,61 +21,46 @@ const suggestedInterests = [
   'Investissement', 'Crypto-monnaies', 'Blockchain', 'Intelligence artificielle',
 ];
 
-export function InterestsForm({
-  interests,
-  onUpdate,
-  onNext,
-  onBack,
-  onSkip,
-}: InterestsFormProps) {
+const labelCls = 'block text-xs font-medium uppercase tracking-wider text-muted-foreground';
+
+export function InterestsForm({ interests, onUpdate, onNext, onBack, onSkip }: InterestsFormProps) {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
 
   const addInterest = (interest: string) => {
     const trimmed = interest.trim();
-    if (!trimmed) return;
-    if (!interests.includes(trimmed)) {
-      onUpdate([...interests, trimmed]);
-    }
+    if (!trimmed || interests.includes(trimmed)) return;
+    onUpdate([...interests, trimmed]);
     setInputValue('');
   };
 
-  const removeInterest = (interestToRemove: string) => {
+  const removeInterest = (interestToRemove: string) =>
     onUpdate(interests.filter(i => i !== interestToRemove));
-  };
 
   const handleNext = () => {
-    if (interests.length === 0) {
-      onSkip();
-    } else {
-      onNext();
-    }
+    if (interests.length === 0) { onSkip(); } else { onNext(); }
   };
 
-  const filteredSuggestions = suggestedInterests.filter(
-    interest => 
-      interest.toLowerCase().includes(inputValue.toLowerCase()) && 
-      !interests.includes(interest)
-  ).slice(0, 10);
+  const filteredSuggestions = suggestedInterests
+    .filter(i => i.toLowerCase().includes(inputValue.toLowerCase()) && !interests.includes(i))
+    .slice(0, 10);
 
   return (
     <div className="max-w-2xl">
-      <h2 className="text-3xl font-bold text-gray-800 mb-2">
-        <span className="text-[#2196F3]">{t('interests.titleHighlight')}</span> {t('interests.title')}
+      <h2 className="text-2xl font-semibold text-foreground mb-1 tracking-tight">
+        <span className="text-blue">{t('interests.titleHighlight')}</span>{' '}
+        {t('interests.title')}
       </h2>
-      <p className="text-gray-500 mb-8">
-        {t('interests.subtitle')}
-      </p>
+      <p className="text-sm text-muted-foreground mb-8">{t('interests.subtitle')}</p>
 
-      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-        <Label className="text-xs uppercase text-gray-500 mb-3 block">
-          {t('interests.addLabel')}
-        </Label>
+      {/* Input card */}
+      <Card variant="compact" className="mb-6">
+        <p className={`${labelCls} mb-3`}>{t('interests.addLabel')}</p>
         <div className="flex gap-2">
           <Input
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => {
+            onChange={e => setInputValue(e.target.value)}
+            onKeyDown={e => {
               if (e.key === 'Enter') {
                 e.preventDefault();
                 addInterest(inputValue);
@@ -84,24 +69,20 @@ export function InterestsForm({
             placeholder={t('interests.placeholder')}
             className="flex-1"
           />
-          <Button
-            onClick={() => addInterest(inputValue)}
-            disabled={!inputValue.trim()}
-            className="bg-[#2196F3] hover:bg-[#1976D2]"
-          >
+          <Button variant="blue" onClick={() => addInterest(inputValue)} disabled={!inputValue.trim()}>
             <Plus className="w-4 h-4" />
           </Button>
         </div>
 
         {inputValue && filteredSuggestions.length > 0 && (
           <div className="mt-3">
-            <p className="text-sm text-gray-500 mb-2">{t('interests.suggestions')} :</p>
-            <div className="flex flex-wrap gap-2">
-              {filteredSuggestions.map((suggestion) => (
+            <p className="text-xs text-muted-foreground mb-2">{t('interests.suggestions')}</p>
+            <div className="flex flex-wrap gap-1.5">
+              {filteredSuggestions.map(suggestion => (
                 <button
                   key={suggestion}
                   onClick={() => addInterest(suggestion)}
-                  className="text-sm px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-colors"
+                  className="text-xs px-2.5 py-1.5 bg-blue/8 text-blue rounded-md hover:bg-blue/15 transition-colors"
                 >
                   + {suggestion}
                 </button>
@@ -109,26 +90,26 @@ export function InterestsForm({
             </div>
           </div>
         )}
-      </div>
+      </Card>
 
+      {/* Current interests */}
       {interests.length > 0 && (
         <div className="mb-6">
-          <Label className="text-xs uppercase text-gray-500 mb-3 block">
+          <p className={`${labelCls} mb-3`}>
             {t('interests.myInterests')} ({interests.length})
-          </Label>
+          </p>
           <div className="flex flex-wrap gap-2">
             {interests.map((interest, index) => (
               <span
                 key={index}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full text-sm font-medium"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-muted border border-border rounded-md text-sm text-foreground font-medium"
               >
-                <Heart className="w-3 h-3" />
                 {interest}
                 <button
                   onClick={() => removeInterest(interest)}
-                  className="text-white/80 hover:text-white"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </span>
             ))}
@@ -136,36 +117,24 @@ export function InterestsForm({
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-medium text-gray-900 mb-2">💡 {t('interests.tipProTitle')}</h4>
-          <p className="text-sm text-gray-600">
-            {t('interests.tipProText')}
-          </p>
-        </div>
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-medium text-gray-900 mb-2">⚠️ {t('interests.avoidTitle')}</h4>
-          <p className="text-sm text-gray-600">
-            {t('interests.avoidText')}
-          </p>
-        </div>
+      {/* Tips */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <Card variant="compact">
+          <h4 className="text-sm font-medium text-foreground mb-1">💡 {t('interests.tipProTitle')}</h4>
+          <p className="text-xs text-muted-foreground leading-relaxed">{t('interests.tipProText')}</p>
+        </Card>
+        <Card variant="compact">
+          <h4 className="text-sm font-medium text-foreground mb-1">⚠️ {t('interests.avoidTitle')}</h4>
+          <p className="text-xs text-muted-foreground leading-relaxed">{t('interests.avoidText')}</p>
+        </Card>
       </div>
 
       <div className="flex justify-between">
-        <Button
-          variant="ghost"
-          onClick={onBack}
-          className="flex items-center gap-2 text-gray-500"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          {t('nav.back')}
+        <Button variant="ghost" onClick={onBack}>
+          <ArrowLeft className="w-4 h-4" /> {t('nav.back')}
         </Button>
-        <Button
-          onClick={handleNext}
-          className="bg-[#2196F3] hover:bg-[#1976D2] text-white px-6 py-2 rounded flex items-center gap-2"
-        >
-          {t('interests.nextStep')}
-          <ArrowRight className="w-4 h-4" />
+        <Button variant="blue" onClick={handleNext}>
+          {t('interests.nextStep')} <ArrowRight className="w-4 h-4" />
         </Button>
       </div>
     </div>

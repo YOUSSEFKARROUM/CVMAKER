@@ -1,9 +1,6 @@
-// Hook useAuth compatible avec l'ancienne API Firebase
-// Maintenant utilisant Keycloak en arrière-plan
-
 import { useCallback } from 'react';
-import { useKeycloakAuth } from '../keycloak/KeycloakProvider';
-import type { AuthError } from '../keycloak/KeycloakProvider';
+import { useSupabaseAuth } from '../supabase/SupabaseProvider';
+import type { AuthError } from '../supabase/SupabaseProvider';
 
 interface AuthContextType {
   user: {
@@ -24,75 +21,64 @@ interface AuthContextType {
 }
 
 export function useAuth(): AuthContextType {
-  const keycloakAuth = useKeycloakAuth();
+  const auth = useSupabaseAuth();
 
-  // Adapter l'API Keycloak à l'ancienne API Firebase
   const login = useCallback(
     async (email?: string, password?: string) => {
-      // Si email et password sont fournis, utiliser le login direct (sans redirection)
       if (email && password) {
-        await keycloakAuth.loginWithCredentials(email, password);
+        await auth.loginWithCredentials(email, password);
       } else {
-        // Sinon, redirection vers Keycloak
-        await keycloakAuth.login();
+        await auth.login();
       }
     },
-    [keycloakAuth]
+    [auth]
   );
 
   const register = useCallback(
     async (email?: string, password?: string, displayName?: string) => {
-      // Si tous les champs sont fournis, essayer l'inscription directe
       if (email && password && displayName) {
-        await keycloakAuth.registerWithCredentials(email, password, displayName);
+        await auth.registerWithCredentials(email, password, displayName);
       } else {
-        // Sinon, redirection vers Keycloak
-        await keycloakAuth.register();
+        await auth.register();
       }
     },
-    [keycloakAuth]
+    [auth]
   );
 
   const logout = useCallback(async () => {
-    await keycloakAuth.logout();
-  }, [keycloakAuth]);
+    await auth.logout();
+  }, [auth]);
 
   const forgotPassword = useCallback(
     async (email?: string) => {
-      // Utiliser l'API directe si email fourni
       if (email) {
-        await keycloakAuth.forgotPasswordWithEmail(email);
-      } else if (keycloakAuth.keycloak) {
-        // Sinon redirection Keycloak
-        keycloakAuth.keycloak.login({ action: 'forgot_password' });
+        await auth.forgotPasswordWithEmail(email);
       }
     },
-    [keycloakAuth]
+    [auth]
   );
 
   return {
-    user: keycloakAuth.user
+    user: auth.user
       ? {
-          uid: keycloakAuth.user.id,
-          email: keycloakAuth.user.email,
-          displayName: keycloakAuth.user.displayName,
+          uid: auth.user.id,
+          email: auth.user.email,
+          displayName: auth.user.displayName,
         }
       : null,
-    loading: keycloakAuth.isLoading,
-    isAuthenticated: keycloakAuth.isAuthenticated,
-    isAuthAvailable: keycloakAuth.isInitialized,
+    loading: auth.isLoading,
+    isAuthenticated: auth.isAuthenticated,
+    isAuthAvailable: auth.isInitialized,
     login,
     register,
     logout,
     forgotPassword,
-    error: keycloakAuth.error,
-    clearError: keycloakAuth.clearError,
-    authLoading: keycloakAuth.isLoading,
+    error: auth.error,
+    clearError: auth.clearError,
+    authLoading: auth.isLoading,
   };
 }
 
-// Hook pour vérifier si on est en mode local (sans Keycloak)
 export function useIsLocalMode(): boolean {
-  const keycloakAuth = useKeycloakAuth();
-  return !keycloakAuth.keycloak && keycloakAuth.isInitialized;
+  return false;
 }

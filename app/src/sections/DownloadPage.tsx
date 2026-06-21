@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Check, Download, FileText, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { CVPreview } from '../components/CVPreview';
 import { ExportModal } from '../components/ExportModal';
 import { ConfettiEffect } from '../components/ConfettiEffect';
@@ -8,6 +9,8 @@ import { useToast } from '../hooks/useToast';
 import type { CVData, CVSettings } from '../types/cv';
 import { SortableList } from '../components/SortableList';
 import { DEFAULT_SECTION_ORDER, type LayoutSectionId } from '../components/templates/utils';
+import { TEMPLATES } from '../data/templates';
+import { THEME_COLORS, TITLE_FONTS, BODY_FONTS } from '../styles/design-system';
 
 type DownloadTab = 'template' | 'colors' | 'fonts' | 'sections';
 
@@ -19,129 +22,68 @@ interface DownloadPageProps {
   onBack?: () => void;
 }
 
-interface TemplateMeta {
-  id: string;
-  name: string;
-  description: string;
-  badge?: string;
-  isRecommended?: boolean;
-  isNew?: boolean;
-}
+/* ── Sub-components ──────────────────────────────────────────────── */
 
-const TEMPLATES: TemplateMeta[] = [
-  { id: 'budapest', name: 'Budapest', description: 'Sidebar colorée à gauche', badge: 'Recommandé', isRecommended: true },
-  { id: 'chicago', name: 'Chicago', description: 'Header centré classique', badge: 'Recommandé', isRecommended: true },
-  { id: 'brunei', name: 'Brunei', description: 'Minimaliste élégant' },
-  { id: 'vladivostok', name: 'Vladivostok', description: 'Moderne sidebar droite' },
-  { id: 'sydney', name: 'Sydney', description: 'Épuré avec timeline', badge: 'Nouveau', isNew: true },
-  { id: 'shanghai', name: 'Shanghai', description: 'Professionnel corporate' },
-  { id: 'kiev', name: 'Kiev', description: 'Créatif avec grande photo' },
-  { id: 'rotterdam', name: 'Rotterdam', description: 'Technique compétences visibles' },
-  { id: 'tokyo', name: 'Tokyo', description: 'Compact 2 colonnes' },
-  { id: 'stanford', name: 'Stanford', description: 'Sidebar foncée élégante', badge: 'Nouveau', isNew: true },
-  { id: 'cambridge', name: 'Cambridge', description: 'Header bleu classique', badge: 'Nouveau', isNew: true },
-  { id: 'oxford', name: 'Oxford', description: 'Sidebar droite structurée', badge: 'Nouveau', isNew: true },
-  { id: 'otago', name: 'Otago', description: 'Minimaliste professionnel', badge: 'Nouveau', isNew: true },
-  { id: 'berkeley', name: 'Berkeley', description: 'Design avec icônes', badge: 'Nouveau', isNew: true },
-  { id: 'harvard', name: 'Harvard', description: 'Sidebar bleue avec timeline', badge: 'Nouveau', isNew: true },
-  { id: 'auckland', name: 'Auckland', description: '2 colonnes équilibrées', badge: 'Nouveau', isNew: true },
-  { id: 'edinburgh', name: 'Edinburgh', description: 'Header violet moderne', badge: 'Nouveau', isNew: true },
-  { id: 'princeton', name: 'Princeton', description: 'Classique centré', badge: 'Nouveau', isNew: true },
-];
-
-const COLOR_OPTIONS = [
-  '#1a1a1a', '#2c3e50', '#1e3a8a', '#6b2c91',
-  '#c62828', '#d84315', '#f57c00', '#f9a825',
-  '#4CAF50', '#00897b', '#00acc1', '#0288d1',
-];
-
-const TITLE_FONTS = [
-  'Bebas Neue', 'Roboto', 'Arial', 'Roboto Mono', 'Bebas Kai',
-  'Source Sans Pro', 'Ubuntu', 'Open Sans', 'Cabin',
-];
-
-const BODY_FONTS = [
-  'Lato', 'Open Sans', 'Playfair Display', 'Arial', 'Roboto',
-  'Roboto Mono', 'Source Sans Pro', 'Butler',
-];
-
-interface SidebarTabsProps {
-  activeTab: DownloadTab;
-  onChange: (tab: DownloadTab) => void;
-}
-
-function SidebarTabs({ activeTab, onChange }: SidebarTabsProps) {
-  const activeClass = 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-500 dark:text-indigo-400';
-  const inactiveClass = 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800';
+function SidebarTabs({ activeTab, onChange }: { activeTab: DownloadTab; onChange: (t: DownloadTab) => void }) {
+  const tabs: { id: DownloadTab; label: string }[] = [
+    { id: 'template', label: 'Template' },
+    { id: 'colors',   label: 'Couleurs' },
+    { id: 'fonts',    label: 'Polices' },
+    { id: 'sections', label: 'Sections' },
+  ];
   return (
-    <div className="flex border-b border-slate-200 dark:border-slate-700">
-      <button
-        onClick={() => onChange('template')}
-        className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${activeTab === 'template' ? activeClass : inactiveClass}`}
-      >
-        Template
-      </button>
-      <button
-        onClick={() => onChange('colors')}
-        className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${activeTab === 'colors' ? activeClass : inactiveClass}`}
-      >
-        Couleurs
-      </button>
-      <button
-        onClick={() => onChange('fonts')}
-        className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${activeTab === 'fonts' ? activeClass : inactiveClass}`}
-      >
-        Polices
-      </button>
-      <button
-        onClick={() => onChange('sections')}
-        className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${activeTab === 'sections' ? activeClass : inactiveClass}`}
-      >
-        Sections
-      </button>
+    <div className="flex border-b border-border">
+      {tabs.map(tab => (
+        <button
+          key={tab.id}
+          onClick={() => onChange(tab.id)}
+          className={`flex-1 py-2.5 px-2 text-xs font-medium transition-colors duration-150 ${
+            activeTab === tab.id
+              ? 'border-b-2 border-blue text-blue'
+              : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+          }`}
+        >
+          {tab.label}
+        </button>
+      ))}
     </div>
   );
 }
 
-interface TemplateTabProps {
-  selectedTemplate: string;
-  onChangeTemplate: (id: string) => void;
-}
-
-function TemplateTab({ selectedTemplate, onChangeTemplate }: TemplateTabProps) {
+function TemplateTab({ selectedTemplate, onChangeTemplate }: { selectedTemplate: string; onChangeTemplate: (id: string) => void }) {
   return (
-    <div className="space-y-4">
-      <h3 className="font-semibold text-gray-900">Choisir un template</h3>
-      <div className="space-y-3">
-        {TEMPLATES.map((template) => (
+    <div className="space-y-3">
+      <h3 className="text-sm font-semibold text-foreground">Choisir un template</h3>
+      <div className="space-y-2">
+        {TEMPLATES.map(template => (
           <button
             key={template.id}
             onClick={() => onChangeTemplate(template.id)}
-            className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+            className={`w-full px-3 py-3 rounded-lg border text-left transition-colors duration-150 ${
               selectedTemplate === template.id
-                ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/30 dark:border-indigo-500'
-                : 'border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500'
+                ? 'border-blue bg-blue/8'
+                : 'border-border hover:border-border/60 hover:bg-accent/50'
             }`}
           >
-            <div className="flex items-start justify-between mb-2">
-              <span className="font-medium">{template.name}</span>
+            <div className="flex items-start justify-between mb-1">
+              <span className="text-sm font-medium text-foreground">{template.name}</span>
               <div className="flex gap-1">
                 {template.isRecommended && (
-                  <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded">
+                  <span className="text-xs px-1.5 py-0.5 bg-success/10 text-success rounded font-medium">
                     Recommandé
                   </span>
                 )}
                 {template.isNew && (
-                  <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded">
+                  <span className="text-xs px-1.5 py-0.5 bg-blue/10 text-blue rounded font-medium">
                     Nouveau
                   </span>
                 )}
               </div>
             </div>
-            <p className="text-sm text-gray-500">{template.description}</p>
+            <p className="text-xs text-muted-foreground">{template.description}</p>
             {selectedTemplate === template.id && (
-              <div className="mt-2 flex items-center gap-1 text-indigo-600 dark:text-indigo-400 text-sm">
-                <Check className="w-4 h-4" />
+              <div className="mt-2 flex items-center gap-1 text-blue text-xs font-medium">
+                <Check className="w-3.5 h-3.5" strokeWidth={2.5} />
                 <span>Sélectionné</span>
               </div>
             )}
@@ -152,147 +94,115 @@ function TemplateTab({ selectedTemplate, onChangeTemplate }: TemplateTabProps) {
   );
 }
 
-interface SectionsTabProps {
-  sectionOrder: string[] | undefined;
-  onChangeOrder: (order: LayoutSectionId[]) => void;
-}
-
-function SectionsTab({ sectionOrder, onChangeOrder }: SectionsTabProps) {
+function SectionsTab({ sectionOrder, onChangeOrder }: { sectionOrder: string[] | undefined; onChangeOrder: (order: LayoutSectionId[]) => void }) {
   type SectionItem = { id: LayoutSectionId; label: string };
-
   const sectionItems: SectionItem[] = useMemo(() => {
     const labels: Record<LayoutSectionId, string> = {
-      profile: 'Profil',
-      experience: 'Expérience professionnelle',
-      education: 'Formation',
-      projects: 'Projets',
-      certifications: 'Certifications',
-      languages: 'Langues',
+      profile: 'Profil', experience: 'Expérience professionnelle',
+      education: 'Formation', projects: 'Projets',
+      certifications: 'Certifications', languages: 'Langues',
     };
-
-    const rawOrder =
-      sectionOrder && sectionOrder.length > 0
-        ? sectionOrder
-        : DEFAULT_SECTION_ORDER;
-
-    const validOrder = rawOrder.filter(
-      (id): id is LayoutSectionId =>
-        (DEFAULT_SECTION_ORDER as string[]).includes(id)
-    );
-
-    return validOrder.map((id) => ({
-      id,
-      label: labels[id],
-    }));
+    const rawOrder = sectionOrder?.length ? sectionOrder : DEFAULT_SECTION_ORDER;
+    const validOrder = rawOrder.filter((id): id is LayoutSectionId =>
+      (DEFAULT_SECTION_ORDER as string[]).includes(id));
+    return validOrder.map(id => ({ id, label: labels[id] }));
   }, [sectionOrder]);
 
   return (
     <div className="space-y-3">
       <div>
-        <h3 className="font-semibold text-gray-900">Ordre des sections du CV</h3>
-        <p className="text-xs text-gray-500 mt-1">
-          Glissez-déposez les éléments pour modifier l&apos;ordre d&apos;affichage (Profil, Expérience, Formation, etc.).
+        <h3 className="text-sm font-semibold text-foreground">Ordre des sections du CV</h3>
+        <p className="text-xs text-muted-foreground mt-1">
+          Glissez-déposez les éléments pour modifier l&apos;ordre d&apos;affichage.
         </p>
       </div>
       <SortableList
         items={sectionItems}
-        onReorder={(items) => onChangeOrder(items.map((item) => item.id))}
-        renderItem={(item) => (
-          <div className="px-3 py-2 bg-white border border-gray-200 rounded-md text-sm">
+        onReorder={items => onChangeOrder(items.map(item => item.id))}
+        renderItem={item => (
+          <Card className="px-3 py-2 text-sm text-foreground">
             {item.label}
-          </div>
+          </Card>
         )}
       />
     </div>
   );
 }
 
-interface ColorsTabProps {
-  selectedColor: string;
-  onChangeColor: (color: string) => void;
-}
-
-function ColorsTab({ selectedColor, onChangeColor }: ColorsTabProps) {
+function ColorsTab({ selectedColor, onChangeColor }: { selectedColor: string; onChangeColor: (c: string) => void }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
-        <h3 className="font-semibold text-gray-900 mb-3">Couleur principale</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-3">Couleur principale</h3>
         <div className="grid grid-cols-4 gap-2">
-          {COLOR_OPTIONS.map((color) => (
+          {THEME_COLORS.map(c => c.value).map(color => (
             <button
               key={color}
               onClick={() => onChangeColor(color)}
-              className={`w-12 h-12 rounded-lg transition-all ${
+              className={`w-11 h-11 rounded-lg transition-all duration-150 ${
                 selectedColor === color
-                  ? 'ring-2 ring-offset-2 ring-indigo-600 dark:ring-indigo-500 scale-110'
+                  ? 'ring-2 ring-offset-2 ring-blue scale-110'
                   : 'hover:scale-105'
               }`}
               style={{ backgroundColor: color }}
             >
               {selectedColor === color && (
-                <Check className="w-5 h-5 text-white mx-auto" />
+                <Check className="w-4 h-4 text-white mx-auto" strokeWidth={3} />
               )}
             </button>
           ))}
         </div>
       </div>
-
-      <div className="p-4 bg-indigo-50 dark:bg-indigo-950/30 rounded-lg">
-        <p className="text-sm text-indigo-800 dark:text-indigo-200">
-          <strong>Conseil :</strong> Choisissez une couleur qui correspond à votre secteur d'activité.
-          Le bleu convient bien aux domaines techniques, le vert à l'environnement, etc.
+      <div className="px-3 py-2.5 bg-muted/50 border border-border rounded-lg">
+        <p className="text-xs text-muted-foreground">
+          <span className="font-medium text-foreground">Conseil : </span>
+          Choisissez une couleur adaptée à votre secteur. Le bleu convient aux domaines techniques, le vert à l'environnement.
         </p>
       </div>
     </div>
   );
 }
 
-interface FontsTabProps {
-  titleFont: string;
-  bodyFont: string;
-  onChangeTitleFont: (font: string) => void;
-  onChangeBodyFont: (font: string) => void;
-}
-
-function FontsTab({ titleFont, bodyFont, onChangeTitleFont, onChangeBodyFont }: FontsTabProps) {
+function FontsTab({ titleFont, bodyFont, onChangeTitleFont, onChangeBodyFont }: {
+  titleFont: string; bodyFont: string;
+  onChangeTitleFont: (f: string) => void; onChangeBodyFont: (f: string) => void;
+}) {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="font-semibold text-gray-900 mb-3">Police des titres</h3>
-        <div className="space-y-2">
-          {TITLE_FONTS.map((font) => (
+        <h3 className="text-sm font-semibold text-foreground mb-3">Police des titres</h3>
+        <div className="space-y-1.5">
+          {TITLE_FONTS.map(f => (
             <button
-              key={font}
-              onClick={() => onChangeTitleFont(font)}
-              className={`w-full px-4 py-3 rounded-lg border text-left transition-colors ${
-                titleFont === font
-                  ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400'
-                  : 'border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500'
+              key={f.value}
+              onClick={() => onChangeTitleFont(f.value)}
+              className={`w-full px-3 py-2.5 rounded-lg border text-left transition-colors duration-150 ${
+                titleFont === f.value
+                  ? 'border-blue bg-blue/8 text-blue'
+                  : 'border-border hover:border-border/60 hover:bg-accent/50 text-foreground'
               }`}
             >
-              <span style={{ fontFamily: font, fontSize: '1.25rem' }}>
-                {font}
-              </span>
+              <span style={{ fontFamily: f.value, fontSize: '1.1rem' }}>{f.name}</span>
             </button>
           ))}
         </div>
       </div>
 
       <div>
-        <h3 className="font-semibold text-gray-900 mb-3">Police du texte</h3>
-        <div className="space-y-2">
-          {BODY_FONTS.map((font) => (
+        <h3 className="text-sm font-semibold text-foreground mb-3">Police du texte</h3>
+        <div className="space-y-1.5">
+          {BODY_FONTS.map(f => (
             <button
-              key={font}
-              onClick={() => onChangeBodyFont(font)}
-              className={`w-full px-4 py-3 rounded-lg border text-left transition-colors ${
-                bodyFont === font
-                  ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400'
-                  : 'border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500'
+              key={f.value}
+              onClick={() => onChangeBodyFont(f.value)}
+              className={`w-full px-3 py-2.5 rounded-lg border text-left transition-colors duration-150 ${
+                bodyFont === f.value
+                  ? 'border-blue bg-blue/8 text-blue'
+                  : 'border-border hover:border-border/60 hover:bg-accent/50 text-foreground'
               }`}
             >
-              <span style={{ fontFamily: font }}>
-                {font} - Texte exemple pour voir le rendu
+              <span style={{ fontFamily: f.value }} className="text-sm">
+                {f.name} — Texte exemple pour voir le rendu
               </span>
             </button>
           ))}
@@ -302,13 +212,9 @@ function FontsTab({ titleFont, bodyFont, onChangeTitleFont, onChangeBodyFont }: 
   );
 }
 
-export function DownloadPage({
-  cvData,
-  settings,
-  setSettings,
-  onHomeClick,
-  onBack,
-}: DownloadPageProps) {
+/* ── Main component ──────────────────────────────────────────────── */
+
+export function DownloadPage({ cvData, settings, setSettings, onHomeClick, onBack }: DownloadPageProps) {
   const [activeTab, setActiveTab] = useState<DownloadTab>('template');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [showConfetti, setShowConfetti] = useState(true);
@@ -320,128 +226,103 @@ export function DownloadPage({
     return () => clearTimeout(timer);
   }, []);
 
-  const getFilename = () =>
-    `CV-${cvData.contact.firstName}-${cvData.contact.lastName}`;
+  const getFilename = () => `CV-${cvData.contact.firstName}-${cvData.contact.lastName}`;
 
   const handleTemplateChange = (templateId: string) => {
     setSettings({ ...settings, template: templateId });
     success('Template appliqué');
   };
 
-  const handleColorChange = (color: string) => {
-    setSettings({ ...settings, primaryColor: color });
-  };
-
-  const handleTitleFontChange = (font: string) => {
-    setSettings({ ...settings, titleFont: font });
-  };
-
-  const handleBodyFontChange = (font: string) => {
-    setSettings({ ...settings, bodyFont: font });
-  };
-
-  const handleSectionOrderChange = (order: LayoutSectionId[]) => {
-    setSettings({ ...settings, sectionOrder: order });
-  };
-
   const resolvedPreviewElement =
     previewRef.current ?? (document.getElementById('cv-preview') as HTMLElement | null);
 
   const handleBackClick = () => {
-    if (onBack) {
-      onBack();
-    } else if (onHomeClick) {
-      onHomeClick();
-    }
+    if (onBack) { onBack(); }
+    else if (onHomeClick) { onHomeClick(); }
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-950 z-50 flex flex-col">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-gray-950 via-slate-900 to-gray-950 text-white px-6 py-4 flex items-center justify-between shadow-lg border-b border-white/5">
+    // Force dark: download page is intentionally always dark (print preview context)
+    <div className="dark fixed inset-0 z-50 flex flex-col">
+      <div className="fixed inset-0 bg-background" aria-hidden />
+      <div className="relative z-10 flex flex-col h-full">
+      {/* ── Header ─────────────────────────────────────────────────── */}
+      <div className="bg-background border-b border-border px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
           {onHomeClick && (
             <button
               onClick={onHomeClick}
-              className="p-2 hover:bg-red-500/90 rounded-lg transition-colors bg-red-500/20 border border-red-400/40"
+              className="p-1.5 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
               title="Retour à l'accueil"
             >
-              <Home className="w-5 h-5" />
+              <Home className="size-[18px]" />
             </button>
           )}
-          <div className="flex items-center gap-2">
-            <FileText className="w-6 h-6 text-indigo-400" />
-            <div className="flex flex-col">
-              <span className="text-lg font-semibold">Finaliser votre CV</span>
-              <span className="text-xs text-slate-300">
-                Ajustez le template, les couleurs, les polices et l&apos;ordre des sections avant de télécharger.
-              </span>
+          <div className="flex items-center gap-2.5">
+            <FileText className="w-5 h-5 text-blue" />
+            <div>
+              <span className="text-sm font-semibold text-foreground">Finaliser votre CV</span>
+              <p className="text-xs text-muted-foreground leading-none mt-0.5">
+                Ajustez le template, les couleurs, les polices et les sections
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Button
             variant="outline"
+            size="sm"
             onClick={handleBackClick}
-            className="border-indigo-500/60 text-indigo-100 bg-indigo-500/10 hover:bg-indigo-500/20 hover:text-white"
+            className="border-border text-muted-foreground bg-surface-2/50 hover:bg-accent hover:text-foreground"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-3.5 h-3.5" />
             Revenir en arrière
           </Button>
-
           <Button
+            size="sm"
+            variant="blue"
             onClick={() => setIsExportModalOpen(true)}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-900/40"
             disabled={!resolvedPreviewElement}
           >
-            <Download className="w-4 h-4 mr-2" />
+            <Download className="w-3.5 h-3.5" />
             Télécharger
           </Button>
         </div>
       </div>
 
-      {/* Content */}
+      {/* ── Content ─────────────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <div className="w-80 bg-white overflow-y-auto border-r">
+        <div className="w-80 bg-card border-r border-border overflow-y-auto flex-shrink-0">
           <SidebarTabs activeTab={activeTab} onChange={setActiveTab} />
-
-          <div className="p-6">
+          <div className="p-5">
             {activeTab === 'template' && (
-              <TemplateTab
-                selectedTemplate={settings.template}
-                onChangeTemplate={handleTemplateChange}
-              />
+              <TemplateTab selectedTemplate={settings.template} onChangeTemplate={handleTemplateChange} />
             )}
-
             {activeTab === 'colors' && (
-              <ColorsTab
-                selectedColor={settings.primaryColor}
-                onChangeColor={handleColorChange}
-              />
+              <ColorsTab selectedColor={settings.primaryColor}
+                onChangeColor={color => setSettings({ ...settings, primaryColor: color })} />
             )}
-
             {activeTab === 'fonts' && (
               <FontsTab
                 titleFont={settings.titleFont}
                 bodyFont={settings.bodyFont}
-                onChangeTitleFont={handleTitleFontChange}
-                onChangeBodyFont={handleBodyFontChange}
+                onChangeTitleFont={font => setSettings({ ...settings, titleFont: font })}
+                onChangeBodyFont={font => setSettings({ ...settings, bodyFont: font })}
               />
             )}
-
             {activeTab === 'sections' && (
               <SectionsTab
                 sectionOrder={settings.sectionOrder}
-                onChangeOrder={handleSectionOrderChange}
+                onChangeOrder={order => setSettings({ ...settings, sectionOrder: order })}
               />
             )}
           </div>
         </div>
 
         {/* Preview */}
-        <div className="flex-1 bg-gray-200 overflow-auto p-8">
+        <div className="flex-1 bg-surface-3 overflow-auto p-8">
           <div className="flex justify-center">
             <CVPreview
               ref={previewRef}
@@ -453,16 +334,14 @@ export function DownloadPage({
         </div>
       </div>
 
-      {/* Confetti Effect */}
       <ConfettiEffect trigger={showConfetti} />
-
-      {/* Export Modal */}
       <ExportModal
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         previewElement={resolvedPreviewElement}
         filename={getFilename()}
       />
+      </div>
     </div>
   );
 }

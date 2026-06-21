@@ -1,15 +1,19 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, ArrowLeft, Plus, Trash2, ChevronUp } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Plus, Trash2, ChevronUp, Briefcase } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Card } from '@/components/ui/card';
+import { FormField } from '@/components/ui/form-field';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { SortableList } from '../components/SortableList';
 import { AISuggestionButton } from '../components/AISuggestionButton';
 import { AutocompleteInput } from '../components/AutocompleteInput';
 import { RichTextArea } from '../components/RichTextArea';
 import { generateExperienceSuggestions, commonJobTitles } from '../utils/aiSuggestions';
+import { fadeInUp, staggerContainer } from '../styles/design-system';
 import type { Experience } from '../types/cv';
 
 interface ExperienceFormProps {
@@ -36,15 +40,10 @@ const emptyExperience: Experience = {
   showDuration: false,
 };
 
+const labelCls = 'block text-xs font-medium uppercase tracking-wider text-muted-foreground';
+
 export function ExperienceForm({
-  experiences,
-  onAdd,
-  onUpdate,
-  onDelete,
-  onReorder,
-  onNext,
-  onBack,
-  onSkip,
+  experiences, onAdd, onUpdate, onDelete, onReorder, onNext, onBack, onSkip,
 }: ExperienceFormProps) {
   const { t } = useTranslation();
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -70,235 +69,204 @@ export function ExperienceForm({
   };
 
   const handleNext = () => {
-    if (experiences.length === 0) {
-      onSkip();
-    } else {
-      onNext();
-    }
+    if (experiences.length === 0) { onSkip(); } else { onNext(); }
   };
 
   const renderExperienceForm = (exp: Experience, isNew: boolean) => {
-    const getAISuggestions = async (): Promise<string[]> => {
-      return generateExperienceSuggestions(exp.jobTitle, 5, '500K€');
-    };
+    const getAISuggestions = async (): Promise<string[]> =>
+      generateExperienceSuggestions(exp.jobTitle, 5, '500K€');
 
     const applySuggestion = (suggestion: string) => {
       const currentDesc = exp.description;
       const newDesc = currentDesc ? `${currentDesc}\n• ${suggestion}` : `• ${suggestion}`;
       if (isNew) {
-        setNewExperience((prev) => prev ? { ...prev, description: newDesc } : prev);
+        setNewExperience(prev => prev ? { ...prev, description: newDesc } : prev);
       } else {
         onUpdate(exp.id, { description: newDesc });
       }
     };
 
     return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <p className="text-gray-500 text-sm">
-            {exp.jobTitle || `(${t('common.notSpecified')})`}, {exp.employer || t('common.unknown')} - {exp.city || t('common.unknown')}
+      <Card variant="compact" hover className="mb-3 cursor-grab active:cursor-grabbing">
+        <div className="flex justify-between items-start mb-3">
+          <p className="text-sm text-muted-foreground">
+            {exp.jobTitle || `(${t('common.notSpecified')})`}, {exp.employer || t('common.unknown')} — {exp.city || t('common.unknown')}
           </p>
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => isNew ? handleCancel() : onDelete(exp.id)}
+              className="text-muted-foreground hover:text-destructive"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <ChevronUp className={`w-3.5 h-3.5 transition-transform ${expandedId === exp.id ? '' : 'rotate-180'}`} />
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => isNew ? handleCancel() : onDelete(exp.id)}
-            className="text-gray-400 hover:text-red-500"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <ChevronUp className={`w-4 h-4 transition-transform ${expandedId === exp.id ? '' : 'rotate-180'}`} />
-          </button>
-        </div>
-      </div>
 
-      {expandedId === exp.id && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label className="text-xs uppercase text-gray-500">{t('experience.jobTitle')}</Label>
-              <AutocompleteInput
-                value={exp.jobTitle}
-                onChange={(value) => isNew 
-                  ? setNewExperience({ ...exp, jobTitle: value })
-                  : onUpdate(exp.id, { jobTitle: value })
-                }
-                suggestions={commonJobTitles}
-                placeholder={t('experience.jobTitlePlaceholder') || 'Chef de projet'}
-              />
+        {expandedId === exp.id && (
+          <div className="space-y-4 pt-3 border-t border-border">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className={labelCls}>{t('experience.jobTitle')}</p>
+                <AutocompleteInput
+                  value={exp.jobTitle}
+                  onChange={value => isNew
+                    ? setNewExperience({ ...exp, jobTitle: value })
+                    : onUpdate(exp.id, { jobTitle: value })}
+                  suggestions={commonJobTitles}
+                  placeholder={t('experience.jobTitlePlaceholder') || 'Chef de projet'}
+                />
+              </div>
+              <FormField label={t('experience.employer')}>
+                <Input
+                  value={exp.employer}
+                  onChange={e => isNew
+                    ? setNewExperience({ ...exp, employer: e.target.value })
+                    : onUpdate(exp.id, { employer: e.target.value })}
+                  placeholder={t('experience.employerPlaceholder') || 'Maroc Telecom'}
+                />
+              </FormField>
             </div>
-            <div>
-              <Label className="text-xs uppercase text-gray-500">{t('experience.employer')}</Label>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField label={t('experience.startDate')}>
+                <Input
+                  type="month"
+                  value={exp.startDate}
+                  onChange={e => isNew
+                    ? setNewExperience({ ...exp, startDate: e.target.value })
+                    : onUpdate(exp.id, { startDate: e.target.value })}
+                />
+              </FormField>
+              <FormField label={t('experience.endDate')}>
+                <Input
+                  type="month"
+                  value={exp.endDate}
+                  onChange={e => isNew
+                    ? setNewExperience({ ...exp, endDate: e.target.value })
+                    : onUpdate(exp.id, { endDate: e.target.value })}
+                  disabled={exp.currentlyWorking}
+                />
+              </FormField>
+            </div>
+
+            <div className="flex items-center gap-6 flex-wrap">
+              {([
+                ['currentlyWorking', 'experience.currentlyWorking'],
+                ['hideMonths',       'experience.hideMonths'],
+                ['showDuration',     'experience.showDuration'],
+              ] as const).map(([field, key]) => (
+                <div key={field} className="flex items-center gap-2">
+                  <Checkbox
+                    checked={exp[field] as boolean}
+                    onCheckedChange={checked => isNew
+                      ? setNewExperience({ ...exp, [field]: checked as boolean })
+                      : onUpdate(exp.id, { [field]: checked as boolean })}
+                  />
+                  <Label className="text-sm text-muted-foreground cursor-pointer">{t(key)}</Label>
+                </div>
+              ))}
+            </div>
+
+            <FormField label={t('experience.city')}>
               <Input
-                value={exp.employer}
-                onChange={(e) => isNew
-                  ? setNewExperience({ ...exp, employer: e.target.value })
-                  : onUpdate(exp.id, { employer: e.target.value })
-                }
-                placeholder={t('experience.employerPlaceholder') || 'Maroc Telecom'}
-                className="mt-1"
+                value={exp.city}
+                onChange={e => isNew
+                  ? setNewExperience({ ...exp, city: e.target.value })
+                  : onUpdate(exp.id, { city: e.target.value })}
+                placeholder={t('experience.cityPlaceholder') || 'Casablanca'}
               />
-            </div>
-          </div>
+            </FormField>
 
-          <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-xs uppercase text-gray-500">{t('experience.startDate')}</Label>
-              <Input
-                type="month"
-                value={exp.startDate}
-                onChange={(e) => isNew
-                  ? setNewExperience({ ...exp, startDate: e.target.value })
-                  : onUpdate(exp.id, { startDate: e.target.value })
-                }
-                className="mt-1"
+              <p className={labelCls}>{t('experience.description')}</p>
+              <RichTextArea
+                value={exp.description}
+                onChange={html => isNew
+                  ? setNewExperience(prev => prev ? { ...prev, description: html } : prev)
+                  : onUpdate(exp.id, { description: html })}
+                placeholder={t('experience.descriptionPlaceholder')}
+                id={`experience-description-${exp.id || 'new'}`}
+              />
+              <AISuggestionButton
+                onSuggest={getAISuggestions}
+                onApply={applySuggestion}
+                buttonText={t('experience.aiSuggestions')}
               />
             </div>
-            <div>
-              <Label className="text-xs uppercase text-gray-500">{t('experience.endDate')}</Label>
-              <Input
-                type="month"
-                value={exp.endDate}
-                onChange={(e) => isNew
-                  ? setNewExperience({ ...exp, endDate: e.target.value })
-                  : onUpdate(exp.id, { endDate: e.target.value })
-                }
-                className="mt-1"
-                disabled={exp.currentlyWorking}
-              />
-            </div>
-          </div>
 
-          <div className="flex items-center gap-4 flex-wrap">
-            <div className="flex items-center gap-2">
-              <Checkbox
-                checked={exp.currentlyWorking}
-                onCheckedChange={(checked) => isNew
-                  ? setNewExperience({ ...exp, currentlyWorking: checked as boolean })
-                  : onUpdate(exp.id, { currentlyWorking: checked as boolean })
-                }
-              />
-              <Label className="text-sm text-gray-500">{t('experience.currentlyWorking')}</Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <Checkbox
-                checked={exp.hideMonths}
-                onCheckedChange={(checked) => isNew
-                  ? setNewExperience({ ...exp, hideMonths: checked as boolean })
-                  : onUpdate(exp.id, { hideMonths: checked as boolean })
-                }
-              />
-              <Label className="text-sm text-gray-500">{t('experience.hideMonths')}</Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <Checkbox
-                checked={exp.showDuration}
-                onCheckedChange={(checked) => isNew
-                  ? setNewExperience({ ...exp, showDuration: checked as boolean })
-                  : onUpdate(exp.id, { showDuration: checked as boolean })
-                }
-              />
-              <Label className="text-sm text-gray-500">{t('experience.showDuration')}</Label>
-            </div>
+            {isNew && (
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="outline" onClick={handleCancel}>{t('nav.cancel')}</Button>
+                <Button variant="blue" onClick={handleSave}>{t('nav.save')}</Button>
+              </div>
+            )}
           </div>
-
-          <div>
-            <Label className="text-xs uppercase text-gray-500">{t('experience.city')}</Label>
-            <Input
-              value={exp.city}
-              onChange={(e) => isNew
-                ? setNewExperience({ ...exp, city: e.target.value })
-                : onUpdate(exp.id, { city: e.target.value })
-              }
-              placeholder={t('experience.cityPlaceholder') || 'Casablanca'}
-              className="mt-1"
-            />
-          </div>
-
-          <div>
-            <Label className="text-xs uppercase text-gray-500">{t('experience.description')}</Label>
-            <RichTextArea
-              value={exp.description}
-              onChange={(html) => isNew
-                ? setNewExperience((prev) => prev ? { ...prev, description: html } : prev)
-                : onUpdate(exp.id, { description: html })
-              }
-              placeholder={t('experience.descriptionPlaceholder')}
-              id={`experience-description-${exp.id || 'new'}`}
-            />
-            <AISuggestionButton
-              onSuggest={getAISuggestions}
-              onApply={applySuggestion}
-              buttonText={t('experience.aiSuggestions')}
-            />
-          </div>
-
-          {isNew && (
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={handleCancel}>
-                {t('nav.cancel')}
-              </Button>
-              <Button onClick={handleSave} className="bg-indigo-600 hover:bg-indigo-700">
-                {t('nav.save')}
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+        )}
+      </Card>
     );
   };
 
   return (
     <div className="max-w-2xl">
-      <h2 className="text-3xl font-bold text-gray-800 mb-2">
-        <span className="text-indigo-600">{t('experience.titleHighlight')}</span> {t('experience.title')}
+      <h2 className="text-2xl font-semibold text-foreground mb-1 tracking-tight">
+        <span className="text-blue">{t('experience.titleHighlight')}</span>{' '}
+        {t('experience.title')}
       </h2>
-      <p className="text-gray-500 mb-8">
-        {t('experience.subtitle')}
-      </p>
+      <p className="text-sm text-muted-foreground mb-8">{t('experience.subtitle')}</p>
 
-      <button
-        onClick={handleAdd}
-        className="flex items-center gap-2 text-indigo-600 font-medium mb-4 hover:underline"
-      >
-        <Plus className="w-5 h-5" />
-        {t('experience.add')}
-      </button>
-
-      {newExperience && renderExperienceForm(newExperience, true)}
-
-      {experiences.length > 0 && (
-        <SortableList
-          items={experiences}
-          onReorder={onReorder}
-          renderItem={(exp) => renderExperienceForm(exp, false)}
-        />
-      )}
-
-      <p className="text-gray-500 text-sm mb-8">
-        {t('experience.helpText')}
-      </p>
-
-      <div className="flex justify-between">
-        <Button
-          variant="ghost"
-          onClick={onBack}
-          className="flex items-center gap-2 text-gray-500"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          {t('nav.back')}
+      <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+        <Button variant="outline" size="sm" onClick={handleAdd} className="mb-4">
+          <Plus className="w-4 h-4" />
+          {t('experience.add')}
         </Button>
-        <Button
-          onClick={handleNext}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded flex items-center gap-2"
-        >
-          {t('experience.nextStep')}
-          <ArrowRight className="w-4 h-4" />
+
+        <AnimatePresence mode="wait">
+          {newExperience && (
+            <motion.div key="new" variants={fadeInUp}>
+              {renderExperienceForm(newExperience, true)}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {experiences.length === 0 && !newExperience && (
+          <motion.div
+            variants={fadeInUp}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-col items-center justify-center py-12 text-center rounded-xl border border-dashed border-border mb-6"
+          >
+            <Briefcase className="w-12 h-12 text-muted-foreground/30 mb-3" />
+            <p className="text-sm text-muted-foreground mb-4">{t('experience.emptyState')}</p>
+            <Button variant="outline" size="sm" onClick={handleAdd}>
+              <Plus className="w-4 h-4" /> {t('experience.add')}
+            </Button>
+          </motion.div>
+        )}
+
+        {experiences.length > 0 && (
+          <SortableList items={experiences} onReorder={onReorder}
+            renderItem={exp => renderExperienceForm(exp, false)} />
+        )}
+      </motion.div>
+
+      <p className="text-xs text-muted-foreground mb-8">{t('experience.helpText')}</p>
+
+      <div className="flex justify-between pt-2">
+        <Button variant="ghost" onClick={onBack}>
+          <ArrowLeft className="w-4 h-4" /> {t('nav.back')}
+        </Button>
+        <Button variant="blue" onClick={handleNext}>
+          {t('experience.nextStep')} <ArrowRight className="w-4 h-4" />
         </Button>
       </div>
     </div>

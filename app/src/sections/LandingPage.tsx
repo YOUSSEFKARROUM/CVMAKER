@@ -513,7 +513,7 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
               whileInView="visible"
               viewport={{ once: true }}
             >
-              {TESTIMONIAL_KEYS.map((key, i) => (
+              {TESTIMONIAL_KEYS.map((key) => (
                 <motion.div key={key} variants={fadeInUp}>
                   <Card variant="standard" className="h-full flex flex-col">
                     <div className="flex gap-0.5 mb-4">

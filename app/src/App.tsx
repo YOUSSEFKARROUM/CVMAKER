@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LandingPage } from './sections/LandingPage';
+import { CVGalleryPage } from './sections/CVGalleryPage';
 import { ContactForm } from './sections/ContactForm';
 import { ExperienceForm } from './sections/ExperienceForm';
 import { EducationForm } from './sections/EducationForm';
@@ -114,10 +115,10 @@ function App() {
   const [showPreviewDesktop, setShowPreviewDesktop] = useState(true);
   const previewRef = useRef<HTMLDivElement | null>(null);
 
-  // Rediriger vers le formulaire CV après authentification
+  // Rediriger vers la galerie de CVs après authentification
   useEffect(() => {
     if (isAuthenticated && currentStep === 'landing') {
-      setCurrentStep('contact');
+      setCurrentStep('my-cvs');
     }
   }, [isAuthenticated, currentStep]);
 
@@ -618,7 +619,7 @@ function App() {
 
   // Rediriger vers landing si non authentifié (via effet, pas dans le render)
   useEffect(() => {
-    if (!isAuthenticated && currentStep !== 'landing') {
+    if (!isAuthenticated && currentStep !== 'landing' && currentStep !== 'my-cvs') {
       setCurrentStep('landing');
     }
   }, [isAuthenticated, currentStep]);
@@ -630,9 +631,29 @@ function App() {
 
     const content = (() => {
       switch (currentStep) {
+        case 'my-cvs':
+          return (
+            <CVGalleryPage
+              onLoadCV={({ cvData: loadedCvData, settings: loadedSettings }) => {
+                setCVData(loadedCvData);
+                setSettings(loadedSettings);
+                setCurrentStep('contact');
+                success('CV chargé — vous pouvez le modifier');
+              }}
+              onCreateNew={() => {
+                resetData();
+                setCurrentStep('contact');
+              }}
+              onImport={async (file) => {
+                await importData(file);
+                success('CV importé avec succès');
+                setCurrentStep('contact');
+              }}
+            />
+          );
         case 'landing':
           return (
-            <LandingPage 
+            <LandingPage
               onCreateNew={() => {
                 if (isAuthenticated) {
                   setCurrentStep('contact');
@@ -800,8 +821,8 @@ function App() {
     );
   };
 
-  const showPreview = currentStep !== 'landing' && currentStep !== 'download';
-  const showProgress = currentStep !== 'landing' && currentStep !== 'download';
+  const showPreview = currentStep !== 'landing' && currentStep !== 'download' && currentStep !== 'my-cvs';
+  const showProgress = currentStep !== 'landing' && currentStep !== 'download' && currentStep !== 'my-cvs';
 
   // Sidebar avec VerticalStepper
   const sidebar = showProgress ? (

@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { User, LogOut, FileText, Cloud, ChevronDown, LayoutGrid, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { useCloudCV } from '../hooks/useCloudCV';
 import { Button } from '@/components/ui/button';
@@ -35,15 +35,10 @@ export function UserMenu({ cvData, settings, onLoadCV, onCreateNew, onEditCV }: 
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = useCallback(async () => {
-    if (!cvData || !settings) {
-      showError('Aucune donnée à sauvegarder');
-      return;
-    }
-    
+    if (!cvData || !settings) { showError('Aucune donnée à sauvegarder'); return; }
     const name = cvData.contact.firstName || cvData.contact.lastName
       ? `${cvData.contact.firstName} ${cvData.contact.lastName} - CV`.trim()
       : 'Mon CV';
-      
     setIsSaving(true);
     try {
       await saveToCloud(name, cvData, settings);
@@ -79,130 +74,108 @@ export function UserMenu({ cvData, settings, onLoadCV, onCreateNew, onEditCV }: 
     try {
       await logout();
       success('Déconnexion réussie');
-    } catch (err) {
+    } catch {
       showError('Erreur lors de la déconnexion');
     }
   }, [logout, success, showError]);
 
+  /* ── Unauthenticated ──────────────────────────────────── */
   if (!isAuthenticated) {
     return (
       <>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowAuthModal(true)}
-          className="gap-2"
-        >
+        <Button variant="ghost" size="sm" onClick={() => setShowAuthModal(true)} className="gap-1.5">
           <User className="w-4 h-4" />
-          <span className="hidden sm:inline">{t('auth.login')}</span>
+          <span className="hidden sm:inline text-sm">{t('auth.login')}</span>
         </Button>
         <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
       </>
     );
   }
 
+  /* ── Authenticated ────────────────────────────────────── */
+  const initial = user?.displayName?.charAt(0) || user?.email?.charAt(0) || '?';
+
   return (
     <>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         {cvData && settings && isCloudEnabled && (
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSave}
-              disabled={isSaving}
-              className="gap-2 hidden sm:flex"
-              title={isCloudEnabled ? undefined : "Stockage cloud non disponible"}
-            >
-              {isSaving ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Cloud className="w-4 h-4" />
-              )}
-              {t('cloud.save')}
-            </Button>
-          </motion.div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSave}
+            disabled={isSaving}
+            className="gap-1.5 hidden sm:flex text-muted-foreground"
+          >
+            {isSaving
+              ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              : <Cloud className="w-3.5 h-3.5" />}
+            {t('cloud.save')}
+          </Button>
         )}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="gap-2">
-              <div 
-                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium"
-                style={{ background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)' }}
-              >
-                {user?.displayName?.charAt(0) || user?.email?.charAt(0) || '?'}
+            <Button variant="ghost" size="sm" className="gap-1.5 px-2">
+              {/* Avatar */}
+              <div className="w-7 h-7 rounded-md bg-blue flex items-center justify-center text-blue-foreground text-xs font-semibold flex-shrink-0">
+                {initial.toUpperCase()}
               </div>
-              <span className="hidden md:inline max-w-[100px] truncate text-slate-700 dark:text-slate-300">
+              <span className="hidden md:inline text-sm text-foreground max-w-[100px] truncate">
                 {user?.displayName || user?.email}
               </span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
+              <ChevronDown className="w-3 h-3 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent align="end" className="w-56">
-            <div className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-700 mb-1">
+            {/* Email header */}
+            <div className="px-3 py-2 text-xs text-muted-foreground border-b border-border mb-1">
               {user?.email}
             </div>
-            
-            <DropdownMenuItem 
-              onClick={() => setShowDashboard(true)} 
-              className="gap-2 cursor-pointer"
-            >
-              <LayoutGrid className="w-4 h-4 text-indigo-500" />
+
+            <DropdownMenuItem onClick={() => setShowDashboard(true)} className="gap-2 cursor-pointer">
+              <LayoutGrid className="w-3.5 h-3.5 text-blue" />
               {t('cloud.myCVs')}
               {cvs.length > 0 && (
-                <span className="ml-auto bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs px-2 py-0.5 rounded-full">
+                <span className="ml-auto text-xs px-1.5 py-0.5 bg-blue/10 text-blue rounded font-medium">
                   {cvs.length}
                 </span>
               )}
             </DropdownMenuItem>
 
-            <DropdownMenuItem 
-              onClick={onCreateNew} 
-              className="gap-2 cursor-pointer"
-            >
-              <FileText className="w-4 h-4 text-emerald-500" />
+            <DropdownMenuItem onClick={onCreateNew} className="gap-2 cursor-pointer">
+              <FileText className="w-3.5 h-3.5 text-success" />
               {t('landing.createCV')}
             </DropdownMenuItem>
 
             {cvData && settings && isCloudEnabled && (
-              <DropdownMenuItem 
-                onClick={handleSave} 
-                disabled={isSaving}
-                className="gap-2 cursor-pointer sm:hidden"
-              >
-                {isSaving ? (
-                  <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
-                ) : (
-                  <Cloud className="w-4 h-4 text-blue-500" />
-                )}
+              <DropdownMenuItem onClick={handleSave} disabled={isSaving} className="gap-2 cursor-pointer sm:hidden">
+                {isSaving
+                  ? <Loader2 className="w-3.5 h-3.5 text-blue animate-spin" />
+                  : <Cloud className="w-3.5 h-3.5 text-blue" />}
                 {t('cloud.save')}
               </DropdownMenuItem>
             )}
 
             <DropdownMenuSeparator />
-            
-            <DropdownMenuItem 
-              onClick={handleLogout} 
-              className="gap-2 cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="gap-2 cursor-pointer text-destructive hover:text-destructive focus:text-destructive"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-3.5 h-3.5" />
               {t('auth.logout')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
-      {/* CV Dashboard Modal */}
       <AnimatePresence>
         {showDashboard && (
           <CVDashboard
             isOpen={showDashboard}
             onClose={() => setShowDashboard(false)}
-            onCreateNew={() => {
-              setShowDashboard(false);
-              onCreateNew?.();
-            }}
+            onCreateNew={() => { setShowDashboard(false); onCreateNew?.(); }}
             onLoadCV={handleLoadCV}
             onEditCV={handleEditCV}
             loading={loading}
@@ -210,7 +183,6 @@ export function UserMenu({ cvData, settings, onLoadCV, onCreateNew, onEditCV }: 
         )}
       </AnimatePresence>
 
-      {/* Auth Modal */}
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </>
   );

@@ -15,88 +15,54 @@ interface FloatingActionsProps {
 }
 
 export function FloatingActions({
-  onUndo,
-  onRedo,
-  canUndo = false,
-  canRedo = false,
-  onExport,
-  onReset,
-  showInZenMode = false,
+  onUndo, onRedo, canUndo = false, canRedo = false, onExport, onReset, showInZenMode = false,
 }: FloatingActionsProps) {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const actions = [
-    {
-      id: 'undo',
-      icon: RotateCcw,
-      label: t('actions.undo') || 'Annuler',
-      onClick: onUndo,
-      disabled: !canUndo,
-      shortcut: '⌘Z',
-    },
-    {
-      id: 'redo',
-      icon: Redo2,
-      label: t('actions.redo') || 'Rétablir',
-      onClick: onRedo,
-      disabled: !canRedo,
-      shortcut: '⌘⇧Z',
-    },
-    {
-      id: 'export',
-      icon: FileJson,
-      label: t('actions.export') || 'Exporter JSON',
-      onClick: onExport,
-      disabled: false,
-    },
-    {
-      id: 'reset',
-      icon: Trash2,
-      label: t('actions.reset') || 'Réinitialiser',
-      onClick: onReset,
-      disabled: false,
-      variant: 'destructive' as const,
-    },
-  ].filter(action => action.onClick);
+    { id: 'undo',   icon: RotateCcw, label: t('actions.undo')   || 'Annuler',         onClick: onUndo,   disabled: !canUndo,  variant: 'secondary' as const },
+    { id: 'redo',   icon: Redo2,     label: t('actions.redo')   || 'Rétablir',         onClick: onRedo,   disabled: !canRedo,  variant: 'secondary' as const },
+    { id: 'export', icon: FileJson,  label: t('actions.export') || 'Exporter JSON',    onClick: onExport, disabled: false,     variant: 'secondary' as const },
+    { id: 'reset',  icon: Trash2,    label: t('actions.reset')  || 'Réinitialiser',    onClick: onReset,  disabled: false,     variant: 'destructive' as const },
+  ].filter(a => a.onClick);
 
   if (actions.length === 0) return null;
 
   return (
-    <div className={`fixed right-6 bottom-6 z-40 flex flex-col items-end gap-2 ${showInZenMode ? '' : 'zen:hidden'}`}>
+    <div className={`fixed right-5 bottom-5 z-40 flex flex-col items-end gap-2 ${showInZenMode ? '' : 'zen:hidden'}`}>
       <AnimatePresence>
         {isExpanded && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.8 }}
+            initial={{ opacity: 0, y: 12, scale: 0.92 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.8 }}
-            className="flex flex-col gap-2 mb-2"
+            exit={{ opacity: 0, y: 12, scale: 0.92 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+            className="flex flex-col gap-1.5 mb-1"
           >
             {actions.map((action, index) => (
               <motion.div
                 key={action.id}
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: 12 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ delay: index * 0.05 }}
+                exit={{ opacity: 0, x: 12 }}
+                transition={{ delay: index * 0.05, duration: 0.15 }}
                 className="flex items-center gap-2"
               >
-                <span className="text-xs text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 px-2 py-1 rounded-full shadow-sm">
+                <span className="text-xs text-muted-foreground bg-card border border-border px-2.5 py-1 rounded-md shadow-sm">
                   {action.label}
                 </span>
                 <Button
-                  variant={action.variant || 'secondary'}
+                  variant={action.variant}
                   size="icon"
                   onClick={() => {
                     action.onClick?.();
-                    if (action.id === 'reset') {
-                      setIsExpanded(false);
-                    }
+                    if (action.id === 'reset') setIsExpanded(false);
                   }}
                   disabled={action.disabled}
-                  className="h-10 w-10 rounded-full shadow-lg"
+                  className="h-9 w-9 rounded-lg shadow-md"
                 >
-                  <action.icon className="w-4 h-4" />
+                  <action.icon className="w-3.5 h-3.5" />
                 </Button>
               </motion.div>
             ))}
@@ -104,57 +70,34 @@ export function FloatingActions({
         )}
       </AnimatePresence>
 
-      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+      <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
         <Button
           onClick={() => setIsExpanded(!isExpanded)}
           size="icon"
-          className={`h-12 w-12 rounded-full shadow-xl transition-all duration-300 ${
-            isExpanded 
-              ? 'bg-slate-700 hover:bg-slate-800 rotate-45' 
-              : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700'
+          className={`h-11 w-11 rounded-lg shadow-lg transition-colors duration-150 ${
+            isExpanded
+              ? 'bg-muted hover:bg-accent text-foreground'
+              : 'bg-blue hover:bg-blue/90 text-blue-foreground'
           }`}
         >
-          {isExpanded ? (
-            <X className="w-5 h-5" />
-          ) : (
-            <MoreHorizontal className="w-5 h-5" />
-          )}
+          {isExpanded ? <X className="size-[18px]" /> : <MoreHorizontal className="size-[18px]" />}
         </Button>
       </motion.div>
     </div>
   );
 }
 
-// Version compacte pour la barre d'outils
-export function CompactActions({
-  onUndo,
-  onRedo,
-  canUndo = false,
-  canRedo = false,
-}: FloatingActionsProps) {
+export function CompactActions({ onUndo, onRedo, canUndo = false, canRedo = false }: FloatingActionsProps) {
   const { t } = useTranslation();
-
   return (
-    <div className="flex items-center gap-1">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onUndo}
-        disabled={!canUndo}
-        className="h-8 w-8"
-        title={t('actions.undo') || 'Annuler (⌘Z)'}
-      >
-        <RotateCcw className="w-4 h-4" />
+    <div className="flex items-center gap-0.5">
+      <Button variant="ghost" size="icon" onClick={onUndo} disabled={!canUndo} className="h-8 w-8"
+        title={t('actions.undo') || 'Annuler (⌘Z)'}>
+        <RotateCcw className="w-3.5 h-3.5" />
       </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onRedo}
-        disabled={!canRedo}
-        className="h-8 w-8"
-        title={t('actions.redo') || 'Rétablir (⌘⇧Z)'}
-      >
-        <Redo2 className="w-4 h-4" />
+      <Button variant="ghost" size="icon" onClick={onRedo} disabled={!canRedo} className="h-8 w-8"
+        title={t('actions.redo') || 'Rétablir (⌘⇧Z)'}>
+        <Redo2 className="w-3.5 h-3.5" />
       </Button>
     </div>
   );
