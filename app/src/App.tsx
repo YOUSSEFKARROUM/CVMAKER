@@ -135,7 +135,7 @@ function App() {
   useGlobalShortcuts(undo, redo, canUndo, canRedo);
 
   // Gestion de la langue
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   
   // Synchronisation initiale de la langue (run once on mount)
   // eslint-disable-next-line react-hooks/exhaustive-deps

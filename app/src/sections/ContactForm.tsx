@@ -10,8 +10,6 @@ import { AutocompleteInput } from '../components/AutocompleteInput';
 import { validationRules, validateField, debounce } from '../utils/validation';
 import { commonJobTitles } from '../utils/aiSuggestions';
 import type { ContactInfo } from '../types/cv';
-import { LABEL_CLASS } from '../styles/design-system';
-
 interface ContactFormProps {
   contact: ContactInfo;
   updateContact: (field: keyof ContactInfo, value: string) => void;
@@ -21,8 +19,6 @@ interface ContactFormProps {
   onNext: () => void;
   onPhotoChange: (photo: string | undefined) => void;
 }
-
-const labelCls = LABEL_CLASS;
 
 export function ContactForm({
   contact, updateContact, errors, showDetails, setShowDetails, onNext, onPhotoChange,

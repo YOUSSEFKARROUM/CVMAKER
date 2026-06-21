@@ -44,7 +44,7 @@ function SkeletonCard() {
 }
 
 export function CVGalleryPage({ onLoadCV, onCreateNew, onImport }: CVGalleryPageProps) {
-  const { user } = useAuth();
+  useAuth();
   const { cvs, loading, deleteFromCloud } = useCloudCV();
   const { success, error: showError } = useToast();
 
