@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { X, Download, FileText, Image as ImageIcon, Printer, Loader2 } from 'lucide-react';
+import { X, Download, FileText, Image as ImageIcon, Printer, Loader2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { exportCVToPDF, exportToImage, downloadImage, printCV } from '../utils/pdfExport';
 import { useToast } from '../hooks/useToast';
 import { colors } from '../styles/design-system';
 import { supabase } from '../supabase/client';
+import { useDownloadRequest } from '../hooks/useDownloadRequest';
+import { useAdmin } from '../hooks/useAdmin';
 
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID as string | undefined;
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL as string | undefined;
@@ -57,13 +59,23 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
   const [paypalError, setPaypalError] = useState<string | null>(null);
   const paypalContainerRef = useRef<HTMLDivElement | null>(null);
   const paypalButtonsRenderedRef = useRef(false);
+  const { canUserDownload } = useDownloadRequest();
+  const { isAdmin } = useAdmin();
+  const [adminApproved, setAdminApproved] = useState(false);
+  const [checkingAccess, setCheckingAccess] = useState(true);
+
+  useEffect(() => {
+    canUserDownload()
+      .then(setAdminApproved)
+      .finally(() => setCheckingAccess(false));
+  }, []);
 
   // Image Options
   const [imageFormat, setImageFormat] = useState<'png' | 'jpeg' | 'webp'>('png');
   const [imageQuality, setImageQuality] = useState(0.95);
 
-  // Paiement requis si PayPal est activé et non encore payé (même si le SDK échoue à charger)
-  const mustPayBeforeDownload = PAYPAL_ENABLED && !hasPaid;
+  // Admin approuvé ou isAdmin = pas de paiement requis, quoi qu'il arrive
+  const mustPayBeforeDownload = !isAdmin && !adminApproved && PAYPAL_ENABLED && !hasPaid;
 
   const handleExportPDF = async () => {
     if (mustPayBeforeDownload) {
@@ -376,46 +388,55 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
                 </p>
               </div>
 
-              <div className="p-4 bg-emerald-50 rounded-lg space-y-2">
-                <h3 className="font-medium text-emerald-900">
-                  Paiement sécurisé pour le téléchargement PDF
-                </h3>
-                <p className="text-sm text-emerald-800">
-                  Prix : <span className="font-semibold">2 € (≈ 20 DH)</span> par CV, via PayPal
-                  (carte bancaire ou compte PayPal).
-                </p>
-                {PAYPAL_ENABLED ? (
-                  <>
-                    <div ref={paypalContainerRef} className="mt-2" />
-                    {paypalError && (
-                      <div className="mt-2 p-3 bg-red-50 rounded-lg border border-red-200">
-                        <p className="text-xs text-red-700 font-medium mb-1">
-                          Le module de paiement PayPal n&apos;a pas pu se charger.
-                        </p>
-                        <p className="text-xs text-red-600">
-                          Vérifiez votre connexion et rechargez la page. Si le problème persiste, le Client ID PayPal sandbox est peut-être expiré.
-                        </p>
-                        <button
-                          onClick={() => { setPaypalError(null); setIsPaypalReady(false); paypalButtonsRenderedRef.current = false; }}
-                          className="mt-2 text-xs text-red-700 underline hover:no-underline"
-                        >
-                          Réessayer
-                        </button>
-                      </div>
-                    )}
-                    {hasPaid && (
-                      <p className="text-xs text-emerald-700 mt-1">
-                        Paiement validé. Vous pouvez maintenant lancer le téléchargement PDF.
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <p className="text-xs text-amber-700 mt-2">
-                    Le paiement PayPal n&apos;est pas encore configuré (variables d&apos;environnement
-                    manquantes). En développement, le téléchargement reste gratuit.
+              {(isAdmin || adminApproved) ? (
+                <div className="flex items-center gap-2 justify-center px-4 py-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                  <Check className="w-5 h-5 text-green-600 shrink-0" />
+                  <span className="text-sm text-green-700 font-medium">
+                    {isAdmin ? 'Accès administrateur — téléchargement gratuit' : 'Accès approuvé — téléchargement gratuit'}
+                  </span>
+                </div>
+              ) : (
+                <div className="p-4 bg-emerald-50 rounded-lg space-y-2">
+                  <h3 className="font-medium text-emerald-900">
+                    Paiement sécurisé pour le téléchargement PDF
+                  </h3>
+                  <p className="text-sm text-emerald-800">
+                    Prix : <span className="font-semibold">2 € (≈ 20 DH)</span> par CV, via PayPal
+                    (carte bancaire ou compte PayPal).
                   </p>
-                )}
-              </div>
+                  {PAYPAL_ENABLED ? (
+                    <>
+                      <div ref={paypalContainerRef} className="mt-2" />
+                      {paypalError && (
+                        <div className="mt-2 p-3 bg-red-50 rounded-lg border border-red-200">
+                          <p className="text-xs text-red-700 font-medium mb-1">
+                            Le module de paiement PayPal n&apos;a pas pu se charger.
+                          </p>
+                          <p className="text-xs text-red-600">
+                            Vérifiez votre connexion et rechargez la page. Si le problème persiste, le Client ID PayPal sandbox est peut-être expiré.
+                          </p>
+                          <button
+                            onClick={() => { setPaypalError(null); setIsPaypalReady(false); paypalButtonsRenderedRef.current = false; }}
+                            className="mt-2 text-xs text-red-700 underline hover:no-underline"
+                          >
+                            Réessayer
+                          </button>
+                        </div>
+                      )}
+                      {hasPaid && (
+                        <p className="text-xs text-emerald-700 mt-1">
+                          Paiement validé. Vous pouvez maintenant lancer le téléchargement PDF.
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-xs text-amber-700 mt-2">
+                      Le paiement PayPal n&apos;est pas encore configuré (variables d&apos;environnement
+                      manquantes). En développement, le téléchargement reste gratuit.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -497,7 +518,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
           {activeTab === 'pdf' && (
             <Button
               onClick={handleExportPDF}
-              disabled={isExporting || mustPayBeforeDownload}
+              disabled={isExporting || checkingAccess || mustPayBeforeDownload}
               className="bg-blue hover:bg-blue/90 text-blue-foreground"
             >
               {isExporting ? (
@@ -505,10 +526,15 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Export en cours...
                 </>
+              ) : checkingAccess ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Vérification...
+                </>
               ) : (
                 <>
                   <Download className="w-4 h-4 mr-2" />
-                  {mustPayBeforeDownload ? 'Télécharger après paiement' : 'Télécharger PDF'}
+                  {(isAdmin || adminApproved) ? 'Télécharger gratuitement' : hasPaid ? 'Télécharger PDF' : 'Télécharger après paiement'}
                 </>
               )}
             </Button>
