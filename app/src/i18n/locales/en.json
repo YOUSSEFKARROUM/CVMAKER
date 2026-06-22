@@ -93,7 +93,60 @@
     "import": "Import",
     "close": "Close",
     "progress": "Progress",
-    "view": "View"
+    "view": "View",
+    "myCVs": "My CVs",
+    "profile": "My profile"
+  },
+  "menu": {
+    "profile": "My profile",
+    "settings": "Settings",
+    "plan": "My plan",
+    "theme": "Theme",
+    "language": "Language",
+    "admin": "Admin Dashboard",
+    "logout": "Sign out"
+  },
+  "profile": {
+    "personalInfo": "Personal information",
+    "displayName": "Display name",
+    "namePlaceholder": "Your full name",
+    "nameUpdated": "Name updated",
+    "nameError": "Error while updating",
+    "email": "Email address",
+    "emailReadonly": "Cannot be changed",
+    "security": "Security",
+    "changePassword": "Change password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password",
+    "updatePassword": "Update",
+    "passwordChanged": "Password changed",
+    "passwordError": "Error changing password",
+    "pwdTooShort": "Password must be at least 8 characters",
+    "pwdMismatch": "Passwords do not match",
+    "plan": "My plan",
+    "freePlan": "Free plan",
+    "freePlanDesc": "Unlimited CV creation. PDF download subject to approval.",
+    "free": "Free",
+    "pdfAccess": "PDF Download Access",
+    "pdfActive": "Active — you can download your CVs as PDF",
+    "pdfPending": "Request pending validation",
+    "pdfRejected": "Request declined",
+    "pdfNotRequested": "Not yet requested — download a CV to submit a request",
+    "rejectionReason": "Reason",
+    "dangerZone": "Danger zone",
+    "deleteAccount": "Delete my account",
+    "deleteDesc": "This action is irreversible. All your CVs will be deleted.",
+    "delete": "Delete",
+    "confirmDelete": "Confirm",
+    "deleteContact": "To delete your account, contact us at support@cvmaker.com",
+    "stats": {
+      "cvs": "CVs created",
+      "downloads": "Downloads",
+      "member": "Member since"
+    }
+  },
+  "common": {
+    "cancel": "Cancel"
   },
   "landing": {
     "title": "Create your professional CV",
@@ -497,11 +550,19 @@
     "tokyo": "Tokyo"
   },
   "settings": {
-    "title": "Customization",
+    "title": "Settings",
     "primaryColor": "Primary color",
     "titleFont": "Title font",
     "bodyFont": "Body font",
-    "preview": "Preview"
+    "preview": "Preview",
+    "appearance": "Appearance",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "language": "Language",
+    "notifications": "Notifications",
+    "notifDesc": "Email notifications will be available soon.",
+    "shortcuts": "Keyboard Shortcuts"
   },
   "export": {
     "title": "Export CV",

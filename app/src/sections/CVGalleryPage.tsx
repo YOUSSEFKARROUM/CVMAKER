@@ -1,9 +1,8 @@
 import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, Loader2, FileText, Edit3, Upload, Shield } from 'lucide-react';
+import { Plus, Trash2, Loader2, FileText, Edit3, Upload } from 'lucide-react';
 import { useCloudCV } from '../hooks/useCloudCV';
 import { useAuth } from '../hooks/useAuth';
-import { useAdmin } from '../hooks/useAdmin';
 import { Button } from '@/components/ui/button';
 import { useToast } from '../hooks/useToast';
 import { staggerContainer, fadeInUp } from '../styles/design-system';
@@ -15,7 +14,7 @@ interface CVGalleryPageProps {
   onLoadCV: (cv: { cvData: CVData; settings: CVSettings }) => void;
   onCreateNew: () => void;
   onImport: (file: File) => Promise<void>;
-  onGoToAdmin?: () => void;
+
 }
 
 function formatRelativeDate(date: Date): string {
@@ -45,9 +44,8 @@ function SkeletonCard() {
   );
 }
 
-export function CVGalleryPage({ onLoadCV, onCreateNew, onImport, onGoToAdmin }: CVGalleryPageProps) {
+export function CVGalleryPage({ onLoadCV, onCreateNew, onImport }: CVGalleryPageProps) {
   useAuth();
-  const { isAdmin } = useAdmin();
   const { cvs, loading, deleteFromCloud } = useCloudCV();
   const { success, error: showError } = useToast();
 
@@ -131,57 +129,46 @@ export function CVGalleryPage({ onLoadCV, onCreateNew, onImport, onGoToAdmin }: 
         )}
       </AnimatePresence>
 
-      {/* ── Header ──────────────────────────────────────────────────────── */}
-      <div className="border-b border-border bg-gradient-to-b from-surface-1 to-background relative overflow-hidden">
-        {/* Subtle blue glow top-right */}
-        <div className="pointer-events-none absolute top-0 right-0 w-80 h-24 bg-blue/5 blur-3xl rounded-full" />
-        <div className="relative max-w-7xl mx-auto px-6 py-7">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              {/* Accent mark */}
-              <div className="hidden sm:block w-1 h-10 rounded-full bg-gradient-to-b from-blue to-blue/20" />
-              <div>
-                <h1 className="text-2xl font-bold text-foreground tracking-tight">Mes CVs</h1>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  <span className={loading ? '' : cvs.length > 0 ? 'text-blue font-medium' : ''}>
-                    {loading
-                      ? 'Chargement…'
-                      : cvs.length === 0
-                      ? 'Aucun CV sauvegardé'
-                      : `${cvs.length} CV${cvs.length > 1 ? 's' : ''}`}
-                  </span>
-                </p>
-              </div>
+      {/* ── Page title + actions ─────────────────────────────────────────── */}
+      <div className="max-w-7xl mx-auto px-6 pt-8 pb-0">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:block w-1 h-8 rounded-full bg-gradient-to-b from-blue to-blue/20" />
+            <div>
+              <h1 className="text-2xl font-bold text-foreground tracking-tight">Mes CVs</h1>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                <span className={loading ? '' : cvs.length > 0 ? 'text-blue font-medium' : ''}>
+                  {loading
+                    ? 'Chargement…'
+                    : cvs.length === 0
+                    ? 'Aucun CV sauvegardé'
+                    : `${cvs.length} CV${cvs.length > 1 ? 's' : ''}`}
+                </span>
+              </p>
             </div>
+          </div>
 
-            <div className="flex items-center gap-2">
-              {isAdmin && onGoToAdmin && (
-                <Button variant="outline" size="sm" onClick={onGoToAdmin} className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-950">
-                  <Shield className="w-3.5 h-3.5" />
-                  Admin
-                </Button>
-              )}
-              <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleFileChange} />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isImporting}
-              >
-                {isImporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-                {isImporting ? 'Import…' : 'Importer JSON'}
-              </Button>
-              <Button variant="blue" size="sm" onClick={onCreateNew}>
-                <Plus className="w-3.5 h-3.5" />
-                Nouveau CV
-              </Button>
-            </div>
+          <div className="flex items-center gap-2">
+            <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleFileChange} />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isImporting}
+            >
+              {isImporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+              {isImporting ? 'Import…' : 'Importer JSON'}
+            </Button>
+            <Button variant="blue" size="sm" onClick={onCreateNew}>
+              <Plus className="w-3.5 h-3.5" />
+              Nouveau CV
+            </Button>
           </div>
         </div>
       </div>
 
       {/* ── Content ─────────────────────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 pb-8">
 
         {/* ── Skeleton loading ────────────────────────────────────────── */}
         {loading && (

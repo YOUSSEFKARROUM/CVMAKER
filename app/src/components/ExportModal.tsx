@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { exportCVToPDF, exportToImage, downloadImage, printCV } from '../utils/pdfExport';
 import { useToast } from '../hooks/useToast';
 import { colors } from '../styles/design-system';
+import { supabase } from '../supabase/client';
 
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID as string | undefined;
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL as string | undefined;
@@ -77,9 +78,28 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
 
     setIsExporting(true);
     try {
-      // Utiliser la fonction optimisée pour les CV (A4 exact)
       await exportCVToPDF(previewElement, `${filename}.pdf`);
       success('PDF exporté avec succès !');
+      // Incrémenter le compteur de téléchargements
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('total_downloads')
+            .eq('id', user.id)
+            .single();
+          await supabase
+            .from('profiles')
+            .update({
+              total_downloads: (profile?.total_downloads || 0) + 1,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', user.id);
+        }
+      } catch (err) {
+        console.warn('Failed to increment download count:', err);
+      }
     } catch (err) {
       error('Erreur lors de l\'export PDF');
     } finally {

@@ -1,4 +1,25 @@
 -- ══════════════════════════════════════════
+-- NETTOYAGE (safe à relancer — DROP IF EXISTS)
+-- ══════════════════════════════════════════
+DROP POLICY IF EXISTS "Users can view own profile"       ON public.profiles;
+DROP POLICY IF EXISTS "Admin can view all profiles"      ON public.profiles;
+DROP POLICY IF EXISTS "Admin can update all profiles"    ON public.profiles;
+DROP POLICY IF EXISTS "Users can update own profile"     ON public.profiles;
+DROP POLICY IF EXISTS "Users can view own requests"      ON public.download_requests;
+DROP POLICY IF EXISTS "Users can insert own requests"    ON public.download_requests;
+DROP POLICY IF EXISTS "Admin can view all requests"      ON public.download_requests;
+DROP POLICY IF EXISTS "Admin can update all requests"    ON public.download_requests;
+DROP POLICY IF EXISTS "Admin can view audit log"         ON public.admin_audit_log;
+DROP POLICY IF EXISTS "Admin can insert audit log"       ON public.admin_audit_log;
+
+DROP INDEX IF EXISTS idx_profiles_role;
+DROP INDEX IF EXISTS idx_profiles_email;
+DROP INDEX IF EXISTS idx_download_requests_status;
+DROP INDEX IF EXISTS idx_download_requests_user;
+DROP INDEX IF EXISTS idx_audit_log_admin;
+DROP INDEX IF EXISTS idx_audit_log_created;
+
+-- ══════════════════════════════════════════
 -- TABLE : profiles (infos étendues des users)
 -- ══════════════════════════════════════════
 CREATE TABLE IF NOT EXISTS public.profiles (
@@ -36,7 +57,7 @@ CREATE OR REPLACE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- ══════════════════════════════════════════
--- TABLE : download_requests (demandes de téléchargement PDF)
+-- TABLE : download_requests
 -- ══════════════════════════════════════════
 CREATE TABLE IF NOT EXISTS public.download_requests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -51,7 +72,7 @@ CREATE TABLE IF NOT EXISTS public.download_requests (
 );
 
 -- ══════════════════════════════════════════
--- TABLE : admin_audit_log (traçabilité des actions admin)
+-- TABLE : admin_audit_log
 -- ══════════════════════════════════════════
 CREATE TABLE IF NOT EXISTS public.admin_audit_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -14,6 +14,9 @@ import { ProfileForm } from './sections/ProfileForm';
 import { FinishForm } from './sections/FinishForm';
 import { DownloadPage } from './sections/DownloadPage';
 import AdminDashboard from './admin/AdminDashboard';
+import AppHeader from './components/AppHeader';
+import ProfilePage from './sections/ProfilePage';
+import SettingsPage from './sections/SettingsPage';
 import { CVPreview } from './components/CVPreview';
 import { ProgressBar } from './components/ProgressBar';
 import { ConfirmationModal } from './components/ConfirmationModal';
@@ -650,7 +653,6 @@ function App() {
                 success('CV importé avec succès');
                 setCurrentStep('contact');
               }}
-              onGoToAdmin={() => setCurrentStep('admin')}
             />
           );
         case 'landing':
@@ -812,6 +814,10 @@ function App() {
               onBack={() => setCurrentStep('my-cvs')}
             />
           );
+        case 'profile-page':
+          return <ProfilePage />;
+        case 'settings-page':
+          return <SettingsPage />;
         default:
           return null;
       }
@@ -828,8 +834,9 @@ function App() {
     );
   };
 
-  const showPreview = currentStep !== 'landing' && currentStep !== 'download' && currentStep !== 'my-cvs' && currentStep !== 'admin';
-  const showProgress = currentStep !== 'landing' && currentStep !== 'download' && currentStep !== 'my-cvs' && currentStep !== 'admin';
+  const noLayoutPages: Step[] = ['landing', 'download', 'my-cvs', 'admin', 'profile-page', 'settings-page'];
+  const showPreview = !noLayoutPages.includes(currentStep);
+  const showProgress = !noLayoutPages.includes(currentStep);
 
   // Sidebar avec VerticalStepper
   const sidebar = showProgress ? (
@@ -845,6 +852,9 @@ function App() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background transition-colors duration-300">
+        {isAuthenticated && currentStep !== 'landing' && !showProgress && (
+          <AppHeader onNavigate={setCurrentStep} currentStep={currentStep} />
+        )}
         {showProgress && (
           <ProgressBar
             steps={steps}

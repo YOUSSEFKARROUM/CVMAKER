@@ -226,6 +226,7 @@ export function DownloadPage({ cvData, settings, setSettings, onHomeClick, onBac
   const { isAdmin } = useAdmin();
   const [hasAccess, setHasAccess] = useState(false);
   const [requestStatus, setRequestStatus] = useState<string | null>(null);
+  const [latestAdminNote, setLatestAdminNote] = useState<string | null>(null);
   const [accessLoading, setAccessLoading] = useState(true);
 
   useEffect(() => {
@@ -239,7 +240,11 @@ export function DownloadPage({ cvData, settings, setSettings, onHomeClick, onBac
       try {
         const [access, requests] = await Promise.all([canUserDownload(), getMyRequests()]);
         setHasAccess(access);
-        if (requests.length > 0) setRequestStatus((requests[0] as { status: string }).status);
+        if (requests.length > 0) {
+          const latest = requests[0] as { status: string; admin_note?: string };
+          setRequestStatus(latest.status);
+          setLatestAdminNote(latest.admin_note ?? null);
+        }
       } finally {
         setAccessLoading(false);
       }
@@ -316,27 +321,32 @@ export function DownloadPage({ cvData, settings, setSettings, onHomeClick, onBac
               En attente de validation…
             </Button>
           ) : (
-            <Button
-              size="sm"
-              variant="blue"
-              disabled={accessLoading}
-              onClick={async () => {
-                if (requestStatus === 'rejected') {
-                  showError('Votre demande précédente a été refusée. Soumission d\'une nouvelle demande…');
-                }
-                try {
-                  const cvName = [cvData.contact.firstName, cvData.contact.lastName].filter(Boolean).join(' ') || 'Mon CV';
-                  await requestDownload(cvName, settings.template);
-                  setRequestStatus('pending');
-                  info('Demande envoyée ! L\'administrateur validera votre accès sous 24h.');
-                } catch {
-                  showError('Erreur lors de l\'envoi de la demande');
-                }
-              }}
-            >
-              <Send className="w-3.5 h-3.5" />
-              Demander l'accès PDF
-            </Button>
+            <div className="flex flex-col items-end gap-1">
+              <Button
+                size="sm"
+                variant="blue"
+                disabled={accessLoading}
+                onClick={async () => {
+                  try {
+                    const cvName = [cvData.contact.firstName, cvData.contact.lastName].filter(Boolean).join(' ') || 'Mon CV';
+                    await requestDownload(cvName, settings.template);
+                    setRequestStatus('pending');
+                    setLatestAdminNote(null);
+                    info('Demande envoyée ! L\'administrateur validera votre accès sous 24h.');
+                  } catch {
+                    showError('Erreur lors de l\'envoi de la demande');
+                  }
+                }}
+              >
+                <Send className="w-3.5 h-3.5" />
+                {requestStatus === 'rejected' ? 'Faire une nouvelle demande' : 'Demander l\'accès PDF'}
+              </Button>
+              {requestStatus === 'rejected' && latestAdminNote && (
+                <p className="text-xs text-destructive text-right max-w-48">
+                  Refusé : {latestAdminNote}
+                </p>
+              )}
+            </div>
           )}
         </div>
       </div>

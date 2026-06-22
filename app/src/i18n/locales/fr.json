@@ -66,7 +66,60 @@
     "import": "Importer",
     "close": "Fermer",
     "progress": "Progression",
-    "view": "Vue"
+    "view": "Vue",
+    "myCVs": "Mes CVs",
+    "profile": "Mon profil"
+  },
+  "menu": {
+    "profile": "Mon profil",
+    "settings": "Paramètres",
+    "plan": "Mon plan",
+    "theme": "Thème",
+    "language": "Langue",
+    "admin": "Dashboard Admin",
+    "logout": "Se déconnecter"
+  },
+  "profile": {
+    "personalInfo": "Informations personnelles",
+    "displayName": "Nom d'affichage",
+    "namePlaceholder": "Votre nom complet",
+    "nameUpdated": "Nom mis à jour",
+    "nameError": "Erreur lors de la mise à jour",
+    "email": "Adresse e-mail",
+    "emailReadonly": "Non modifiable",
+    "security": "Sécurité",
+    "changePassword": "Changer le mot de passe",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le nouveau mot de passe",
+    "updatePassword": "Mettre à jour",
+    "passwordChanged": "Mot de passe modifié",
+    "passwordError": "Erreur lors du changement de mot de passe",
+    "pwdTooShort": "Le mot de passe doit faire au moins 8 caractères",
+    "pwdMismatch": "Les mots de passe ne correspondent pas",
+    "plan": "Mon plan",
+    "freePlan": "Plan gratuit",
+    "freePlanDesc": "Création illimitée de CVs. Téléchargement PDF sur approbation.",
+    "free": "Gratuit",
+    "pdfAccess": "Accès téléchargement PDF",
+    "pdfActive": "Actif — vous pouvez télécharger vos CVs en PDF",
+    "pdfPending": "Demande en attente de validation",
+    "pdfRejected": "Demande refusée",
+    "pdfNotRequested": "Pas encore demandé — téléchargez un CV pour soumettre une demande",
+    "rejectionReason": "Raison",
+    "dangerZone": "Zone dangereuse",
+    "deleteAccount": "Supprimer mon compte",
+    "deleteDesc": "Cette action est irréversible. Tous vos CVs seront supprimés.",
+    "delete": "Supprimer",
+    "confirmDelete": "Confirmer",
+    "deleteContact": "Pour supprimer votre compte, contactez-nous à support@cvmaker.com",
+    "stats": {
+      "cvs": "CVs créés",
+      "downloads": "Téléchargements",
+      "member": "Membre depuis"
+    }
+  },
+  "common": {
+    "cancel": "Annuler"
   },
   "zen": {
     "title": "Mode Zen",
@@ -497,11 +550,19 @@
     "tokyo": "Tokyo"
   },
   "settings": {
-    "title": "Personnalisation",
+    "title": "Paramètres",
     "primaryColor": "Couleur principale",
     "titleFont": "Police des titres",
     "bodyFont": "Police du texte",
-    "preview": "Aperçu"
+    "preview": "Aperçu",
+    "appearance": "Apparence",
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système",
+    "language": "Langue",
+    "notifications": "Notifications",
+    "notifDesc": "Les notifications par email seront disponibles prochainement.",
+    "shortcuts": "Raccourcis clavier"
   },
   "export": {
     "title": "Exporter le CV",

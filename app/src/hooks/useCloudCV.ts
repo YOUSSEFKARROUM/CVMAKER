@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useAuth } from './useAuth';
+import { supabase } from '../supabase/client';
 import type { CVData, CVSettings } from '../types/cv';
 
 export interface SavedCV {
@@ -155,7 +156,27 @@ export function useCloudCV(): UseCloudCVReturn {
 
       // Sauvegarder dans le localStorage
       saveToStorage(user.uid, existingCVs);
-      
+
+      // Incrémenter le compteur en DB seulement pour les nouveaux CVs
+      if (existingIndex < 0) {
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('total_cvs_created')
+            .eq('id', user.uid)
+            .single();
+          await supabase
+            .from('profiles')
+            .update({
+              total_cvs_created: (profile?.total_cvs_created || 0) + 1,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', user.uid);
+        } catch (err) {
+          console.warn('Failed to increment CV count:', err);
+        }
+      }
+
       // Invalider le cache
       cache.delete(user.uid);
       await refreshCVs(true);

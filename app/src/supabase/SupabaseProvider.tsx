@@ -35,7 +35,7 @@ function sessionToUser(session: Session | null) {
   return {
     id: u.id,
     email: u.email ?? '',
-    displayName: (u.user_metadata?.display_name as string) || u.email?.split('@')[0] || '',
+    displayName: (u.user_metadata?.displayName as string) || u.email?.split('@')[0] || '',
     token: session.access_token,
   };
 }
@@ -120,7 +120,7 @@ export function SupabaseProvider({ children }: { children: ReactNode }) {
       const { data, error: authError } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { display_name: displayName } },
+        options: { data: { displayName: displayName } },
       });
       if (authError) throw authError;
 
