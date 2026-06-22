@@ -53,18 +53,20 @@ export function ProgressBar({
 
   const getStepLabel = (step: Exclude<Step, 'landing' | 'download'>): string => {
     const labelMap: Record<Exclude<Step, 'landing' | 'download'>, string> = {
-      'my-cvs':       t('steps.myCvs', 'Mes CVs'),
-      admin:          'Admin',
-      contact:        t('steps.contact'),
-      experience:     t('steps.experience'),
-      education:      t('steps.education'),
-      skills:         t('steps.skills'),
-      languages:      t('steps.languages'),
-      certifications: t('steps.certifications'),
-      projects:       t('steps.projects'),
-      interests:      t('steps.interests'),
-      profile:        t('steps.profile'),
-      finish:         t('steps.finish'),
+      'my-cvs':        t('steps.myCvs', 'Mes CVs'),
+      admin:           'Admin',
+      'profile-page':  t('menu.profile', 'Mon profil'),
+      'settings-page': t('menu.settings', 'Paramètres'),
+      contact:         t('steps.contact'),
+      experience:      t('steps.experience'),
+      education:       t('steps.education'),
+      skills:          t('steps.skills'),
+      languages:       t('steps.languages'),
+      certifications:  t('steps.certifications'),
+      projects:        t('steps.projects'),
+      interests:       t('steps.interests'),
+      profile:         t('steps.profile'),
+      finish:          t('steps.finish'),
     };
     return labelMap[step];
   };
