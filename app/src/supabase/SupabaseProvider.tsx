@@ -76,22 +76,27 @@ export function SupabaseProvider({ children }: { children: ReactNode }) {
       if (authError) throw authError;
 
       if (data.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('is_banned, ban_reason')
-          .eq('id', data.user.id)
-          .single();
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('is_banned, ban_reason')
+            .eq('id', data.user.id)
+            .single();
 
-        if (profile?.is_banned) {
-          await supabase.auth.signOut();
-          const reason = profile.ban_reason ? ` : ${profile.ban_reason}` : '';
-          throw new Error(`Compte suspendu${reason}`);
+          if (profile?.is_banned) {
+            await supabase.auth.signOut();
+            const reason = profile.ban_reason ? ` : ${profile.ban_reason}` : '';
+            throw new Error(`Compte suspendu${reason}`);
+          }
+
+          await supabase
+            .from('profiles')
+            .update({ last_login_at: new Date().toISOString() })
+            .eq('id', data.user.id);
+        } catch (profileErr: any) {
+          // Si la table profiles n'existe pas encore, on laisse le login passer
+          if (profileErr?.message?.includes('suspendu')) throw profileErr;
         }
-
-        await supabase
-          .from('profiles')
-          .update({ last_login_at: new Date().toISOString() })
-          .eq('id', data.user.id);
       }
     } catch (err: any) {
       let message: string = err.message || 'Identifiants incorrects';
