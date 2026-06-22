@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, LogOut, FileText, Cloud, ChevronDown, LayoutGrid, Loader2 } from 'lucide-react';
+import { User, LogOut, FileText, Cloud, ChevronDown, LayoutGrid, Loader2, Shield } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { useCloudCV } from '../hooks/useCloudCV';
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { AuthModal } from './AuthModal';
 import { CVDashboard } from './CVDashboard';
+import { useAdmin } from '../hooks/useAdmin';
 import type { CVData, CVSettings } from '../types/cv';
 
 interface UserMenuProps {
@@ -23,11 +24,13 @@ interface UserMenuProps {
   onLoadCV?: (cv: { cvData: CVData; settings: CVSettings }) => void;
   onCreateNew?: () => void;
   onEditCV?: (cvId: string, cvData: CVData, settings: CVSettings) => void;
+  onGoToAdmin?: () => void;
 }
 
-export function UserMenu({ cvData, settings, onLoadCV, onCreateNew, onEditCV }: UserMenuProps) {
+export function UserMenu({ cvData, settings, onLoadCV, onCreateNew, onEditCV, onGoToAdmin }: UserMenuProps) {
   const { t } = useTranslation();
   const { user, isAuthenticated, logout } = useAuth();
+  const { isAdmin } = useAdmin();
   const { cvs, saveToCloud, loadFromCloud, loading, isCloudEnabled } = useCloudCV();
   const { success, error: showError } = useToast();
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -155,6 +158,19 @@ export function UserMenu({ cvData, settings, onLoadCV, onCreateNew, onEditCV }: 
                   : <Cloud className="w-3.5 h-3.5 text-blue" />}
                 {t('cloud.save')}
               </DropdownMenuItem>
+            )}
+
+            {isAdmin && onGoToAdmin && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={onGoToAdmin}
+                  className="gap-2 cursor-pointer text-red-600 focus:text-red-600"
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  Dashboard Admin
+                </DropdownMenuItem>
+              </>
             )}
 
             <DropdownMenuSeparator />

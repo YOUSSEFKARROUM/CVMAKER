@@ -13,6 +13,7 @@ import { InterestsForm } from './sections/InterestsForm';
 import { ProfileForm } from './sections/ProfileForm';
 import { FinishForm } from './sections/FinishForm';
 import { DownloadPage } from './sections/DownloadPage';
+import AdminDashboard from './admin/AdminDashboard';
 import { CVPreview } from './components/CVPreview';
 import { ProgressBar } from './components/ProgressBar';
 import { ConfirmationModal } from './components/ConfirmationModal';
@@ -804,6 +805,12 @@ function App() {
               onBack={() => setCurrentStep('finish')}
             />
           );
+        case 'admin':
+          return (
+            <AdminDashboard
+              onBack={() => setCurrentStep('my-cvs')}
+            />
+          );
         default:
           return null;
       }
@@ -820,8 +827,8 @@ function App() {
     );
   };
 
-  const showPreview = currentStep !== 'landing' && currentStep !== 'download' && currentStep !== 'my-cvs';
-  const showProgress = currentStep !== 'landing' && currentStep !== 'download' && currentStep !== 'my-cvs';
+  const showPreview = currentStep !== 'landing' && currentStep !== 'download' && currentStep !== 'my-cvs' && currentStep !== 'admin';
+  const showProgress = currentStep !== 'landing' && currentStep !== 'download' && currentStep !== 'my-cvs' && currentStep !== 'admin';
 
   // Sidebar avec VerticalStepper
   const sidebar = showProgress ? (
@@ -854,6 +861,7 @@ function App() {
             onZenToggle={() => setIsZenMode(!isZenMode)}
             onExport={handleExport}
             onReset={handleReset}
+            onGoToAdmin={() => setCurrentStep('admin')}
             onHomeClick={() => {
               const hasData = cvData.contact.firstName || 
                               cvData.contact.lastName || 

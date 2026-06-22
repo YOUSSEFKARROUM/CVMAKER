@@ -28,6 +28,7 @@ interface ProgressBarProps {
   onZenToggle?: () => void;
   onExport?: () => void;
   onReset?: () => void;
+  onGoToAdmin?: () => void;
 }
 
 export function ProgressBar({
@@ -43,6 +44,7 @@ export function ProgressBar({
   onZenToggle,
   onExport,
   onReset,
+  onGoToAdmin,
 }: ProgressBarProps) {
   const { t, i18n } = useTranslation();
   const { theme, setTheme } = useTheme();
@@ -52,6 +54,7 @@ export function ProgressBar({
   const getStepLabel = (step: Exclude<Step, 'landing' | 'download'>): string => {
     const labelMap: Record<Exclude<Step, 'landing' | 'download'>, string> = {
       'my-cvs':       t('steps.myCvs', 'Mes CVs'),
+      admin:          'Admin',
       contact:        t('steps.contact'),
       experience:     t('steps.experience'),
       education:      t('steps.education'),
@@ -179,6 +182,7 @@ export function ProgressBar({
                 onLoadCV={onLoadCV}
                 onEditCV={onEditCV}
                 onCreateNew={onCreateNew}
+                onGoToAdmin={onGoToAdmin}
               />
             )}
           </div>

@@ -72,8 +72,27 @@ export function SupabaseProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       setError(null);
-      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
       if (authError) throw authError;
+
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_banned, ban_reason')
+          .eq('id', data.user.id)
+          .single();
+
+        if (profile?.is_banned) {
+          await supabase.auth.signOut();
+          const reason = profile.ban_reason ? ` : ${profile.ban_reason}` : '';
+          throw new Error(`Compte suspendu${reason}`);
+        }
+
+        await supabase
+          .from('profiles')
+          .update({ last_login_at: new Date().toISOString() })
+          .eq('id', data.user.id);
+      }
     } catch (err: any) {
       let message: string = err.message || 'Identifiants incorrects';
       if (message.includes('Invalid login credentials')) message = 'Email ou mot de passe incorrect';

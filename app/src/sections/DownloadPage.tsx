@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Check, Download, FileText, Home } from 'lucide-react';
+import { ArrowLeft, Check, Clock, Download, FileText, Home, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CVPreview } from '../components/CVPreview';
 import { ExportModal } from '../components/ExportModal';
 import { ConfettiEffect } from '../components/ConfettiEffect';
 import { useToast } from '../hooks/useToast';
+import { useDownloadRequest } from '../hooks/useDownloadRequest';
+import { useAdmin } from '../hooks/useAdmin';
 import type { CVData, CVSettings } from '../types/cv';
 import { SortableList } from '../components/SortableList';
 import { DEFAULT_SECTION_ORDER, type LayoutSectionId } from '../components/templates/utils';
@@ -219,11 +221,30 @@ export function DownloadPage({ cvData, settings, setSettings, onHomeClick, onBac
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [showConfetti, setShowConfetti] = useState(true);
   const previewRef = useRef<HTMLDivElement>(null);
-  const { success } = useToast();
+  const { success, info, error: showError } = useToast();
+  const { canUserDownload, requestDownload, getMyRequests } = useDownloadRequest();
+  const { isAdmin } = useAdmin();
+  const [hasAccess, setHasAccess] = useState(false);
+  const [requestStatus, setRequestStatus] = useState<string | null>(null);
+  const [accessLoading, setAccessLoading] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowConfetti(false), 3000);
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    async function checkAccess() {
+      setAccessLoading(true);
+      try {
+        const [access, requests] = await Promise.all([canUserDownload(), getMyRequests()]);
+        setHasAccess(access);
+        if (requests.length > 0) setRequestStatus((requests[0] as { status: string }).status);
+      } finally {
+        setAccessLoading(false);
+      }
+    }
+    checkAccess();
   }, []);
 
   const getFilename = () => `CV-${cvData.contact.firstName}-${cvData.contact.lastName}`;
@@ -279,15 +300,44 @@ export function DownloadPage({ cvData, settings, setSettings, onHomeClick, onBac
             <ArrowLeft className="w-3.5 h-3.5" />
             Revenir en arrière
           </Button>
-          <Button
-            size="sm"
-            variant="blue"
-            onClick={() => setIsExportModalOpen(true)}
-            disabled={!resolvedPreviewElement}
-          >
-            <Download className="w-3.5 h-3.5" />
-            Télécharger
-          </Button>
+          {(hasAccess || isAdmin) ? (
+            <Button
+              size="sm"
+              variant="blue"
+              onClick={() => setIsExportModalOpen(true)}
+              disabled={!resolvedPreviewElement || accessLoading}
+            >
+              <Download className="w-3.5 h-3.5" />
+              Télécharger
+            </Button>
+          ) : requestStatus === 'pending' ? (
+            <Button size="sm" variant="outline" disabled>
+              <Clock className="w-3.5 h-3.5" />
+              En attente de validation…
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              variant="blue"
+              disabled={accessLoading}
+              onClick={async () => {
+                if (requestStatus === 'rejected') {
+                  showError('Votre demande précédente a été refusée. Soumission d\'une nouvelle demande…');
+                }
+                try {
+                  const cvName = [cvData.contact.firstName, cvData.contact.lastName].filter(Boolean).join(' ') || 'Mon CV';
+                  await requestDownload(cvName, settings.template);
+                  setRequestStatus('pending');
+                  info('Demande envoyée ! L\'administrateur validera votre accès sous 24h.');
+                } catch {
+                  showError('Erreur lors de l\'envoi de la demande');
+                }
+              }}
+            >
+              <Send className="w-3.5 h-3.5" />
+              Demander l'accès PDF
+            </Button>
+          )}
         </div>
       </div>
 
