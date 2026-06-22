@@ -1,8 +1,9 @@
 import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, Loader2, FileText, Edit3, Upload } from 'lucide-react';
+import { Plus, Trash2, Loader2, FileText, Edit3, Upload, Shield } from 'lucide-react';
 import { useCloudCV } from '../hooks/useCloudCV';
 import { useAuth } from '../hooks/useAuth';
+import { useAdmin } from '../hooks/useAdmin';
 import { Button } from '@/components/ui/button';
 import { useToast } from '../hooks/useToast';
 import { staggerContainer, fadeInUp } from '../styles/design-system';
@@ -14,6 +15,7 @@ interface CVGalleryPageProps {
   onLoadCV: (cv: { cvData: CVData; settings: CVSettings }) => void;
   onCreateNew: () => void;
   onImport: (file: File) => Promise<void>;
+  onGoToAdmin?: () => void;
 }
 
 function formatRelativeDate(date: Date): string {
@@ -43,8 +45,9 @@ function SkeletonCard() {
   );
 }
 
-export function CVGalleryPage({ onLoadCV, onCreateNew, onImport }: CVGalleryPageProps) {
+export function CVGalleryPage({ onLoadCV, onCreateNew, onImport, onGoToAdmin }: CVGalleryPageProps) {
   useAuth();
+  const { isAdmin } = useAdmin();
   const { cvs, loading, deleteFromCloud } = useCloudCV();
   const { success, error: showError } = useToast();
 
@@ -152,6 +155,12 @@ export function CVGalleryPage({ onLoadCV, onCreateNew, onImport }: CVGalleryPage
             </div>
 
             <div className="flex items-center gap-2">
+              {isAdmin && onGoToAdmin && (
+                <Button variant="outline" size="sm" onClick={onGoToAdmin} className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-950">
+                  <Shield className="w-3.5 h-3.5" />
+                  Admin
+                </Button>
+              )}
               <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleFileChange} />
               <Button
                 variant="outline"

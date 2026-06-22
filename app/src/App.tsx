@@ -650,6 +650,7 @@ function App() {
                 success('CV importé avec succès');
                 setCurrentStep('contact');
               }}
+              onGoToAdmin={() => setCurrentStep('admin')}
             />
           );
         case 'landing':
