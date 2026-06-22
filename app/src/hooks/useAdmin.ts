@@ -1,12 +1,27 @@
+import { useEffect, useState } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '../supabase/client';
 
-const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL as string;
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL as string | undefined;
 
 export function useAdmin() {
   const { user, isAuthenticated } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  const isAdmin = isAuthenticated && user?.email === ADMIN_EMAIL;
+  useEffect(() => {
+    if (!isAuthenticated || !user) { setIsAdmin(false); return; }
+
+    // Vérification rapide par email (marche en local si .env défini)
+    if (ADMIN_EMAIL && user.email === ADMIN_EMAIL) { setIsAdmin(true); return; }
+
+    // Vérification par rôle en base (marche sur Vercel même sans env var)
+    supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.uid)
+      .single()
+      .then(({ data }) => setIsAdmin(data?.role === 'admin'));
+  }, [isAuthenticated, user?.uid]);
 
   async function getAllUsers() {
     const { data, error } = await supabase
