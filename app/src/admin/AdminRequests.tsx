@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useAdmin } from '../hooks/useAdmin';
 import { toast } from 'sonner';
+import AdminPromptModal from './AdminPromptModal';
 
 type StatusFilter = 'pending' | 'approved' | 'rejected' | 'all';
 
@@ -43,6 +44,8 @@ export default function AdminRequests() {
   const [filter, setFilter] = useState<StatusFilter>('pending');
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [approveTarget, setApproveTarget] = useState<DownloadRequest | null>(null);
+  const [rejectTarget, setRejectTarget] = useState<DownloadRequest | null>(null);
 
   useEffect(() => { loadRequests(); }, [filter]);
 
@@ -56,11 +59,13 @@ export default function AdminRequests() {
     }
   }
 
-  async function handleApprove(req: DownloadRequest) {
+  async function handleApproveConfirm(note: string) {
+    if (!approveTarget) return;
+    const req = approveTarget;
+    setApproveTarget(null);
     setProcessingId(req.id);
-    const note = window.prompt('Note pour l\'utilisateur (optionnel) :') ?? undefined;
     try {
-      await approveRequest(req.id, req.user_id, note);
+      await approveRequest(req.id, req.user_id, note || undefined);
       await loadRequests();
       toast.success(`Demande approuvée pour ${req.profiles?.email ?? req.user_id}`);
     } catch {
@@ -70,9 +75,10 @@ export default function AdminRequests() {
     }
   }
 
-  async function handleReject(req: DownloadRequest) {
-    const note = window.prompt('Raison du refus :');
-    if (!note) return;
+  async function handleRejectConfirm(note: string) {
+    if (!rejectTarget) return;
+    const req = rejectTarget;
+    setRejectTarget(null);
     setProcessingId(req.id);
     try {
       await rejectRequest(req.id, req.user_id, note);
@@ -167,7 +173,7 @@ export default function AdminRequests() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleReject(req)}
+                    onClick={() => setRejectTarget(req)}
                     disabled={processingId === req.id}
                     className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                   >
@@ -176,7 +182,7 @@ export default function AdminRequests() {
                   <Button
                     variant="blue"
                     size="sm"
-                    onClick={() => handleApprove(req)}
+                    onClick={() => setApproveTarget(req)}
                     disabled={processingId === req.id}
                   >
                     Approuver
@@ -193,6 +199,30 @@ export default function AdminRequests() {
           )}
         </div>
       )}
+
+      <AdminPromptModal
+        open={approveTarget !== null}
+        onClose={() => setApproveTarget(null)}
+        onConfirm={handleApproveConfirm}
+        title="Approuver la demande"
+        description="Vous pouvez ajouter une note optionnelle pour l'utilisateur."
+        placeholder="Note pour l'utilisateur (optionnel)..."
+        confirmLabel="Approuver"
+        confirmVariant="blue"
+        required={false}
+      />
+
+      <AdminPromptModal
+        open={rejectTarget !== null}
+        onClose={() => setRejectTarget(null)}
+        onConfirm={handleRejectConfirm}
+        title="Refuser la demande"
+        description="Indiquez la raison du refus. Elle sera visible par l'utilisateur."
+        placeholder="Raison du refus..."
+        confirmLabel="Refuser"
+        confirmVariant="destructive"
+        required
+      />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAdmin } from '../hooks/useAdmin';
+import AdminPromptModal from './AdminPromptModal';
 
 type FilterType = 'all' | 'active' | 'banned' | 'pdf-access';
 
@@ -34,6 +35,7 @@ export default function AdminUsers() {
   const [filter, setFilter] = useState<FilterType>('all');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [banTarget, setBanTarget] = useState<Profile | null>(null);
 
   useEffect(() => { loadUsers(); }, []);
 
@@ -57,15 +59,15 @@ export default function AdminUsers() {
     }
   }
 
-  async function handleBan(user: Profile) {
-    const reason = window.prompt('Raison du bannissement :');
-    if (!reason) return;
-    setActionLoading(user.id);
+  async function handleBanConfirm(reason: string) {
+    if (!banTarget) return;
+    setActionLoading(banTarget.id);
     try {
-      await banUser(user.id, reason);
+      await banUser(banTarget.id, reason);
       await loadUsers();
     } finally {
       setActionLoading(null);
+      setBanTarget(null);
     }
   }
 
@@ -226,7 +228,7 @@ export default function AdminUsers() {
                             </DropdownMenuItem>
                           ) : (
                             <DropdownMenuItem
-                              onClick={() => handleBan(u)}
+                              onClick={() => setBanTarget(u)}
                               className="gap-2 cursor-pointer text-destructive focus:text-destructive"
                             >
                               <Ban className="w-4 h-4" />
@@ -248,6 +250,18 @@ export default function AdminUsers() {
           </div>
         )}
       </div>
+
+      <AdminPromptModal
+        open={banTarget !== null}
+        onClose={() => setBanTarget(null)}
+        onConfirm={handleBanConfirm}
+        title="Bannir l'utilisateur"
+        description="Cette action empêchera l'utilisateur de se connecter."
+        placeholder="Raison du bannissement..."
+        confirmLabel="Bannir"
+        confirmVariant="destructive"
+        required
+      />
     </div>
   );
 }
