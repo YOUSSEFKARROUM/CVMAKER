@@ -15,7 +15,7 @@ export const OtagoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
     );
 
     const getContactField = (field: string): string | undefined => {
-      return (contact as Record<string, unknown>)[field] as string | undefined;
+      return (contact as unknown as Record<string, unknown>)[field] as string | undefined;
     };
 
     return (
