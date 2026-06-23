@@ -154,3 +154,27 @@ CREATE INDEX idx_download_requests_status ON public.download_requests(status);
 CREATE INDEX idx_download_requests_user ON public.download_requests(user_id);
 CREATE INDEX idx_audit_log_admin ON public.admin_audit_log(admin_id);
 CREATE INDEX idx_audit_log_created ON public.admin_audit_log(created_at DESC);
+
+-- ══════════════════════════════════════════
+-- TABLE : saved_cvs (CVs persistés en Supabase)
+-- ══════════════════════════════════════════
+DROP POLICY IF EXISTS "Users CRUD own CVs" ON public.saved_cvs;
+DROP INDEX IF EXISTS idx_saved_cvs_user;
+
+CREATE TABLE IF NOT EXISTS public.saved_cvs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL DEFAULT 'Mon CV',
+  cv_data JSONB NOT NULL,
+  settings JSONB NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.saved_cvs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users CRUD own CVs" ON public.saved_cvs
+  FOR ALL USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE INDEX IF NOT EXISTS idx_saved_cvs_user ON public.saved_cvs(user_id);
