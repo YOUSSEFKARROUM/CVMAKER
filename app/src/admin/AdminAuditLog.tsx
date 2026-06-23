@@ -66,7 +66,14 @@ export default function AdminAuditLog() {
                     )}
                     {log.details && (
                       <span className="ml-2 text-xs opacity-70">
-                        {JSON.stringify(log.details).slice(0, 100)}
+                        {log.details.note && <span>Note : {log.details.note}</span>}
+                        {log.details.reason && <span>Raison : {log.details.reason}</span>}
+                        {log.details.requestId && (
+                          <span className="font-mono opacity-50 ml-1">
+                            (#{String(log.details.requestId).slice(0, 8)})
+                          </span>
+                        )}
+                        {!log.details.note && !log.details.reason && <span>—</span>}
                       </span>
                     )}
                   </div>

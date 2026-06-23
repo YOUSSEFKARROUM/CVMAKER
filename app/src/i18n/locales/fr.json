@@ -6,13 +6,25 @@
   "common": {
     "step": "Étape",
     "notSpecified": "Non spécifié",
-    "unknown": "Inconnu",
+    "unknown": "",
     "loading": "Chargement...",
     "current": "En cours",
     "completed": "Complété",
     "required": "Requis",
     "optional": "Optionnel",
-    "present": "Présent"
+    "present": "Présent",
+    "save": "Sauvegarder",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "next": "Suivant",
+    "back": "Retour",
+    "close": "Fermer",
+    "search": "Rechercher",
+    "confirm": "Confirmer",
+    "yes": "Oui",
+    "no": "Non"
   },
   "template": {
     "profile": "Profil",
@@ -117,9 +129,6 @@
       "downloads": "Téléchargements",
       "member": "Membre depuis"
     }
-  },
-  "common": {
-    "cancel": "Annuler"
   },
   "zen": {
     "title": "Mode Zen",
@@ -291,7 +300,7 @@
     "templates": {
       "title": "Des modèles professionnels, prêts à l'emploi",
       "subtitle": "19 templates conçus pour maximiser vos chances. Choisissez, personnalisez, téléchargez.",
-      "showAll": "Voir les {count} autres modèles"
+      "showAll": "Voir les {{count}} autres modèles"
     }
   },
   "steps": {

@@ -38,7 +38,7 @@ function FormField({
       {label && (
         <label
           htmlFor={id}
-          className="block text-xs font-medium uppercase tracking-wider text-muted-foreground"
+          className="block text-sm font-medium text-foreground mb-1"
         >
           {label}
           {required && (

@@ -48,9 +48,10 @@ interface ExportModalProps {
   onClose: () => void;
   previewElement: HTMLElement | null;
   filename: string;
+  onSuccess?: () => void;
 }
 
-export function ExportModal({ isOpen, onClose, previewElement, filename }: ExportModalProps) {
+export function ExportModal({ isOpen, onClose, previewElement, filename, onSuccess }: ExportModalProps) {
   const [activeTab, setActiveTab] = useState<'pdf' | 'image' | 'print'>('pdf');
   const [isExporting, setIsExporting] = useState(false);
   const { success, error } = useToast();
@@ -92,6 +93,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
     try {
       await exportCVToPDF(previewElement, `${filename}.pdf`);
       success('PDF exporté avec succès !');
+      onSuccess?.();
       // Incrémenter le compteur de téléchargements
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -130,6 +132,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
       const dataUrl = await exportToImage(previewElement, imageFormat, imageQuality);
       downloadImage(dataUrl, `${filename}.${imageFormat}`);
       success('Image exportée avec succès');
+      onSuccess?.();
       onClose();
     } catch (err) {
       error('Erreur lors de l\'export de l\'image');
@@ -453,7 +456,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename }: Expor
                       className={`py-2 px-4 rounded-lg border transition-colors uppercase ${
                         imageFormat === format
                           ? 'border-blue bg-blue/5 dark:bg-blue/10 text-blue'
-                          : 'border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500'
+                          : 'border-border bg-card text-foreground hover:border-blue/40'
                       }`}
                     >
                       {format}

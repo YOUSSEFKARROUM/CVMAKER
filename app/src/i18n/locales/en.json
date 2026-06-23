@@ -6,13 +6,25 @@
   "common": {
     "step": "Step",
     "notSpecified": "Not specified",
-    "unknown": "Unknown",
+    "unknown": "",
     "loading": "Loading...",
     "current": "Current",
     "completed": "Completed",
     "required": "Required",
     "optional": "Optional",
-    "present": "Present"
+    "present": "Present",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "next": "Next",
+    "back": "Back",
+    "close": "Close",
+    "search": "Search",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No"
   },
   "template": {
     "profile": "Profile",
@@ -144,9 +156,6 @@
       "downloads": "Downloads",
       "member": "Member since"
     }
-  },
-  "common": {
-    "cancel": "Cancel"
   },
   "landing": {
     "title": "Create your professional CV",
@@ -291,7 +300,7 @@
     "templates": {
       "title": "Professional templates, ready to use",
       "subtitle": "19 templates designed to maximize your chances. Choose, customize, download.",
-      "showAll": "View {count} more templates"
+      "showAll": "View {{count}} more templates"
     }
   },
   "steps": {

@@ -974,20 +974,22 @@ function App() {
           {renderContent()}
         </ZenMode>
 
-        {/* Floating Actions */}
-        <FloatingActions
-          onUndo={undo}
-          onRedo={redo}
-          canUndo={canUndo}
-          canRedo={canRedo}
-          onExport={handleExport}
-          onReset={handleReset}
-        />
-
-        {/* Keyboard Shortcuts Help — mobile only (desktop: access via ?) */}
-        <div className="lg:hidden">
-          <KeyboardShortcutsHelp />
-        </div>
+        {/* Floating Actions + Keyboard Shortcuts — wizard only */}
+        {showPreview && (
+          <>
+            <FloatingActions
+              onUndo={undo}
+              onRedo={redo}
+              canUndo={canUndo}
+              canRedo={canRedo}
+              onExport={handleExport}
+              onReset={handleReset}
+            />
+            <div className="lg:hidden">
+              <KeyboardShortcutsHelp />
+            </div>
+          </>
+        )}
 
         {/* Modals */}
         {modalState.type === 'delete' && (

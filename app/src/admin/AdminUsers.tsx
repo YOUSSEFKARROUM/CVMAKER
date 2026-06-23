@@ -136,7 +136,8 @@ export default function AdminUsers() {
         {loading ? (
           <div className="p-8 text-center text-sm text-muted-foreground">Chargement...</div>
         ) : (
-          <table className="w-full">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[700px]">
             <thead>
               <tr className="border-b border-border bg-muted/30">
                 <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">Utilisateur</th>
@@ -243,6 +244,7 @@ export default function AdminUsers() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
         {!loading && filtered.length === 0 && (
           <div className="py-12 text-center text-sm text-muted-foreground">

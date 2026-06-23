@@ -219,7 +219,7 @@ function FontsTab({ titleFont, bodyFont, onChangeTitleFont, onChangeBodyFont }: 
 export function DownloadPage({ cvData, settings, setSettings, onHomeClick, onBack }: DownloadPageProps) {
   const [activeTab, setActiveTab] = useState<DownloadTab>('template');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(true);
+  const [showConfetti, setShowConfetti] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
   const { success, info, error: showError } = useToast();
   const { canUserDownload, requestDownload, getMyRequests } = useDownloadRequest();
@@ -229,10 +229,10 @@ export function DownloadPage({ cvData, settings, setSettings, onHomeClick, onBac
   const [latestAdminNote, setLatestAdminNote] = useState<string | null>(null);
   const [accessLoading, setAccessLoading] = useState(true);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setShowConfetti(false), 3000);
-    return () => clearTimeout(timer);
-  }, []);
+  const handleDownloadSuccess = () => {
+    setShowConfetti(true);
+    setTimeout(() => setShowConfetti(false), 3000);
+  };
 
   useEffect(() => {
     async function checkAccess() {
@@ -400,6 +400,7 @@ export function DownloadPage({ cvData, settings, setSettings, onHomeClick, onBac
         onClose={() => setIsExportModalOpen(false)}
         previewElement={resolvedPreviewElement}
         filename={getFilename()}
+        onSuccess={handleDownloadSuccess}
       />
       </div>
     </div>
