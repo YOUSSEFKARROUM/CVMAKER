@@ -1,4 +1,4 @@
-import { forwardRef, memo } from 'react';
+import { forwardRef, memo, useRef, useState, useEffect } from 'react';
 import type { CVData, CVSettings } from '../types/cv';
 import {
   BudapestTemplate,
@@ -28,15 +28,50 @@ interface CVPreviewProps {
   className?: string;
 }
 
+const PAGE_H_PX = 1123; // A4 à 96dpi
+
+function PageBreakOverlay({ contentHeight }: { contentHeight: number }) {
+  const pageCount = Math.ceil(contentHeight / PAGE_H_PX);
+  if (pageCount <= 1) return null;
+  return (
+    <>
+      {Array.from({ length: pageCount - 1 }, (_, i) => (
+        <div
+          key={i}
+          className="absolute left-0 right-0 pointer-events-none z-10"
+          style={{ top: `${(i + 1) * PAGE_H_PX}px` }}
+        >
+          <div className="border-t-2 border-dashed border-red-300 relative">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-red-100 text-red-500 text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap">
+              Page {i + 2}
+            </span>
+          </div>
+          <div className="h-3 bg-gray-100/80" />
+        </div>
+      ))}
+    </>
+  );
+}
+
 // Composant mémorisé pour éviter les re-rendus inutiles
 const CVPreviewComponent = forwardRef<HTMLDivElement, CVPreviewProps>(
   ({ cvData, settings, className = '' }, ref) => {
-    // Ne pas rendre si pas de données minimales
-    if (!cvData || !settings) {
-      return null;
-    }
+    const wrapperRef = useRef<HTMLDivElement>(null);
+    const [contentHeight, setContentHeight] = useState(PAGE_H_PX);
 
-    switch (settings.template) {
+    useEffect(() => {
+      const el = wrapperRef.current;
+      if (!el) return;
+      const ro = new ResizeObserver(entries => {
+        setContentHeight(entries[0].contentRect.height);
+      });
+      ro.observe(el);
+      return () => ro.disconnect();
+    }, []);
+
+    if (!cvData || !settings) return null;
+
+    const template = (() => { switch (settings.template) {
       case 'budapest':
         return <BudapestTemplate ref={ref} cvData={cvData} settings={settings} className={className} />;
       case 'brunei':
@@ -75,7 +110,14 @@ const CVPreviewComponent = forwardRef<HTMLDivElement, CVPreviewProps>(
         return <PrincetonTemplate ref={ref} cvData={cvData} settings={settings} className={className} />;
       default:
         return <ModernTemplate ref={ref} cvData={cvData} settings={settings} className={className} />;
-    }
+    }})();
+
+    return (
+      <div ref={wrapperRef} style={{ position: 'relative' }}>
+        {template}
+        <PageBreakOverlay contentHeight={contentHeight} />
+      </div>
+    );
   }
 );
 

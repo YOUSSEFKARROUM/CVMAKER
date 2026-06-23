@@ -14,30 +14,31 @@ const formatDimensions = {
   legal: { width: 216, height: 356 },
 };
 
+// Dimensions A4 en pixels à 96dpi (référence pour le slicing)
+const A4_W_PX = 794;
+const A4_H_PX = 1123;
+// Scale de capture — 2 donne du 1588×2246 par page, qualité suffisante
+const CAPTURE_SCALE = 2;
+
 /**
- * Exporte un CV vers PDF avec format A4 exact
- * Cette version garantit que le CV tient sur une page avec les bonnes proportions
+ * Exporte un CV vers PDF multi-page A4.
+ * Capture tout le contenu en haute résolution, puis le découpe en tranches
+ * A4 qui deviennent chacune une page du PDF.
  */
 export async function exportCVToPDF(
   element: HTMLElement,
   filename: string
 ): Promise<void> {
-  // Attendre polices et rendu
   await document.fonts.ready;
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise(resolve => setTimeout(resolve, 300));
 
-  const format = 'a4';
-  const dims = formatDimensions[format];
-  const pageWidth = dims.width;  // 210mm
-  const pageHeight = dims.height; // 297mm
-
-  const originalStyles = {
+  const hadPdfExportClass = element.classList.contains('pdf-export-mode');
+  const saved = {
     width: element.style.width,
-    height: element.style.height,
     maxWidth: element.style.maxWidth,
+    height: element.style.height,
     maxHeight: element.style.maxHeight,
     transform: element.style.transform,
-    transformOrigin: element.style.transformOrigin,
     position: element.style.position,
     left: element.style.left,
     top: element.style.top,
@@ -45,122 +46,87 @@ export async function exportCVToPDF(
     overflowX: element.style.overflowX,
     overflowY: element.style.overflowY,
   };
-  const hadPdfExportClass = element.classList.contains('pdf-export-mode');
 
   try {
     element.classList.add('pdf-export-mode');
-    element.style.width = '210mm';
-    element.style.maxWidth = '210mm';
+    element.style.width = `${A4_W_PX}px`;
+    element.style.maxWidth = `${A4_W_PX}px`;
     element.style.height = 'auto';
     element.style.maxHeight = 'none';
     element.style.transform = 'none';
     element.style.position = 'relative';
     element.style.left = '0';
     element.style.top = '0';
-    // Éviter que overflow-hidden sur la racine ne coupe le contenu en PDF
     element.style.overflow = 'visible';
     element.style.overflowX = 'visible';
     element.style.overflowY = 'visible';
 
-    await new Promise(resolve => setTimeout(resolve, 400));
+    await new Promise(resolve => setTimeout(resolve, 300));
 
-    // 2. Capturer avec html2canvas
-    // Utiliser un scale élevé pour la qualité, mais nous réduirons ensuite
-    const canvas = await html2canvas(element, {
-      scale: 3, // Haute qualité
+    // 1. Capturer tout le contenu en une seule image haute résolution
+    const fullCanvas = await html2canvas(element, {
+      scale: CAPTURE_SCALE,
       useCORS: true,
       allowTaint: true,
       logging: false,
       backgroundColor: '#ffffff',
-      width: element.offsetWidth,
-      height: element.offsetHeight,
-      windowWidth: element.offsetWidth,
-      windowHeight: element.offsetHeight,
+      width: A4_W_PX,
+      height: element.scrollHeight,
+      windowWidth: A4_W_PX,
       x: 0,
       y: 0,
       scrollX: 0,
       scrollY: 0,
     });
 
-    // 3. Créer le PDF
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4',
-    });
+    const totalImgHeight = fullCanvas.height; // en px canvas (scale inclus)
+    const pageImgH = A4_H_PX * CAPTURE_SCALE;  // hauteur d'une page en px canvas
+    const pageCount = Math.ceil(totalImgHeight / pageImgH);
 
-    // 4. Calculer les dimensions pour fit parfait dans A4
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
-    const imgRatio = imgWidth / imgHeight;
-    const pageRatio = pageWidth / pageHeight;
+    // 2. Créer le PDF A4
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pdfW = 210; // mm
+    const pdfH = 297; // mm
 
-    let finalWidth: number;
-    let finalHeight: number;
-    let x: number;
-    let y: number;
+    // Canvas tampon pour chaque tranche de page
+    const pageCanvas = document.createElement('canvas');
+    pageCanvas.width = fullCanvas.width;
+    pageCanvas.height = pageImgH;
+    const ctx = pageCanvas.getContext('2d')!;
 
-    // Déterminer comment ajuster l'image
-    if (imgRatio > pageRatio) {
-      // L'image est plus large que la page (relativement)
-      // On l'ajuste à la largeur de la page
-      finalWidth = pageWidth;
-      finalHeight = pageWidth / imgRatio;
-      x = 0;
-      y = (pageHeight - finalHeight) / 2; // Centrer verticalement
-    } else {
-      // L'image est plus haute que la page
-      // On l'ajuste à la hauteur de la page
-      finalHeight = pageHeight;
-      finalWidth = pageHeight * imgRatio;
-      x = (pageWidth - finalWidth) / 2; // Centrer horizontalement
-      y = 0;
+    for (let page = 0; page < pageCount; page++) {
+      if (page > 0) pdf.addPage();
+
+      const srcY = page * pageImgH;
+      const srcH = Math.min(pageImgH, totalImgHeight - srcY);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+      ctx.drawImage(
+        fullCanvas,
+        0, srcY, fullCanvas.width, srcH,  // source
+        0, 0, fullCanvas.width, srcH       // destination
+      );
+
+      const pageImg = pageCanvas.toDataURL('image/jpeg', 0.95);
+      pdf.addImage(pageImg, 'JPEG', 0, 0, pdfW, pdfH, undefined, 'FAST');
     }
 
-    // Si l'image dépasse toujours, la réduire davantage
-    if (finalWidth > pageWidth || finalHeight > pageHeight) {
-      const scaleX = pageWidth / finalWidth;
-      const scaleY = pageHeight / finalHeight;
-      const scale = Math.min(scaleX, scaleY);
-      finalWidth *= scale;
-      finalHeight *= scale;
-      x = (pageWidth - finalWidth) / 2;
-      y = (pageHeight - finalHeight) / 2;
-    }
-
-    // 5. Convertir en image et ajouter au PDF
-    const imgData = canvas.toDataURL('image/jpeg', 0.98);
-    
-    pdf.addImage(
-      imgData,
-      'JPEG',
-      x,
-      y,
-      finalWidth,
-      finalHeight,
-      undefined,
-      'SLOW' // Meilleure qualité
-    );
-
-    // 6. Sauvegarder
     pdf.save(filename);
 
   } finally {
-    if (!hadPdfExportClass) {
-      element.classList.remove('pdf-export-mode');
-    }
-    element.style.width = originalStyles.width;
-    element.style.height = originalStyles.height;
-    element.style.maxWidth = originalStyles.maxWidth;
-    element.style.maxHeight = originalStyles.maxHeight;
-    element.style.transform = originalStyles.transform;
-    element.style.transformOrigin = originalStyles.transformOrigin;
-    element.style.position = originalStyles.position;
-    element.style.left = originalStyles.left;
-    element.style.top = originalStyles.top;
-    element.style.overflow = originalStyles.overflow;
-    element.style.overflowX = originalStyles.overflowX;
-    element.style.overflowY = originalStyles.overflowY;
+    if (!hadPdfExportClass) element.classList.remove('pdf-export-mode');
+    element.style.width = saved.width;
+    element.style.maxWidth = saved.maxWidth;
+    element.style.height = saved.height;
+    element.style.maxHeight = saved.maxHeight;
+    element.style.transform = saved.transform;
+    element.style.position = saved.position;
+    element.style.left = saved.left;
+    element.style.top = saved.top;
+    element.style.overflow = saved.overflow;
+    element.style.overflowX = saved.overflowX;
+    element.style.overflowY = saved.overflowY;
   }
 }
 

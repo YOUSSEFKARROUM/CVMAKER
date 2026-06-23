@@ -95,13 +95,13 @@ export const HarvardTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         ref={ref}
         id="cv-preview"
         data-cv-preview
-        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl overflow-hidden ${className}`}
+        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl ${className}`}
         style={{ fontFamily: settings.bodyFont }}
       >
         <div className="flex">
           {/* Left Sidebar */}
           <div
-            className="w-[35%] p-6 text-white min-h-[297mm]"
+            className="w-[35%] p-6 text-white self-stretch"
             style={{ backgroundColor: settings.primaryColor }}
           >
             {/* Photo */}

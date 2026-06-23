@@ -32,7 +32,7 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         ref={ref}
         id="cv-preview"
         data-cv-preview
-        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl overflow-hidden ${className}`}
+        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl ${className}`}
         style={{ fontFamily: settings.bodyFont }}
       >
         <div className="flex">
@@ -41,7 +41,7 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
             className="w-2/5 relative"
             style={{ backgroundColor: settings.primaryColor }}
           >
-            <div className="p-8 text-white min-h-[297mm]">
+            <div className="p-8 text-white self-stretch">
               {contact.photo ? (
                 <div className="w-full aspect-[3/4] mb-6 overflow-hidden">
                   <img src={contact.photo} alt="Profile" className="w-full h-full object-cover" />

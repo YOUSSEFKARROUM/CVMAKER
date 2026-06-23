@@ -29,13 +29,13 @@ export const BudapestTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         ref={ref}
         id="cv-preview"
         data-cv-preview
-        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl overflow-hidden ${className}`}
+        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl ${className}`}
         style={{ fontFamily: bodyFont }}
       >
         <div className="flex">
           {/* Left Sidebar */}
           <div
-            className="w-[33%] shrink-0 min-h-[297mm]"
+            className="w-[33%] shrink-0 self-stretch"
             style={{ backgroundColor: primaryColor, padding: '32px 22px' }}
           >
             {/* Photo / Initials */}
@@ -211,7 +211,7 @@ export const BudapestTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     <SectionTitle titleKey="template.experience" variant="underline" color={primaryColor} />
                     <div className="space-y-4 min-w-0">
                       {experiences.map((exp) => (
-                        <div key={exp.id} className="min-w-0">
+                        <div key={exp.id} className="min-w-0" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                           <div className="flex justify-between items-start gap-2 min-w-0">
                             <h4 className="text-[12px] font-bold text-gray-900 break-words min-w-0">{exp.jobTitle}</h4>
                             <span className="text-[10px] text-gray-400 flex-shrink-0 whitespace-nowrap ml-2">
@@ -240,7 +240,7 @@ export const BudapestTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     <SectionTitle titleKey="template.education" variant="underline" color={primaryColor} />
                     <div className="space-y-3 min-w-0">
                       {educations.map((edu) => (
-                        <div key={edu.id} className="min-w-0">
+                        <div key={edu.id} className="min-w-0" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                           <div className="flex justify-between items-start gap-2 min-w-0">
                             <h4 className="text-[12px] font-bold text-gray-900 break-words min-w-0">{edu.diploma}</h4>
                             <span className="text-[10px] text-gray-400 flex-shrink-0 whitespace-nowrap ml-2">{formatDate(edu.graduationDate)}</span>
@@ -267,7 +267,7 @@ export const BudapestTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     <SectionTitle titleKey="template.certifications" variant="underline" color={primaryColor} />
                     <div className="space-y-3">
                       {certifications.map((cert) => (
-                        <div key={cert.id}>
+                        <div key={cert.id} style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                           <div className="flex justify-between items-start gap-2">
                             <h4 className="text-[12px] font-bold text-gray-900">{cert.name}</h4>
                             <span className="text-[10px] text-gray-400 flex-shrink-0 whitespace-nowrap ml-2">{formatDate(cert.date)}</span>
@@ -288,7 +288,7 @@ export const BudapestTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     <SectionTitle titleKey="template.projects" variant="underline" color={primaryColor} />
                     <div className="space-y-3 min-w-0">
                       {projects.map((proj) => (
-                        <div key={proj.id} className="min-w-0">
+                        <div key={proj.id} className="min-w-0" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                           <div className="flex items-center gap-1.5 min-w-0">
                             <h4 className="text-[12px] font-bold text-gray-900 truncate">{proj.name}</h4>
                             {proj.link && <ExternalLink className="w-3 h-3 flex-shrink-0 text-gray-400" />}

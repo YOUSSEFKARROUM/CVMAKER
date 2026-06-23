@@ -18,7 +18,7 @@ export const OxfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         ref={ref}
         id="cv-preview"
         data-cv-preview
-        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl overflow-hidden ${className}`}
+        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl ${className}`}
         style={{ fontFamily: settings.bodyFont }}
       >
         <div className="p-8">

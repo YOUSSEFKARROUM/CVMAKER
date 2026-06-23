@@ -19,13 +19,13 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         ref={ref}
         id="cv-preview"
         data-cv-preview
-        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl overflow-hidden ${className}`}
+        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl ${className}`}
         style={{ fontFamily: settings.bodyFont }}
       >
         <div className="flex">
           {/* Left Sidebar - Dark Charcoal (design intent: fixed dark) */}
           <div
-            className="w-[32%] p-6 text-white min-h-[297mm]"
+            className="w-[32%] p-6 text-white self-stretch"
             style={{ backgroundColor: '#4A4A4A' }}
           >
             {/* Photo */}
