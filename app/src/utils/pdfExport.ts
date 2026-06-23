@@ -8,12 +8,6 @@ export interface PDFExportOptions {
   orientation?: 'portrait' | 'landscape';
 }
 
-const formatDimensions = {
-  a4: { width: 210, height: 297 },
-  letter: { width: 216, height: 279 },
-  legal: { width: 216, height: 356 },
-};
-
 // Dimensions A4 en pixels à 96dpi (référence pour le slicing)
 const A4_W_PX = 794;
 const A4_H_PX = 1123;

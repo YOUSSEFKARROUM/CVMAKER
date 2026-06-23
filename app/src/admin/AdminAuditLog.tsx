@@ -64,18 +64,21 @@ export default function AdminAuditLog() {
                         User&nbsp;{log.target_user_id.slice(0, 8)}…
                       </span>
                     )}
-                    {log.details && (
-                      <span className="ml-2 text-xs opacity-70">
-                        {log.details.note && <span>Note : {log.details.note}</span>}
-                        {log.details.reason && <span>Raison : {log.details.reason}</span>}
-                        {log.details.requestId && (
-                          <span className="font-mono opacity-50 ml-1">
-                            (#{String(log.details.requestId).slice(0, 8)})
-                          </span>
-                        )}
-                        {!log.details.note && !log.details.reason && <span>—</span>}
-                      </span>
-                    )}
+                    {log.details && (() => {
+                      const d = log.details as { note?: string; reason?: string; requestId?: string };
+                      return (
+                        <span className="ml-2 text-xs opacity-70">
+                          {d.note && <span>Note : {d.note}</span>}
+                          {d.reason && <span>Raison : {d.reason}</span>}
+                          {d.requestId && (
+                            <span className="font-mono opacity-50 ml-1">
+                              (#{String(d.requestId).slice(0, 8)})
+                            </span>
+                          )}
+                          {!d.note && !d.reason && <span>—</span>}
+                        </span>
+                      );
+                    })()}
                   </div>
                   <div className="text-xs text-muted-foreground shrink-0">
                     {new Date(log.created_at).toLocaleDateString('fr-FR', {

@@ -171,18 +171,21 @@ export function useCloudCV(): UseCloudCVReturn {
         await refreshCVs(true);
 
         // Incrémenter compteur profil (non-bloquant)
-        supabase
-          .from('profiles')
-          .select('total_cvs_created')
-          .eq('id', user.uid)
-          .single()
-          .then(({ data: p }) =>
-            supabase.from('profiles').update({
+        void (async () => {
+          try {
+            const { data: p } = await supabase
+              .from('profiles')
+              .select('total_cvs_created')
+              .eq('id', user.uid)
+              .single();
+            await supabase.from('profiles').update({
               total_cvs_created: (p?.total_cvs_created ?? 0) + 1,
               updated_at: new Date().toISOString(),
-            }).eq('id', user.uid)
-          )
-          .catch((err) => console.warn('Counter update failed (non-fatal):', err));
+            }).eq('id', user.uid);
+          } catch (err) {
+            console.warn('Counter update failed (non-fatal):', err);
+          }
+        })();
 
         return data.id as string;
       }
