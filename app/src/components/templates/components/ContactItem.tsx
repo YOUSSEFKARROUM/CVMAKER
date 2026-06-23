@@ -17,6 +17,7 @@ interface ContactItemProps {
   value?: string;
   variant?: 'default' | 'sidebar' | 'inline';
   accentColor?: string;
+  textColor?: string;
   className?: string;
 }
 
@@ -32,38 +33,40 @@ const iconMap: Record<string, React.FC<LucideProps>> = {
   birthdate: Calendar
 };
 
-export function ContactItem({ 
-  icon, 
-  value, 
+export function ContactItem({
+  icon,
+  value,
   variant = 'default',
   accentColor,
-  className = '' 
+  textColor,
+  className = ''
 }: ContactItemProps) {
   const Icon = iconMap[icon];
-  
+
   if (!value) return null;
 
   const variantStyles = {
     default: 'flex items-center gap-2.5 text-sm text-gray-700',
-    sidebar: 'flex items-center gap-2.5 text-sm text-white/95',
+    sidebar: 'flex items-center gap-2.5 text-sm',
     inline: 'inline-flex items-center gap-1.5 text-sm text-gray-600'
   };
 
   const iconStyles = {
     default: 'w-4 h-4 flex-shrink-0 opacity-75',
-    sidebar: 'w-4 h-4 flex-shrink-0 opacity-90',
+    sidebar: 'w-4 h-4 flex-shrink-0 opacity-80',
     inline: 'w-3.5 h-3.5 flex-shrink-0'
   };
 
-  const iconColor = accentColor && variant !== 'sidebar' ? accentColor : undefined;
+  const iconColor = variant === 'sidebar' && textColor ? textColor : (accentColor && variant !== 'sidebar' ? accentColor : undefined);
+  const textStyle = variant === 'sidebar' && textColor ? { color: textColor } : undefined;
 
   return (
-    <div className={`${variantStyles[variant]} min-w-0 ${className}`}>
+    <div className={`${variantStyles[variant]} min-w-0 ${className}`} style={textStyle}>
       <Icon
         className={`${iconStyles[variant]} flex-shrink-0`}
         style={iconColor ? { color: iconColor } : undefined}
       />
-      <span className="break-words leading-snug" style={{ overflowWrap: 'anywhere' }}>{value}</span>
+      <span className="text-[11px] break-words leading-snug" style={{ overflowWrap: 'anywhere' }}>{value}</span>
     </div>
   );
 }
