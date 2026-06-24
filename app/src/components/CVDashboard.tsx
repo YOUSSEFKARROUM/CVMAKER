@@ -1,12 +1,12 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  FileText, 
-  Plus, 
-  Search, 
-  MoreVertical, 
-  Copy, 
+import {
+  FileText,
+  Plus,
+  Search,
+  MoreVertical,
+  Copy,
   Trash2,
   Edit3,
   Calendar,
@@ -19,6 +19,7 @@ import {
   AlertCircle,
   ArrowLeft
 } from 'lucide-react';
+import { CVThumbnail } from './CVThumbnail';
 import { useCloudCV } from '../hooks/useCloudCV';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -156,21 +157,6 @@ export function CVDashboard({
     }).format(date);
   }, []);
 
-  const getTemplateColor = useCallback((template: string) => {
-    const colors: Record<string, string> = {
-      budapest: 'from-blue-500 to-blue-700',
-      chicago: 'from-blue-400 to-blue-600',
-      brunei: 'from-emerald-500 to-teal-600',
-      vladivostok: 'from-orange-500 to-red-600',
-      sydney: 'from-cyan-500 to-blue-600',
-      shanghai: 'from-rose-500 to-pink-600',
-      kiev: 'from-blue-600 to-blue-800',
-      rotterdam: 'from-amber-500 to-orange-600',
-      tokyo: 'from-gray-600 to-gray-800',
-      modern: 'from-blue-500 to-blue-700',
-    };
-    return colors[template] || colors.modern;
-  }, []);
 
   // Bloquer le scroll du body quand la modale est ouverte
   useEffect(() => {
@@ -216,7 +202,7 @@ export function CVDashboard({
             <div>
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{t('cloud.myCVs') || 'Mes CVs'}</h2>
               <p className="text-slate-500 dark:text-slate-400 text-sm">
-                {filteredCVs.length} {filteredCVs.length === 1 ? 'CV' : 'CVs'} • {user?.email}
+                {filteredCVs.length} {filteredCVs.length === 1 ? 'CV' : 'CVs'}
               </p>
             </div>
           </div>
@@ -378,26 +364,16 @@ export function CVDashboard({
                     } ${loadingCV === cv.id ? 'ring-2 ring-indigo-500' : ''}`}
                   >
                     {/* Thumbnail */}
-                    <div className={`relative overflow-hidden ${viewMode === 'list' ? 'w-16 h-16 rounded-xl flex-shrink-0' : 'h-40'}`}>
-                      <div className={`absolute inset-0 bg-gradient-to-br ${getTemplateColor(cv.settings.template)}`} />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        {loadingCV === cv.id ? (
-                          <Loader2 className="w-8 h-8 text-white animate-spin" />
-                        ) : (
-                          <span className="text-white text-2xl font-bold opacity-30">
-                            {cv.cvData.contact.firstName?.charAt(0) || 'C'}
-                            {cv.cvData.contact.lastName?.charAt(0) || 'V'}
-                          </span>
-                        )}
-                      </div>
+                    <div className={`relative overflow-hidden ${viewMode === 'list' ? 'w-16 h-20 rounded-xl flex-shrink-0' : ''}`}>
+                      <CVThumbnail cvData={cv.cvData} settings={cv.settings} />
                       {index === 0 && loadingCV !== cv.id && (
                         <div className="absolute top-2 left-2 px-2 py-0.5 bg-white/90 backdrop-blur rounded-full">
                           <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
                         </div>
                       )}
                       {loadingCV === cv.id && (
-                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                          <span className="text-white text-xs font-medium">Chargement...</span>
+                        <div className="absolute inset-0 bg-blue/10 flex items-center justify-center">
+                          <Loader2 className="w-6 h-6 text-blue animate-spin" />
                         </div>
                       )}
                     </div>

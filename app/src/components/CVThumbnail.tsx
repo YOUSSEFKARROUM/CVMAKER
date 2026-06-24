@@ -1,53 +1,56 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, memo } from 'react';
 import { CVPreview } from './CVPreview';
 import type { CVData, CVSettings } from '../types/cv';
-
-// A4 width in px at 96 dpi — used to compute scale dynamically.
-const A4_WIDTH_PX = 794;
 
 interface CVThumbnailProps {
   cvData: CVData;
   settings: CVSettings;
-  /** Width of the container in px. If omitted, a ResizeObserver measures it. */
-  containerWidth?: number;
   className?: string;
 }
 
-export function CVThumbnail({ cvData, settings, containerWidth, className = '' }: CVThumbnailProps) {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const [measuredWidth, setMeasuredWidth] = useState<number>(containerWidth ?? 0);
+export const CVThumbnail = memo(function CVThumbnail({ cvData, settings, className }: CVThumbnailProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0.25);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (containerWidth !== undefined) return; // controlled externally
+    if (!containerRef.current) return;
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsVisible(true);
+        io.disconnect();
+      }
+    }, { rootMargin: '100px' });
+    io.observe(containerRef.current);
+    return () => io.disconnect();
+  }, []);
 
-    const el = wrapperRef.current;
-    if (!el) return;
-
+  useEffect(() => {
+    if (!containerRef.current || !isVisible) return;
     const ro = new ResizeObserver(([entry]) => {
-      setMeasuredWidth(entry.contentRect.width);
+      const w = entry.contentRect.width;
+      if (w > 0) setScale(w / 794);
     });
-    ro.observe(el);
+    ro.observe(containerRef.current);
     return () => ro.disconnect();
-  }, [containerWidth]);
-
-  const width = containerWidth ?? measuredWidth;
-  const scale = width > 0 ? width / A4_WIDTH_PX : 0;
+  }, [isVisible]);
 
   return (
-    <div ref={wrapperRef} className={`relative w-full ${className}`}>
-      {scale > 0 && (
+    <div
+      ref={containerRef}
+      className={`relative overflow-hidden bg-white ${className || ''}`}
+      style={{ aspectRatio: '210/297', width: '100%' }}
+    >
+      {isVisible ? (
         <div
-          style={{
-            transform: `scale(${scale})`,
-            transformOrigin: 'top left',
-            width: A4_WIDTH_PX,
-            pointerEvents: 'none',
-            userSelect: 'none',
-          }}
+          className="absolute top-0 left-0 origin-top-left pointer-events-none select-none"
+          style={{ width: '794px', height: '1123px', transform: `scale(${scale})` }}
         >
           <CVPreview cvData={cvData} settings={settings} />
         </div>
+      ) : (
+        <div className="absolute inset-0 animate-pulse bg-gray-100" />
       )}
     </div>
   );
-}
+});
