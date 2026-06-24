@@ -12,7 +12,6 @@ import { ProjectsForm } from './sections/ProjectsForm';
 import { InterestsForm } from './sections/InterestsForm';
 import { ProfileForm } from './sections/ProfileForm';
 import { FinishForm } from './sections/FinishForm';
-import { DownloadPage } from './sections/DownloadPage';
 import AdminDashboard from './admin/AdminDashboard';
 import AppHeader from './components/AppHeader';
 import ProfilePage from './sections/ProfilePage';
