@@ -20,7 +20,7 @@ const PAYMENT_INFO = {
   iban: 'MA64 2300 9070 0196 6211 0048 0074',
   swift: 'CIHMMAMC',
   bank: 'CIH Bank',
-  whatsapp: '+212712303264',
+  whatsapp: '+212691719109',
   price: '30',
   currency: 'DH',
   quota: 4,
