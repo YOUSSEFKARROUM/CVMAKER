@@ -67,7 +67,7 @@ export function CVDashboard({
   loading: externalLoading 
 }: CVDashboardProps) {
   const { t } = useTranslation();
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { cvs, loading: cloudLoading, deleteFromCloud, refreshCVs, error: cloudError, isCloudEnabled } = useCloudCV();
   const { success, error: showError } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
