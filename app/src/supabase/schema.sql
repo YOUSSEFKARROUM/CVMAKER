@@ -178,3 +178,12 @@ CREATE POLICY "Users CRUD own CVs" ON public.saved_cvs
   WITH CHECK (auth.uid() = user_id);
 
 CREATE INDEX IF NOT EXISTS idx_saved_cvs_user ON public.saved_cvs(user_id);
+
+-- ══════════════════════════════════════════
+-- QUOTA TÉLÉCHARGEMENT (virement bancaire 30 DH = 4 PDFs)
+-- Exécuter ce bloc dans Supabase Dashboard → SQL Editor
+-- ══════════════════════════════════════════
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS downloads_remaining INTEGER NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS has_paid BOOLEAN NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS payment_approved_at TIMESTAMPTZ;

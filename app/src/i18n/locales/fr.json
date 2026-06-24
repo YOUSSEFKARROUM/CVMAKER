@@ -680,5 +680,25 @@
     "address": "Adresse",
     "addressPlaceholder": "Entrez votre adresse",
     "nextStep": "Télécharger le CV"
+  },
+  "payment": {
+    "offer": "Offre de lancement",
+    "quota": "Accès à {{count}} téléchargements PDF",
+    "step1": "Effectuez le virement bancaire",
+    "holder": "Titulaire",
+    "bank": "Banque",
+    "amount": "Montant",
+    "step2": "Envoyez la preuve de paiement",
+    "step2Desc": "Envoyez le reçu de virement par WhatsApp pour une activation rapide.",
+    "whatsapp": "Envoyer sur WhatsApp",
+    "step3": "Confirmez votre demande",
+    "step3Desc": "Cliquez ci-dessous pour que l'administrateur soit notifié. Votre accès sera activé sous 24h.",
+    "confirm": "J'ai effectué le paiement",
+    "copied": "Copié !",
+    "note": "Paiement sécurisé par virement bancaire. Votre accès sera activé manuellement après vérification. Vous pourrez télécharger jusqu'à {{count}} CVs en PDF.",
+    "pending": "Demande en cours de traitement",
+    "pendingDesc": "Votre paiement est en cours de vérification. Vous recevrez l'accès sous 24h maximum.",
+    "quotaExhausted": "Quota épuisé — effectuez un nouveau paiement pour 4 téléchargements",
+    "remaining": "{{count}} téléchargement(s) restant(s)"
   }
 }

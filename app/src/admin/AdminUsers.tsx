@@ -23,6 +23,7 @@ interface Profile {
   is_banned: boolean;
   ban_reason: string | null;
   can_download_pdf: boolean;
+  downloads_remaining: number | null;
   total_cvs_created: number;
   total_downloads: number;
   created_at: string;
@@ -144,6 +145,7 @@ export default function AdminUsers() {
                 <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3 hidden sm:table-cell">Inscrit le</th>
                 <th className="text-center text-xs font-medium text-muted-foreground px-4 py-3 hidden md:table-cell">CVs</th>
                 <th className="text-center text-xs font-medium text-muted-foreground px-4 py-3">PDF</th>
+                <th className="text-center text-xs font-medium text-muted-foreground px-4 py-3 hidden lg:table-cell">Quota</th>
                 <th className="text-center text-xs font-medium text-muted-foreground px-4 py-3">Statut</th>
                 <th className="text-right text-xs font-medium text-muted-foreground px-4 py-3">Actions</th>
               </tr>
@@ -185,6 +187,18 @@ export default function AdminUsers() {
                       {u.can_download_pdf ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                       {u.can_download_pdf ? 'Actif' : 'Off'}
                     </button>
+                  </td>
+                  <td className="px-4 py-3 text-center text-sm hidden lg:table-cell">
+                    {u.can_download_pdf ? (
+                      <span className={cn(
+                        'font-medium',
+                        (u.downloads_remaining ?? 0) > 0 ? 'text-green-600' : 'text-amber-600'
+                      )}>
+                        {u.downloads_remaining ?? 0} restant{(u.downloads_remaining ?? 0) !== 1 ? 's' : ''}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-center">
                     <span className={cn(

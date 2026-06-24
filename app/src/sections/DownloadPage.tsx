@@ -1,13 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Check, Clock, Download, FileText, Home, Send } from 'lucide-react';
+import { ArrowLeft, Download, FileText, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CVPreview } from '../components/CVPreview';
 import { ExportModal } from '../components/ExportModal';
 import { ConfettiEffect } from '../components/ConfettiEffect';
 import { useToast } from '../hooks/useToast';
-import { useDownloadRequest } from '../hooks/useDownloadRequest';
-import { useAdmin } from '../hooks/useAdmin';
 import type { CVData, CVSettings } from '../types/cv';
 import { SortableList } from '../components/SortableList';
 import { DEFAULT_SECTION_ORDER, type LayoutSectionId } from '../components/templates/utils';
@@ -221,36 +219,12 @@ export function DownloadPage({ cvData, settings, setSettings, onHomeClick, onBac
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
-  const { success, info, error: showError } = useToast();
-  const { canUserDownload, requestDownload, getMyRequests } = useDownloadRequest();
-  const { isAdmin } = useAdmin();
-  const [hasAccess, setHasAccess] = useState(false);
-  const [requestStatus, setRequestStatus] = useState<string | null>(null);
-  const [latestAdminNote, setLatestAdminNote] = useState<string | null>(null);
-  const [accessLoading, setAccessLoading] = useState(true);
+  const { success } = useToast();
 
   const handleDownloadSuccess = () => {
     setShowConfetti(true);
     setTimeout(() => setShowConfetti(false), 3000);
   };
-
-  useEffect(() => {
-    async function checkAccess() {
-      setAccessLoading(true);
-      try {
-        const [access, requests] = await Promise.all([canUserDownload(), getMyRequests()]);
-        setHasAccess(access);
-        if (requests.length > 0) {
-          const latest = requests[0] as { status: string; admin_note?: string };
-          setRequestStatus(latest.status);
-          setLatestAdminNote(latest.admin_note ?? null);
-        }
-      } finally {
-        setAccessLoading(false);
-      }
-    }
-    checkAccess();
-  }, []);
 
   const getFilename = () => `CV-${cvData.contact.firstName}-${cvData.contact.lastName}`;
 
@@ -305,49 +279,15 @@ export function DownloadPage({ cvData, settings, setSettings, onHomeClick, onBac
             <ArrowLeft className="w-3.5 h-3.5" />
             Revenir en arrière
           </Button>
-          {(hasAccess || isAdmin) ? (
-            <Button
-              size="sm"
-              variant="blue"
-              onClick={() => setIsExportModalOpen(true)}
-              disabled={!resolvedPreviewElement || accessLoading}
-            >
-              <Download className="w-3.5 h-3.5" />
-              Télécharger
-            </Button>
-          ) : requestStatus === 'pending' ? (
-            <Button size="sm" variant="outline" disabled>
-              <Clock className="w-3.5 h-3.5" />
-              En attente de validation…
-            </Button>
-          ) : (
-            <div className="flex flex-col items-end gap-1">
-              <Button
-                size="sm"
-                variant="blue"
-                disabled={accessLoading}
-                onClick={async () => {
-                  try {
-                    const cvName = [cvData.contact.firstName, cvData.contact.lastName].filter(Boolean).join(' ') || 'Mon CV';
-                    await requestDownload(cvName, settings.template);
-                    setRequestStatus('pending');
-                    setLatestAdminNote(null);
-                    info('Demande envoyée ! L\'administrateur validera votre accès sous 24h.');
-                  } catch {
-                    showError('Erreur lors de l\'envoi de la demande');
-                  }
-                }}
-              >
-                <Send className="w-3.5 h-3.5" />
-                {requestStatus === 'rejected' ? 'Faire une nouvelle demande' : 'Demander l\'accès PDF'}
-              </Button>
-              {requestStatus === 'rejected' && latestAdminNote && (
-                <p className="text-xs text-destructive text-right max-w-48">
-                  Refusé : {latestAdminNote}
-                </p>
-              )}
-            </div>
-          )}
+          <Button
+            size="sm"
+            variant="blue"
+            onClick={() => setIsExportModalOpen(true)}
+            disabled={!resolvedPreviewElement}
+          >
+            <Download className="w-3.5 h-3.5" />
+            Télécharger
+          </Button>
         </div>
       </div>
 
@@ -400,6 +340,7 @@ export function DownloadPage({ cvData, settings, setSettings, onHomeClick, onBac
         onClose={() => setIsExportModalOpen(false)}
         previewElement={resolvedPreviewElement}
         filename={getFilename()}
+        cvTemplate={settings.template}
         onSuccess={handleDownloadSuccess}
       />
       </div>

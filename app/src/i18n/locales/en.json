@@ -680,5 +680,25 @@
     "address": "Address",
     "addressPlaceholder": "Enter your address",
     "nextStep": "Download CV"
+  },
+  "payment": {
+    "offer": "Launch offer",
+    "quota": "Access to {{count}} PDF downloads",
+    "step1": "Make the bank transfer",
+    "holder": "Account holder",
+    "bank": "Bank",
+    "amount": "Amount",
+    "step2": "Send proof of payment",
+    "step2Desc": "Send the transfer receipt via WhatsApp for quick activation.",
+    "whatsapp": "Send on WhatsApp",
+    "step3": "Confirm your request",
+    "step3Desc": "Click below to notify the administrator. Your access will be activated within 24h.",
+    "confirm": "I have made the payment",
+    "copied": "Copied!",
+    "note": "Secure payment by bank transfer. Your access will be manually activated after verification. You can download up to {{count}} CVs in PDF.",
+    "pending": "Request being processed",
+    "pendingDesc": "Your payment is being verified. You will receive access within 24h.",
+    "quotaExhausted": "Quota exhausted — make a new payment for 4 downloads",
+    "remaining": "{{count}} download(s) remaining"
   }
 }

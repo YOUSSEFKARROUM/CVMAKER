@@ -81,8 +81,21 @@ export function useAdmin() {
       })
       .eq('id', requestId);
     if (reqError) throw reqError;
-    await toggleDownloadAccess(userId, true);
-    await logAction('approve_download_request', userId, { requestId, note });
+
+    // Accorder l'accès + 4 téléchargements (30 DH = 4 CVs PDF)
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .update({
+        can_download_pdf: true,
+        has_paid: true,
+        downloads_remaining: 4,
+        payment_approved_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId);
+    if (profileError) throw profileError;
+
+    await logAction('approve_download_request', userId, { requestId, note, quota: 4 });
   }
 
   async function rejectRequest(requestId: string, userId: string, note?: string) {
