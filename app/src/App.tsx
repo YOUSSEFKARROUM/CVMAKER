@@ -628,6 +628,13 @@ function App() {
     }
   }, [isAuthenticated, currentStep]);
 
+  // 'download' est fusionné dans 'finish' — rediriger si jamais atteint
+  useEffect(() => {
+    if (currentStep === 'download') {
+      setCurrentStep('finish');
+    }
+  }, [currentStep]);
+
   const renderContent = () => {
     if (!isAuthenticated && currentStep !== 'landing') {
       return null;
@@ -793,21 +800,14 @@ function App() {
               settings={settings}
               setSettings={setSettings}
               updateContact={updateContact}
-              onNext={() => setCurrentStep('download')}
+              onNext={() => {}}
               onBack={handleBack}
               onExport={handleExport}
             />
           );
         case 'download':
-          return (
-            <DownloadPage
-              cvData={cvData}
-              settings={settings}
-              setSettings={setSettings}
-              onHomeClick={goToLanding}
-              onBack={() => setCurrentStep('finish')}
-            />
-          );
+          // DownloadPage fusionnée dans FinishForm — cette case ne devrait plus être atteinte
+          return null;
         case 'admin':
           return (
             <AdminDashboard

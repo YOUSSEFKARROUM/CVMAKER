@@ -8,6 +8,7 @@ import { FormField } from '@/components/ui/form-field';
 import { PhotoUpload } from '../components/PhotoUpload';
 import { CVPreview } from '../components/CVPreview';
 import { CVThumbnail } from '../components/CVThumbnail';
+import { ExportModal } from '../components/ExportModal';
 import type { CVData, CVSettings, ContactInfo } from '../types/cv';
 import { SortableList } from '../components/SortableList';
 import { DEFAULT_SECTION_ORDER, type LayoutSectionId } from '../components/templates/utils';
@@ -50,14 +51,19 @@ const TABS: { id: FinishTab; label: string; icon: React.ElementType }[] = [
 ];
 
 export function FinishForm({
-  cvData, settings, setSettings, updateContact, onNext, onBack,
+  cvData, settings, setSettings, updateContact, onBack,
 }: FinishFormProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<FinishTab>('template');
   const [previewScale, setPreviewScale] = useState(0.65);
   const [manualScale, setManualScale] = useState<number | null>(null);
+  const [showExportModal, setShowExportModal] = useState(false);
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+  const cvPreviewRef = useRef<HTMLDivElement>(null);
+
+  const getFilename = () =>
+    `CV-${cvData.contact.firstName || 'CV'}-${cvData.contact.lastName || ''}`.replace(/\s+/g, '-');
 
   const updateSettings = (patch: Partial<CVSettings>) =>
     setSettings({ ...settings, ...patch });
@@ -100,7 +106,7 @@ export function FinishForm({
   }, [settings.sectionOrder]);
 
   return (
-    <div className="dark fixed inset-0 z-50 flex flex-col">
+    <div className="fixed inset-0 z-50 flex flex-col">
       {/* Background */}
       <div className="fixed inset-0 bg-background" aria-hidden />
 
@@ -127,7 +133,7 @@ export function FinishForm({
             </div>
           </div>
 
-          <Button variant="blue" onClick={onNext} className="gap-1.5">
+          <Button variant="blue" onClick={() => setShowExportModal(true)} className="gap-1.5">
             <Download className="w-4 h-4" />
             {t('finishForm.nextStep')}
           </Button>
@@ -443,7 +449,7 @@ export function FinishForm({
                 className="absolute top-0 left-0 origin-top-left"
                 style={{ width: '794px', transform: `scale(${effectiveScale})` }}
               >
-                <CVPreview cvData={cvData} settings={settings} />
+                <CVPreview ref={cvPreviewRef} cvData={cvData} settings={settings} />
               </div>
             </div>
 
@@ -468,6 +474,15 @@ export function FinishForm({
           </main>
         </div>
       </div>
+
+      {/* Modale d'export PDF */}
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        previewElement={cvPreviewRef.current}
+        filename={getFilename()}
+        cvTemplate={settings.template}
+      />
     </div>
   );
 }
