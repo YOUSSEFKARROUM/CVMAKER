@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Download, FileText, Home } from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
+import { ArrowLeft, Check, Download, FileText, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CVPreview } from '../components/CVPreview';
