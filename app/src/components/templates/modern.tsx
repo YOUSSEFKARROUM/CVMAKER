@@ -196,7 +196,7 @@ export const ModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     <SectionTitle titleKey="template.experience" color={settings.primaryColor} variant="underline" className="text-sm uppercase tracking-wider" />
                     <div className="space-y-4">
                       {experiences.map((exp) => (
-                        <div key={exp.id}>
+                        <div key={exp.id} style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                           <h4 className="font-semibold text-gray-900">{exp.jobTitle}</h4>
                           <p className="text-sm text-gray-600">{exp.employer}{exp.city && `, ${exp.city}`}</p>
                           <p className="text-xs text-gray-500 mb-1">
@@ -217,7 +217,7 @@ export const ModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     <SectionTitle titleKey="template.education" color={settings.primaryColor} variant="underline" className="text-sm uppercase tracking-wider" />
                     <div className="space-y-3">
                       {educations.map((edu) => (
-                        <div key={edu.id}>
+                        <div key={edu.id} style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                           <h4 className="font-semibold text-gray-900">{edu.diploma}</h4>
                           <p className="text-sm text-gray-600">{edu.school}</p>
                           <p className="text-xs text-gray-500">{formatDate(edu.graduationDate)}</p>

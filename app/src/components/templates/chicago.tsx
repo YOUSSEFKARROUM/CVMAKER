@@ -84,7 +84,7 @@ export const ChicagoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 <SectionTitle titleKey="template.experience" color={settings.primaryColor} variant="bordered" />
                 <div className="space-y-5">
                   {experiences.map((exp) => (
-                    <div key={exp.id} className="min-w-0">
+                    <div key={exp.id} className="min-w-0" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                       <div className="flex justify-between items-start gap-2 min-w-0">
                         <h4 className="font-semibold text-gray-900 break-words min-w-0">{exp.jobTitle}</h4>
                         <span className="text-sm text-gray-500 flex-shrink-0">
@@ -107,7 +107,7 @@ export const ChicagoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 <SectionTitle titleKey="template.education" color={settings.primaryColor} variant="bordered" />
                 <div className="space-y-4">
                   {educations.map((edu) => (
-                    <div key={edu.id} className="min-w-0">
+                    <div key={edu.id} className="min-w-0" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                       <div className="flex justify-between items-start gap-2 min-w-0">
                         <h4 className="font-semibold text-gray-900 break-words min-w-0">{edu.diploma}</h4>
                         <span className="text-sm text-gray-500 flex-shrink-0">{formatDate(edu.graduationDate)}</span>

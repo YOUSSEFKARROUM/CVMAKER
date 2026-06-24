@@ -19,10 +19,10 @@ export const VladivostokTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         ref={ref}
         id="cv-preview"
         data-cv-preview
-        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl ${className}`}
+        className={`bg-white w-[210mm] shadow-xl ${className}`}
         style={{ fontFamily: settings.bodyFont }}
       >
-        <div className="flex">
+        <div className="flex min-h-[297mm]">
           {/* Main Content - 70% */}
           <div className="w-[70%] p-8">
             {/* Header */}
@@ -198,7 +198,7 @@ export const VladivostokTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
           {/* Right Sidebar - 30% */}
           <div
-            className="w-[30%] p-6 text-white"
+            className="w-[30%] p-6 text-white self-stretch"
             style={{ backgroundColor: settings.primaryColor }}
           >
             {contact.photo ? (

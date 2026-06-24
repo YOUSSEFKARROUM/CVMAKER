@@ -19,10 +19,10 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         ref={ref}
         id="cv-preview"
         data-cv-preview
-        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl ${className}`}
+        className={`bg-white w-[210mm] shadow-xl ${className}`}
         style={{ fontFamily: settings.bodyFont }}
       >
-        <div className="flex">
+        <div className="flex min-h-[297mm]">
           {/* Left Sidebar - Dark Charcoal (design intent: fixed dark) */}
           <div
             className="w-[32%] p-6 text-white self-stretch"
@@ -183,7 +183,7 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     </h3>
                     <div className="space-y-3">
                       {educations.map((edu) => (
-                        <div key={edu.id}>
+                        <div key={edu.id} style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                           <div className="flex justify-between items-start mb-1">
                             <h4 className="font-semibold text-sm text-gray-900">{edu.diploma}</h4>
                             <span className="text-xs text-gray-500">{formatDate(edu.graduationDate)}</span>
@@ -206,7 +206,7 @@ export const StanfordTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     </h3>
                     <div className="space-y-4">
                       {experiences.map((exp) => (
-                        <div key={exp.id}>
+                        <div key={exp.id} style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                           <div className="flex justify-between items-start mb-1">
                             <h4 className="font-semibold text-sm text-gray-900">{exp.jobTitle}</h4>
                             <span className="text-xs text-gray-500">

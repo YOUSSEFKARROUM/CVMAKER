@@ -121,7 +121,7 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                       </h3>
                       <div className="space-y-4">
                         {educations.map((edu) => (
-                          <div key={edu.id} className="min-w-0">
+                          <div key={edu.id} className="min-w-0" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                             <p className="text-xs text-gray-500 mb-0.5">
                               {formatDate(edu.graduationDate)}
                             </p>
@@ -148,7 +148,7 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                       </h3>
                       <div className="space-y-4">
                         {experiences.map((exp) => (
-                          <div key={exp.id} className="min-w-0">
+                          <div key={exp.id} className="min-w-0" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                             <p className="text-xs text-gray-500 mb-0.5">
                               {formatDate(exp.startDate)} - {exp.currentlyWorking ? t('common.present') : formatDate(exp.endDate)}
                             </p>

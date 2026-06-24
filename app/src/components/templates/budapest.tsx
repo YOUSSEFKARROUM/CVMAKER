@@ -29,10 +29,10 @@ export const BudapestTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         ref={ref}
         id="cv-preview"
         data-cv-preview
-        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl ${className}`}
+        className={`bg-white w-[210mm] shadow-xl ${className}`}
         style={{ fontFamily: bodyFont }}
       >
-        <div className="flex">
+        <div className="flex min-h-[297mm]">
           {/* Left Sidebar */}
           <div
             className="w-[33%] shrink-0 self-stretch"

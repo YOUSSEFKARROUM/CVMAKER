@@ -46,7 +46,7 @@ function SkeletonCard() {
 
 export function CVGalleryPage({ onLoadCV, onCreateNew, onImport }: CVGalleryPageProps) {
   useAuth();
-  const { cvs, loading, deleteFromCloud } = useCloudCV();
+  const { cvs, loading, deleteFromCloud, error: cloudError, refreshCVs } = useCloudCV();
   const { success, error: showError } = useToast();
 
   const [isDeleting,    setIsDeleting]    = useState<string | null>(null);
@@ -128,6 +128,22 @@ export function CVGalleryPage({ onLoadCV, onCreateNew, onImport }: CVGalleryPage
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ── Supabase error banner ────────────────────────────────────────── */}
+      {cloudError && (
+        <div className="max-w-7xl mx-auto px-6 pt-4">
+          <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-destructive/10 border border-destructive/30 text-sm text-destructive">
+            <span className="font-medium">Erreur Supabase :</span>
+            <span>{cloudError}</span>
+            <button
+              onClick={() => refreshCVs(true)}
+              className="ml-auto shrink-0 underline underline-offset-2 hover:no-underline"
+            >
+              Réessayer
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Page title + actions ─────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-6 pt-8 pb-0">

@@ -60,7 +60,7 @@ export const EdinburghTemplate = forwardRef<HTMLDivElement, TemplateProps>(
         ref={ref}
         id="cv-preview"
         data-cv-preview
-        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl ${className}`}
+        className={`bg-white w-[210mm] min-h-[297mm] shadow-xl flex flex-col ${className}`}
         style={{ fontFamily: settings.bodyFont }}
       >
         {/* Header */}
@@ -87,9 +87,9 @@ export const EdinburghTemplate = forwardRef<HTMLDivElement, TemplateProps>(
           </div>
         </div>
 
-        <div className="flex">
+        <div className="flex flex-1">
           {/* Left Sidebar */}
-          <div className="w-[30%] p-6 bg-gray-100">
+          <div className="w-[30%] p-6 bg-gray-100 self-stretch">
             {/* Personnelles */}
             <div className="mb-6">
               <h3 className="text-xs font-bold uppercase tracking-wider mb-4 text-gray-800 border-b border-gray-300 pb-1">
