@@ -834,7 +834,7 @@ function App() {
     );
   };
 
-  const noLayoutPages: Step[] = ['landing', 'download', 'my-cvs', 'admin', 'profile-page', 'settings-page'];
+  const noLayoutPages: Step[] = ['landing', 'download', 'finish', 'my-cvs', 'admin', 'profile-page', 'settings-page'];
   const showPreview = !noLayoutPages.includes(currentStep);
   const showProgress = !noLayoutPages.includes(currentStep);
 
