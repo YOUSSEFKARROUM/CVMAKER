@@ -21,13 +21,15 @@ import type { CVData, CVSettings } from '../types/cv';
 interface UserMenuProps {
   cvData?: CVData;
   settings?: CVSettings;
-  onLoadCV?: (cv: { cvData: CVData; settings: CVSettings }) => void;
+  activeCVId?: string | null;
+  onSavedCV?: (cvId: string) => void;
+  onLoadCV?: (cv: { id: string; name: string; cvData: CVData; settings: CVSettings; updatedAt: Date }) => void;
   onCreateNew?: () => void;
   onEditCV?: (cvId: string, cvData: CVData, settings: CVSettings) => void;
   onGoToAdmin?: () => void;
 }
 
-export function UserMenu({ cvData, settings, onLoadCV, onCreateNew, onEditCV, onGoToAdmin }: UserMenuProps) {
+export function UserMenu({ cvData, settings, activeCVId, onSavedCV, onLoadCV, onCreateNew, onEditCV, onGoToAdmin }: UserMenuProps) {
   const { t } = useTranslation();
   const { user, isAuthenticated, logout } = useAuth();
   const { isAdmin } = useAdmin();
@@ -44,16 +46,17 @@ export function UserMenu({ cvData, settings, onLoadCV, onCreateNew, onEditCV, on
       : 'Mon CV';
     setIsSaving(true);
     try {
-      await saveToCloud(name, cvData, settings);
+      const savedId = await saveToCloud(name, cvData, settings, activeCVId ?? undefined);
+      onSavedCV?.(savedId);
       success('CV sauvegardé avec succès dans le cloud');
     } catch (err: any) {
       showError(err.message || 'Erreur lors de la sauvegarde');
     } finally {
       setIsSaving(false);
     }
-  }, [cvData, settings, saveToCloud, success, showError]);
+  }, [activeCVId, cvData, settings, onSavedCV, saveToCloud, success, showError]);
 
-  const handleLoadCV = useCallback((cv: { cvData: CVData; settings: CVSettings }) => {
+  const handleLoadCV = useCallback((cv: { id: string; name: string; cvData: CVData; settings: CVSettings; updatedAt: Date }) => {
     onLoadCV?.(cv);
     success('CV chargé avec succès');
   }, [onLoadCV, success]);

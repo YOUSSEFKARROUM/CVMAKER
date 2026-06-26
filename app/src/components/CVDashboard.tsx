@@ -31,7 +31,7 @@ interface CVDashboardProps {
   isOpen: boolean;
   onClose: () => void;
   onCreateNew: () => void;
-  onLoadCV: (cv: { cvData: CVData; settings: CVSettings }) => void;
+  onLoadCV: (cv: { id: string; name: string; cvData: CVData; settings: CVSettings; updatedAt: Date }) => void;
   onEditCV: (cvId: string) => void;
   loading?: boolean;
 }
@@ -137,7 +137,13 @@ export function CVDashboard({
     
     // Petit délai pour montrer le feedback visuel
     setTimeout(() => {
-      onLoadCV({ cvData: cv.cvData, settings: cv.settings });
+      onLoadCV({
+        id: cv.id,
+        name: cv.name,
+        cvData: cv.cvData,
+        settings: cv.settings,
+        updatedAt: cv.updatedAt,
+      });
       setLoadingCV(null);
       onClose();
     }, 300);

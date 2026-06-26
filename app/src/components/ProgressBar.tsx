@@ -21,7 +21,9 @@ interface ProgressBarProps {
   cvData?: CVData;
   settings?: CVSettings;
   setSettings?: (settings: CVSettings) => void;
-  onLoadCV?: (cv: { cvData: CVData; settings: CVSettings }) => void;
+  activeCVId?: string | null;
+  onSavedCV?: (cvId: string) => void;
+  onLoadCV?: (cv: { id: string; name: string; cvData: CVData; settings: CVSettings; updatedAt: Date }) => void;
   onEditCV?: (cvId: string, cvData: CVData, settings: CVSettings) => void;
   onCreateNew?: () => void;
   isZenMode?: boolean;
@@ -38,6 +40,8 @@ export function ProgressBar({
   cvData,
   settings,
   setSettings,
+  activeCVId,
+  onSavedCV,
   onLoadCV,
   onEditCV,
   onCreateNew,
@@ -181,6 +185,8 @@ export function ProgressBar({
               <UserMenu
                 cvData={cvData}
                 settings={settings}
+                activeCVId={activeCVId}
+                onSavedCV={onSavedCV}
                 onLoadCV={onLoadCV}
                 onEditCV={onEditCV}
                 onCreateNew={onCreateNew}

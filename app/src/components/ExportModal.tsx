@@ -130,13 +130,6 @@ export function ExportModal({ isOpen, onClose, previewElement, filename, cvTempl
                   Accès approuvé — {downloadsRemaining} téléchargement{downloadsRemaining > 1 ? 's' : ''} restant{downloadsRemaining > 1 ? 's' : ''}
                 </span>
               </div>
-              <Button variant="blue" size="lg" className="w-full gap-2"
-                      onClick={handleExportPDF} disabled={isExporting}>
-                {isExporting
-                  ? <><Loader2 className="w-5 h-5 animate-spin" />Export en cours...</>
-                  : <><Download className="w-5 h-5" />Télécharger PDF</>
-                }
-              </Button>
             </div>
 
           ) : hasAccess && downloadsRemaining <= 0 ? (

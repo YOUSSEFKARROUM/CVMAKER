@@ -213,10 +213,25 @@
   @apply bg-white;
   color-scheme: light;
 }
+[data-cv-preview] * {
+  word-spacing: 0.05em;
+  -webkit-font-smoothing: antialiased;
+}
 [data-cv-preview] p,
 [data-cv-preview] .break-words {
   word-break: break-word;
   overflow-wrap: anywhere;
+}
+[data-cv-preview] p,
+[data-cv-preview] span,
+[data-cv-preview] div,
+[data-cv-preview] h1,
+[data-cv-preview] h2,
+[data-cv-preview] h3,
+[data-cv-preview] li {
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 [data-cv-preview] .flex-1.min-w-0,
 [data-cv-preview] [class*="min-w-0"] {

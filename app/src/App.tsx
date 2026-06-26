@@ -35,6 +35,7 @@ import { useCVStorage } from './hooks/useCVStorage';
 import { useHistory } from './hooks/useHistory';
 import { useToast } from './hooks/useToast';
 import { useAutoSave } from './hooks/useAutoSave';
+import { useCloudCV } from './hooks/useCloudCV';
 import { useGlobalShortcuts } from './hooks/useKeyboardShortcuts';
 import type { CVData, CVSettings, Step, Experience, Education, Skill, Language, Certification, Project } from './types/cv';
 import './App.css';
@@ -85,6 +86,32 @@ const initialSettings: CVSettings = {
 };
 
 const steps: Exclude<Step, 'landing' | 'download'>[] = ['contact', 'experience', 'education', 'skills', 'languages', 'certifications', 'projects', 'interests', 'profile', 'finish'];
+const editSteps = new Set<Step>(steps);
+
+function hasMeaningfulCVData(data: CVData): boolean {
+  return Object.values(data.contact).some(value => typeof value === 'string' && value.trim().length > 0)
+    || data.experiences.length > 0
+    || data.educations.length > 0
+    || data.skills.length > 0
+    || data.languages.length > 0
+    || data.certifications.length > 0
+    || data.projects.length > 0
+    || data.interests.length > 0
+    || data.references.length > 0
+    || data.internships.length > 0
+    || data.publications.length > 0
+    || data.extracurricular.length > 0
+    || data.profile.trim().length > 0;
+}
+
+function getCVName(data: CVData): string {
+  const name = `${data.contact.firstName} ${data.contact.lastName}`.trim();
+  return name ? `${name} - CV` : 'Mon CV';
+}
+
+function serializeCVPayload(cvData: CVData, settings: CVSettings): string {
+  return JSON.stringify({ cvData, settings });
+}
 
 function App() {
   // IMPORTANT: useAuth doit être appelé avant useCVStorage car il fournit user
@@ -103,6 +130,7 @@ function App() {
   } = useCVStorage(initialCVData, initialSettings, 'landing', user?.uid);
 
   const { setState: setHistoryState, undo, redo, canUndo, canRedo } = useHistory(cvData);
+  const { saveToCloud } = useCloudCV();
   const { toasts, removeToast, success, error, info } = useToast();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -116,7 +144,13 @@ function App() {
   }>({ type: null });
   const [isZenMode, setIsZenMode] = useState(false);
   const [showPreviewDesktop, setShowPreviewDesktop] = useState(true);
+  const [activeCVId, setActiveCVId] = useState<string | null>(null);
+  const [activeCVName, setActiveCVName] = useState<string | null>(null);
+  const [isCloudAutosaving, setIsCloudAutosaving] = useState(false);
+  const [cloudLastSaved, setCloudLastSaved] = useState<Date | undefined>();
   const previewRef = useRef<HTMLDivElement | null>(null);
+  const cloudAutosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastCloudSavedPayloadRef = useRef<string | null>(null);
 
   // Rediriger vers la galerie de CVs après authentification
   useEffect(() => {
@@ -133,6 +167,74 @@ function App() {
       // Silencieux
     },
   });
+
+  const currentCloudPayload = useMemo(
+    () => serializeCVPayload(cvData, settings),
+    [cvData, settings]
+  );
+
+  const handleCloudSaved = useCallback((cvId: string) => {
+    setActiveCVId(cvId);
+    lastCloudSavedPayloadRef.current = currentCloudPayload;
+    setCloudLastSaved(new Date());
+  }, [currentCloudPayload]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user?.uid || !editSteps.has(currentStep) || !hasMeaningfulCVData(cvData)) {
+      return;
+    }
+    if (currentCloudPayload === lastCloudSavedPayloadRef.current) {
+      return;
+    }
+
+    if (cloudAutosaveTimerRef.current) {
+      clearTimeout(cloudAutosaveTimerRef.current);
+    }
+
+    cloudAutosaveTimerRef.current = setTimeout(async () => {
+      setIsCloudAutosaving(true);
+      try {
+        const savedId = await saveToCloud(
+          activeCVName ?? getCVName(cvData),
+          cvData,
+          settings,
+          activeCVId ?? undefined
+        );
+        setActiveCVId(savedId);
+        lastCloudSavedPayloadRef.current = currentCloudPayload;
+        setCloudLastSaved(new Date());
+      } catch (err) {
+        console.warn('Cloud autosave failed:', err);
+      } finally {
+        setIsCloudAutosaving(false);
+      }
+    }, 5000);
+
+    return () => {
+      if (cloudAutosaveTimerRef.current) {
+        clearTimeout(cloudAutosaveTimerRef.current);
+      }
+    };
+  }, [
+    activeCVId,
+    activeCVName,
+    currentCloudPayload,
+    currentStep,
+    cvData,
+    isAuthenticated,
+    saveToCloud,
+    settings,
+    user?.uid,
+  ]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setActiveCVId(null);
+      setActiveCVName(null);
+      setCloudLastSaved(undefined);
+      lastCloudSavedPayloadRef.current = null;
+    }
+  }, [isAuthenticated]);
 
   // Keyboard shortcuts
   useGlobalShortcuts(undo, redo, canUndo, canRedo);
@@ -576,6 +678,10 @@ function App() {
       message: 'Êtes-vous sûr de vouloir réinitialiser votre CV ? Toutes vos données seront perdues.',
       onConfirm: () => {
         resetData();
+        setActiveCVId(null);
+        setActiveCVName(null);
+        setCloudLastSaved(undefined);
+        lastCloudSavedPayloadRef.current = null;
         setModalState({ type: null });
         success('CV réinitialisé avec succès');
       },
@@ -585,6 +691,10 @@ function App() {
 
   const goToLanding = () => {
     resetData();
+    setActiveCVId(null);
+    setActiveCVName(null);
+    setCloudLastSaved(undefined);
+    lastCloudSavedPayloadRef.current = null;
     setCurrentStep('landing');
     success('Retour à l\'accueil');
   };
@@ -594,9 +704,13 @@ function App() {
     success('Données exportées avec succès');
   };
 
-  const handleEditCV = useCallback((_cvId: string, loadedCvData: CVData, loadedSettings: CVSettings) => {
+  const handleEditCV = useCallback((cvId: string, loadedCvData: CVData, loadedSettings: CVSettings) => {
     setCVData(loadedCvData);
     setSettings(loadedSettings);
+    setActiveCVId(cvId);
+    setActiveCVName(null);
+    lastCloudSavedPayloadRef.current = serializeCVPayload(loadedCvData, loadedSettings);
+    setCloudLastSaved(new Date());
     setCurrentStep('contact');
     success('CV chargé en mode édition');
   }, [setCVData, setSettings, setCurrentStep, success]);
@@ -604,6 +718,10 @@ function App() {
   const handleImport = async (file: File) => {
     try {
       await importData(file);
+      setActiveCVId(null);
+      setActiveCVName(null);
+      setCloudLastSaved(undefined);
+      lastCloudSavedPayloadRef.current = null;
       success('Données importées avec succès');
     } catch (err) {
       error('Erreur lors de l\'importation des données');
@@ -644,18 +762,30 @@ function App() {
         case 'my-cvs':
           return (
             <CVGalleryPage
-              onLoadCV={({ cvData: loadedCvData, settings: loadedSettings }) => {
+              onLoadCV={({ id, name, cvData: loadedCvData, settings: loadedSettings, updatedAt }) => {
                 setCVData(loadedCvData);
                 setSettings(loadedSettings);
+                setActiveCVId(id);
+                setActiveCVName(name);
+                lastCloudSavedPayloadRef.current = serializeCVPayload(loadedCvData, loadedSettings);
+                setCloudLastSaved(updatedAt);
                 setCurrentStep('contact');
                 success('CV chargé — vous pouvez le modifier');
               }}
               onCreateNew={() => {
                 resetData();
+                setActiveCVId(null);
+                setActiveCVName(null);
+                setCloudLastSaved(undefined);
+                lastCloudSavedPayloadRef.current = null;
                 setCurrentStep('contact');
               }}
               onImport={async (file) => {
                 await importData(file);
+                setActiveCVId(null);
+                setActiveCVName(null);
+                setCloudLastSaved(undefined);
+                lastCloudSavedPayloadRef.current = null;
                 success('CV importé avec succès');
                 setCurrentStep('contact');
               }}
@@ -666,6 +796,11 @@ function App() {
             <LandingPage
               onCreateNew={() => {
                 if (isAuthenticated) {
+                  resetData();
+                  setActiveCVId(null);
+                  setActiveCVName(null);
+                  setCloudLastSaved(undefined);
+                  lastCloudSavedPayloadRef.current = null;
                   setCurrentStep('contact');
                 } else {
                   setShowAuthModal(true);
@@ -861,9 +996,16 @@ function App() {
             cvData={cvData}
             settings={settings}
             setSettings={setSettings}
-            onLoadCV={({ cvData: loadedCvData, settings: loadedSettings }) => {
+            activeCVId={activeCVId}
+            onSavedCV={handleCloudSaved}
+            onLoadCV={({ id, name, cvData: loadedCvData, settings: loadedSettings, updatedAt }) => {
               setCVData(loadedCvData);
               setSettings(loadedSettings);
+              setActiveCVId(id);
+              setActiveCVName(name);
+              lastCloudSavedPayloadRef.current = serializeCVPayload(loadedCvData, loadedSettings);
+              setCloudLastSaved(updatedAt);
+              setCurrentStep('contact');
             }}
             onEditCV={handleEditCV}
             onCreateNew={goToLanding}
@@ -911,9 +1053,9 @@ function App() {
               {showProgress && (
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
                   <AutoSaveIndicator
-                    lastSaved={lastSaved}
-                    isSaving={isSaving}
-                    isCloudEnabled={false}
+                    lastSaved={cloudLastSaved ?? lastSaved}
+                    isSaving={isSaving || isCloudAutosaving}
+                    isCloudEnabled={!!activeCVId}
                     versions={versions}
                   />
                   <div className="flex items-center gap-2">

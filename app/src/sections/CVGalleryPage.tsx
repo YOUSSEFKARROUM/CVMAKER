@@ -11,7 +11,7 @@ import { CVThumbnail } from '../components/CVThumbnail';
 import type { CVData, CVSettings } from '../types/cv';
 
 interface CVGalleryPageProps {
-  onLoadCV: (cv: { cvData: CVData; settings: CVSettings }) => void;
+  onLoadCV: (cv: { id: string; name: string; cvData: CVData; settings: CVSettings; updatedAt: Date }) => void;
   onCreateNew: () => void;
   onImport: (file: File) => Promise<void>;
 
@@ -59,7 +59,16 @@ export function CVGalleryPage({ onLoadCV, onCreateNew, onImport }: CVGalleryPage
   const handleLoad = useCallback((cv: typeof cvs[0]) => {
     if (loadingCV) return;
     setLoadingCV(cv.id);
-    setTimeout(() => { onLoadCV({ cvData: cv.cvData, settings: cv.settings }); setLoadingCV(null); }, 200);
+    setTimeout(() => {
+      onLoadCV({
+        id: cv.id,
+        name: cv.name,
+        cvData: cv.cvData,
+        settings: cv.settings,
+        updatedAt: cv.updatedAt,
+      });
+      setLoadingCV(null);
+    }, 200);
   }, [onLoadCV, loadingCV]);
 
   const handleDelete = useCallback((cvId: string, e: React.MouseEvent) => {

@@ -170,7 +170,7 @@ export const BerkeleyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                       <div className="flex-1 min-w-0">
                         <h4 className="font-semibold text-sm text-gray-900">{cert.name}</h4>
                         <p className="text-sm text-gray-600">{cert.organization}</p>
-                        {cert.credentialId && <p className="text-xs text-gray-500">ID: {cert.credentialId}</p>}
+                        {cert.credentialId && <p className="text-sm text-gray-500">ID: {cert.credentialId}</p>}
                       </div>
                       <span className="text-sm text-gray-500 whitespace-nowrap flex-shrink-0">{formatDate(cert.date)}</span>
                     </div>
@@ -192,7 +192,7 @@ export const BerkeleyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                       {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1">
                           {proj.technologies.slice(0, 12).map((tech, idx) => (
-                            <span key={idx} className="text-xs px-2 py-0.5 bg-gray-100 rounded text-gray-600">{String(tech)}</span>
+                            <span key={idx} className="text-sm px-2 py-0.5 bg-gray-100 rounded text-gray-600">{String(tech)}</span>
                           ))}
                         </div>
                       )}
@@ -254,7 +254,7 @@ export const BerkeleyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
               {languages.map((lang) => (
                 <div key={lang.id} className="flex items-center justify-between text-sm">
                   <span className="text-gray-700">{lang.name}</span>
-                  <span className="text-gray-500 text-xs">{t(`template.languageLevels.${lang.level}`, lang.level)}</span>
+                  <span className="text-gray-500 text-sm">{t(`template.languageLevels.${lang.level}`, lang.level)}</span>
                 </div>
               ))}
             </div>
@@ -331,8 +331,8 @@ export const BerkeleyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 <div key={ref.id} className="text-sm">
                   <p className="font-semibold text-gray-900">{ref.name}</p>
                   <p className="text-gray-600">{ref.position}{ref.company && `, ${ref.company}`}</p>
-                  {ref.email && <p className="text-gray-500 text-xs">{ref.email}</p>}
-                  {ref.phone && <p className="text-gray-500 text-xs">{ref.phone}</p>}
+                  {ref.email && <p className="text-gray-500 text-sm">{ref.email}</p>}
+                  {ref.phone && <p className="text-gray-500 text-sm">{ref.phone}</p>}
                 </div>
               ))}
             </div>

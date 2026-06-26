@@ -13,6 +13,10 @@ const A4_W_PX = 794;
 const A4_H_PX = 1123;
 // Scale de capture — 2 donne du 1588×2246 par page, qualité suffisante
 const CAPTURE_SCALE = 2;
+const TEXT_ELEMENTS_SELECTOR = 'p, span, div, h1, h2, h3, h4, h5, h6, li, td, th, a, label';
+type Html2CanvasOptions = NonNullable<Parameters<typeof html2canvas>[1]> & {
+  letterRendering?: boolean;
+};
 
 /**
  * Exporte un CV vers PDF multi-page A4.
@@ -40,6 +44,7 @@ export async function exportCVToPDF(
     overflowX: element.style.overflowX,
     overflowY: element.style.overflowY,
   };
+  const savedTextStyles: { el: HTMLElement; style: string }[] = [];
 
   try {
     element.classList.add('pdf-export-mode');
@@ -55,10 +60,23 @@ export async function exportCVToPDF(
     element.style.overflowX = 'visible';
     element.style.overflowY = 'visible';
 
+    element.querySelectorAll(TEXT_ELEMENTS_SELECTOR).forEach((el) => {
+      const htmlEl = el as HTMLElement;
+      const computed = window.getComputedStyle(htmlEl);
+      savedTextStyles.push({ el: htmlEl, style: htmlEl.style.cssText });
+
+      if (computed.wordSpacing === 'normal' || computed.wordSpacing === '0px') {
+        htmlEl.style.wordSpacing = '0.05em';
+      }
+      if (computed.whiteSpace === 'nowrap') {
+        htmlEl.style.whiteSpace = 'normal';
+      }
+    });
+
     await new Promise(resolve => setTimeout(resolve, 300));
 
     // 1. Capturer tout le contenu en une seule image haute résolution
-    const fullCanvas = await html2canvas(element, {
+    const captureOptions: Html2CanvasOptions = {
       scale: CAPTURE_SCALE,
       useCORS: true,
       allowTaint: true,
@@ -71,11 +89,45 @@ export async function exportCVToPDF(
       y: 0,
       scrollX: 0,
       scrollY: 0,
-    });
+      letterRendering: true,
+      foreignObjectRendering: false,
+    };
+    const fullCanvas = await html2canvas(element, captureOptions);
 
     const totalImgHeight = fullCanvas.height; // en px canvas (scale inclus)
     const pageImgH = A4_H_PX * CAPTURE_SCALE;  // hauteur d'une page en px canvas
-    const pageCount = Math.ceil(totalImgHeight / pageImgH);
+    const totalPages = Math.ceil(totalImgHeight / pageImgH);
+    let pageCount = totalPages;
+
+    if (totalPages > 1) {
+      const lastPageStart = (totalPages - 1) * pageImgH;
+      const lastPageHeight = totalImgHeight - lastPageStart;
+      const lastPageCanvas = document.createElement('canvas');
+      lastPageCanvas.width = fullCanvas.width;
+      lastPageCanvas.height = Math.min(pageImgH, lastPageHeight);
+      const lastPageCtx = lastPageCanvas.getContext('2d')!;
+      lastPageCtx.drawImage(
+        fullCanvas,
+        0, lastPageStart, fullCanvas.width, lastPageHeight,
+        0, 0, fullCanvas.width, lastPageHeight
+      );
+
+      const imageData = lastPageCtx.getImageData(0, 0, lastPageCanvas.width, lastPageCanvas.height);
+      let nonWhitePixels = 0;
+      const totalPixels = imageData.data.length / 4;
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        const r = imageData.data[i];
+        const g = imageData.data[i + 1];
+        const b = imageData.data[i + 2];
+        if (r < 250 || g < 250 || b < 250) {
+          nonWhitePixels++;
+        }
+      }
+
+      if (nonWhitePixels / totalPixels < 0.02) {
+        pageCount = totalPages - 1;
+      }
+    }
 
     // 2. Créer le PDF A4
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -121,6 +173,9 @@ export async function exportCVToPDF(
     element.style.overflow = saved.overflow;
     element.style.overflowX = saved.overflowX;
     element.style.overflowY = saved.overflowY;
+    savedTextStyles.forEach(({ el, style }) => {
+      el.style.cssText = style;
+    });
   }
 }
 
