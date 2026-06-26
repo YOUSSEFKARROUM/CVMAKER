@@ -5,7 +5,7 @@ import { fadeInUp, staggerContainer } from '../styles/design-system';
 import {
   FilePlus, Sparkles, Zap, Globe, Star, Shield, Download,
   Palette, Eye, ArrowRight, MousePointerClick, Clock,
-  FileCheck, ChevronDown, Menu, X, Check,
+  FileCheck, ChevronDown, Menu, X,
 } from 'lucide-react';
 import { Logo } from '../components/Logo';
 import { Button } from '../components/ui/button';
@@ -85,9 +85,6 @@ const FEATURES = [
 
 const TESTIMONIAL_KEYS = ['testimonial1', 'testimonial2', 'testimonial3'] as const;
 const FAQ_KEYS         = ['faq1', 'faq2', 'faq3', 'faq4'] as const;
-
-const FREE_FEATURES     = ['Création illimitée de CV', 'Auto-sauvegarde cloud', 'Aperçu en temps réel', '19 templates disponibles', 'Export JSON'];
-const PREMIUM_FEATURES  = ['Tout du plan gratuit', 'PDF haute définition', 'Optimisé ATS', 'Sans filigrane', 'Téléchargement instantané'];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -534,92 +531,6 @@ export function LandingPage({ onCreateNew, onImport, isAuthenticated }: LandingP
                   </Card>
                 </motion.div>
               ))}
-            </motion.div>
-          </div>
-        </section>
-
-        {/* ── Pricing ─────────────────────────────────────────────────────── */}
-        <section id="pricing" className="py-20 bg-surface-1">
-          <div className="max-w-5xl mx-auto px-6">
-            <motion.div
-              variants={fadeInUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="text-center mb-12"
-            >
-              <SectionBadge>Tarifs</SectionBadge>
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 tracking-tight">
-                Simple et transparent
-              </h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">
-                Créez votre CV gratuitement. Payez uniquement quand vous êtes prêt à télécharger.
-              </p>
-            </motion.div>
-
-            <motion.div
-              className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto"
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              {/* Free */}
-              <motion.div variants={fadeInUp}>
-                <Card variant="marketing" className="h-full flex flex-col">
-                  <div className="mb-6">
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Plan</p>
-                    <h3 className="text-xl font-bold text-foreground">Gratuit</h3>
-                    <p className="mt-3">
-                      <span className="text-4xl font-bold text-foreground">0 €</span>
-                      <span className="text-sm text-muted-foreground"> / toujours</span>
-                    </p>
-                  </div>
-                  <ul className="space-y-3 mb-8 flex-1">
-                    {FREE_FEATURES.map(f => (
-                      <li key={f} className="flex items-center gap-2.5 text-sm">
-                        <Check className="w-4 h-4 text-success shrink-0" />
-                        <span className="text-foreground">{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button variant="outline" size="lg" className="w-full" onClick={onCreateNew}>
-                    Commencer gratuitement
-                  </Button>
-                </Card>
-              </motion.div>
-
-              {/* Premium */}
-              <motion.div variants={fadeInUp} className="relative">
-                {/* Popular badge */}
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                  <span className="px-3 py-1 bg-blue text-blue-foreground text-xs font-semibold rounded-full whitespace-nowrap">
-                    Le + populaire
-                  </span>
-                </div>
-                <Card variant="marketing" className="h-full flex flex-col border-blue">
-                  <div className="mb-6">
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Plan</p>
-                    <h3 className="text-xl font-bold text-foreground">Téléchargement PDF</h3>
-                    <p className="mt-3">
-                      <span className="text-4xl font-bold text-blue">2 €</span>
-                      <span className="text-sm text-muted-foreground"> / CV</span>
-                    </p>
-                  </div>
-                  <ul className="space-y-3 mb-8 flex-1">
-                    {PREMIUM_FEATURES.map(f => (
-                      <li key={f} className="flex items-center gap-2.5 text-sm">
-                        <Check className="w-4 h-4 text-success shrink-0" />
-                        <span className="text-foreground">{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button variant="blue" size="lg" className="w-full" onClick={onCreateNew}>
-                    Créer mon CV
-                    <ArrowRight />
-                  </Button>
-                </Card>
-              </motion.div>
             </motion.div>
           </div>
         </section>
