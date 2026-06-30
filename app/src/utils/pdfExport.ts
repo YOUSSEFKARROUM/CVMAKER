@@ -13,7 +13,8 @@ const A4_W_PX = 794;
 const A4_H_PX = 1123;
 // Scale de capture — 2 donne du 1588×2246 par page, qualité suffisante
 const CAPTURE_SCALE = 2;
-const TEXT_ELEMENTS_SELECTOR = 'p, span, div, h1, h2, h3, h4, h5, h6, li, td, th, a, label';
+// Valeur absolue de word-spacing injectée via onclone pour éviter l'arrondi à 0px par html2canvas
+const CLONE_WORD_SPACING = '3px';
 type Html2CanvasOptions = NonNullable<Parameters<typeof html2canvas>[1]> & {
   letterRendering?: boolean;
 };
@@ -44,7 +45,6 @@ export async function exportCVToPDF(
     overflowX: element.style.overflowX,
     overflowY: element.style.overflowY,
   };
-  const savedTextStyles: { el: HTMLElement; style: string }[] = [];
 
   try {
     element.classList.add('pdf-export-mode');
@@ -59,19 +59,6 @@ export async function exportCVToPDF(
     element.style.overflow = 'visible';
     element.style.overflowX = 'visible';
     element.style.overflowY = 'visible';
-
-    element.querySelectorAll(TEXT_ELEMENTS_SELECTOR).forEach((el) => {
-      const htmlEl = el as HTMLElement;
-      const computed = window.getComputedStyle(htmlEl);
-      savedTextStyles.push({ el: htmlEl, style: htmlEl.style.cssText });
-
-      if (computed.wordSpacing === 'normal' || computed.wordSpacing === '0px') {
-        htmlEl.style.wordSpacing = '0.05em';
-      }
-      if (computed.whiteSpace === 'nowrap') {
-        htmlEl.style.whiteSpace = 'normal';
-      }
-    });
 
     await new Promise(resolve => setTimeout(resolve, 300));
 
@@ -91,6 +78,15 @@ export async function exportCVToPDF(
       scrollY: 0,
       letterRendering: true,
       foreignObjectRendering: false,
+      // Fix mots collés : injecter word-spacing absolu dans la copie interne d'html2canvas.
+      // 0.05em est arrondi à 0px par le moteur de rendu → on force 3px qui ne peut pas être annulé.
+      onclone: (_clonedDoc: Document, clonedEl: HTMLElement) => {
+        // Fix mots collés : 3px absolu impossible à arrondir à 0 par html2canvas.
+        // S'applique à tous les templates sans exception via le clône interne.
+        clonedEl.querySelectorAll<HTMLElement>('*').forEach(el => {
+          el.style.wordSpacing = CLONE_WORD_SPACING;
+        });
+      },
     };
     const fullCanvas = await html2canvas(element, captureOptions);
 
@@ -173,9 +169,6 @@ export async function exportCVToPDF(
     element.style.overflow = saved.overflow;
     element.style.overflowX = saved.overflowX;
     element.style.overflowY = saved.overflowY;
-    savedTextStyles.forEach(({ el, style }) => {
-      el.style.cssText = style;
-    });
   }
 }
 
