@@ -57,8 +57,12 @@ export async function exportCVToPDF(
   clone.style.zIndex = '-1';
 
   clone.querySelectorAll<HTMLElement>('*').forEach(el => {
-    // word-spacing absolu : compense le 0px de Canvas2D pour les espaces
-    el.style.wordSpacing = '2px';
+    // word-spacing RELATIF (em) : scale avec la taille de police
+    // 2px absolu était insuffisant pour Bebas Neue ≥36px (espace naturel=0px, 2px≈4% → invisible)
+    // 0.2em = 2.8px à 14px, 9.6px à 48px → visible à toutes les tailles
+    el.style.wordSpacing = '0.2em';
+    // letter-spacing minimal : évite la fusion des glyphes (é, à, ê...) dans html2canvas
+    el.style.letterSpacing = '0.01em';
     // overflow visible partout sauf photos de profil (rounded-full) et images
     if (!el.classList.contains('rounded-full') && el.tagName !== 'IMG') {
       el.style.overflow = 'visible';
@@ -69,9 +73,9 @@ export async function exportCVToPDF(
 
   document.body.appendChild(clone);
 
-  // 2 frames + 400ms pour que le navigateur calcule layout et polices
+  // 2 frames + 600ms : laisse le navigateur recalculer layout, polices et word-spacing relatif
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-  await new Promise(resolve => setTimeout(resolve, 400));
+  await new Promise(resolve => setTimeout(resolve, 600));
 
   try {
     const contentHeight = clone.scrollHeight;
