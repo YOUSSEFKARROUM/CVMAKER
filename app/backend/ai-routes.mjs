@@ -1,10 +1,10 @@
-import Anthropic from '@anthropic-ai/sdk';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 
 const router = Router();
 
-const MODEL = process.env.AI_MODEL || 'claude-sonnet-4-6';
+const GROQ_CHAT_COMPLETIONS_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const MODEL = process.env.GROQ_MODEL || process.env.AI_MODEL || 'llama-3.3-70b-versatile';
 const MAX_TOKENS = Number.parseInt(process.env.AI_MAX_TOKENS || '2000', 10);
 
 const aiLimiter = rateLimit({
@@ -33,7 +33,7 @@ router.post('/generate', async (req, res) => {
       return res.status(400).json({ error: 'action et data sont requis' });
     }
 
-    if (!process.env.ANTHROPIC_API_KEY) {
+    if (!process.env.GROQ_API_KEY) {
       return res.status(503).json({ error: 'Service IA non configure.' });
     }
 
@@ -42,22 +42,37 @@ router.post('/generate', async (req, res) => {
       return res.status(400).json({ error: `Action inconnue: ${action}` });
     }
 
-    const anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
+    const response = await fetch(GROQ_CHAT_COMPLETIONS_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: Number.isFinite(MAX_TOKENS) ? MAX_TOKENS : 2000,
+        temperature: 0.4,
+        messages: [
+          { role: 'system', content: prompts.system },
+          { role: 'user', content: prompts.user },
+        ],
+      }),
     });
 
-    const response = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: Number.isFinite(MAX_TOKENS) ? MAX_TOKENS : 2000,
-      system: prompts.system,
-      messages: [{ role: 'user', content: prompts.user }],
-    });
+    const payload = await response.json().catch(() => null);
 
-    const text = response.content
-      .filter((block) => block.type === 'text')
-      .map((block) => block.text)
-      .join('')
-      .trim();
+    if (!response.ok) {
+      const message = payload?.error?.message || payload?.error || `Groq API error ${response.status}`;
+      const error = new Error(message);
+      error.status = response.status;
+      throw error;
+    }
+
+    const text = String(payload?.choices?.[0]?.message?.content ?? '').trim();
+
+    if (!text) {
+      throw new Error('Groq API returned an empty response.');
+    }
 
     if (jsonActions.has(action)) {
       try {
