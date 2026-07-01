@@ -203,7 +203,7 @@ export const CambridgeTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                           <div key={proj.id} className="min-w-0">
                             <div className="flex items-center gap-2 mb-0.5 min-w-0">
                               <Folder className="w-3.5 h-3.5 flex-shrink-0" style={{ color: settings.primaryColor }} />
-                              <h4 className="font-semibold text-sm text-gray-900 truncate">{proj.name}</h4>
+                              <h4 className="font-semibold text-sm text-gray-900 break-words">{proj.name}</h4>
                             </div>
                             <div className="text-xs text-gray-700 break-words leading-relaxed" style={{ overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(proj.description || '') }} />
                             {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (

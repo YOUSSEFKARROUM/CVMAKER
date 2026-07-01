@@ -147,10 +147,10 @@ export const ChicagoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                 <SectionTitle titleKey="template.projects" color={settings.primaryColor} variant="bordered" />
                 <div className="space-y-4 min-w-0">
                   {projects.map((proj) => (
-                    <div key={proj.id} className="min-w-0 overflow-hidden">
+                    <div key={proj.id} className="min-w-0">
                       <div className="flex items-center gap-2 mb-1 min-w-0">
                         <Folder className="w-4 h-4 flex-shrink-0" style={{ color: settings.primaryColor }} />
-                        <h4 className="font-semibold text-gray-900 truncate">{proj.name}</h4>
+                        <h4 className="font-semibold text-gray-900 break-words">{proj.name}</h4>
                       </div>
                       <div className="text-sm text-gray-700 mb-1 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(proj.description || '') }} />
                       {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (

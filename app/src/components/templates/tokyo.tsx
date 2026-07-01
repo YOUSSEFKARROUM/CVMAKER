@@ -185,10 +185,10 @@ export const TokyoTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     <SectionTitle titleKey="template.projects" color={settings.primaryColor} className="text-sm uppercase" />
                     <div className="space-y-3 min-w-0">
                       {projects.map((proj) => (
-                        <div key={proj.id} className="min-w-0 overflow-hidden">
+                        <div key={proj.id} className="min-w-0">
                           <div className="flex items-center gap-1 mb-1 min-w-0">
                             <Folder className="w-3 h-3 flex-shrink-0" style={{ color: settings.primaryColor }} />
-                            <h4 className="font-semibold text-sm text-gray-900 truncate">{proj.name}</h4>
+                            <h4 className="font-semibold text-sm text-gray-900 break-words">{proj.name}</h4>
                           </div>
                           <div className="text-xs text-gray-700 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(proj.description || '') }} />
                           {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (

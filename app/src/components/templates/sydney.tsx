@@ -189,8 +189,8 @@ export const SydneyTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         <div className="w-24 flex-shrink-0 text-right">
                           <Folder className="w-5 h-5 ml-auto" style={{ color: settings.primaryColor }} />
                         </div>
-                        <div className="flex-1 min-w-0 overflow-hidden border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
-                          <h4 className="font-semibold text-gray-900 truncate">
+                        <div className="flex-1 min-w-0 border-l-2 pl-4" style={{ borderColor: settings.primaryColor }}>
+                          <h4 className="font-semibold text-gray-900 break-words">
                             {proj.name}
                             {proj.link && (
                               <a href={proj.link} target="_blank" rel="noopener noreferrer" className="text-xs ml-2 break-all" style={{ color: settings.primaryColor }}>

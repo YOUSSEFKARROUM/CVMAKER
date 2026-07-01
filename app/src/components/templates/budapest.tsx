@@ -290,7 +290,7 @@ export const BudapestTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                       {projects.map((proj) => (
                         <div key={proj.id} className="min-w-0" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                           <div className="flex items-center gap-1.5 min-w-0">
-                            <h4 className="text-[12px] font-bold text-gray-900 truncate">{proj.name}</h4>
+                            <h4 className="text-[12px] font-bold text-gray-900 break-words">{proj.name}</h4>
                             {proj.link && <ExternalLink className="w-3 h-3 flex-shrink-0 text-gray-400" />}
                           </div>
                           {proj.description && (

@@ -299,9 +299,9 @@ export const KievTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     />
                     <div className="space-y-4 min-w-0">
                       {projects.map((proj) => (
-                        <div key={proj.id} className="min-w-0 overflow-hidden">
+                        <div key={proj.id} className="min-w-0">
                           <div className="flex items-center gap-2 mb-1 min-w-0">
-                            <h4 className="font-semibold text-gray-900 truncate">
+                            <h4 className="font-semibold text-gray-900 break-words">
                               {proj.name}
                             </h4>
                             {proj.link && (
