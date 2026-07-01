@@ -51,7 +51,11 @@ export function useAI(): UseAIReturn {
       const { result } = await res.json();
       return result;
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Erreur lors de la generation IA';
+      const message = err instanceof TypeError && err.message === 'Failed to fetch'
+        ? 'Backend IA inaccessible. Verifiez VITE_BACKEND_URL, CORS et la protection Vercel.'
+        : err instanceof Error
+          ? err.message
+          : 'Erreur lors de la generation IA';
       setError(message);
       throw err;
     } finally {
