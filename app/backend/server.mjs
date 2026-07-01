@@ -33,12 +33,24 @@ app.use(
   })
 );
 
+app.get('/', (_req, res) => {
+  res.json({
+    ok: true,
+    service: 'cv-maker-backend',
+    endpoints: ['/health', '/ai/generate'],
+  });
+});
+
 app.get('/health', (_req, res) => {
   res.json({ ok: true });
 });
 
 app.use('/ai', aiRoutes);
 
-app.listen(port, () => {
-  console.log(`[cv-maker-backend] Listening on port ${port}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(port, () => {
+    console.log(`[cv-maker-backend] Listening on port ${port}`);
+  });
+}
+
+export default app;
