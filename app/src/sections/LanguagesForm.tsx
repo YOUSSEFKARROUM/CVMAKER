@@ -4,13 +4,17 @@ import { ArrowRight, ArrowLeft, Plus, Trash2, ChevronUp, Globe, Check } from 'lu
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import AIButton from '@/components/AIButton';
+import { useAI } from '@/hooks/useAI';
 import { SortableList } from '../components/SortableList';
 import { AutocompleteInput } from '../components/AutocompleteInput';
 import { fadeInUp, staggerContainer } from '../styles/design-system';
-import type { Language } from '../types/cv';
+import type { CVSettings, Language } from '../types/cv';
 
 interface LanguagesFormProps {
   languages: Language[];
+  settings: CVSettings;
+  jobTitle?: string;
   onAdd: (language: Language) => void;
   onUpdate: (id: string, language: Partial<Language>) => void;
   onDelete: (id: string) => void;
@@ -29,10 +33,16 @@ const emptyLanguage: Language = { id: '', name: '', level: 'intermediate' };
 
 const labelCls = 'block text-sm font-medium text-foreground mb-1';
 
+interface ImprovedLanguage {
+  name: string;
+  description?: string;
+}
+
 export function LanguagesForm({
-  languages, onAdd, onUpdate, onDelete, onReorder, onNext, onBack,
+  languages, settings, jobTitle, onAdd, onUpdate, onDelete, onReorder, onNext, onBack,
 }: LanguagesFormProps) {
   const { t } = useTranslation();
+  const { generate, error: aiError } = useAI();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [newLanguage, setNewLanguage] = useState<Language | null>(null);
 
@@ -66,6 +76,22 @@ export function LanguagesForm({
   const getLevelLabel       = (level: string) => getProficiencyLevels().find(l => l.value === level)?.label || level;
   const getLevelDescription = (level: string) => getProficiencyLevels().find(l => l.value === level)?.description || '';
 
+  const handleImproveLanguages = async () => {
+    const result = await generate('improve-languages', {
+      languages,
+      jobTitle,
+      language: settings.language,
+    });
+
+    if (!Array.isArray(result)) return;
+    (result as ImprovedLanguage[]).forEach((improved) => {
+      const existing = languages.find(lang => lang.name.toLowerCase() === improved.name.toLowerCase());
+      if (existing && improved.description) {
+        onUpdate(existing.id, { description: improved.description });
+      }
+    });
+  };
+
   const renderLanguageForm = (lang: Language, isNew: boolean) => (
     <Card variant="compact" hover className="mb-3 cursor-grab active:cursor-grabbing">
       <div className="flex justify-between items-start mb-3">
@@ -77,7 +103,7 @@ export function LanguagesForm({
             </p>
             {lang.name && (
               <p className="text-xs text-muted-foreground">
-                {getLevelLabel(lang.level)} — {getLevelDescription(lang.level)}
+                {getLevelLabel(lang.level)} — {lang.description || getLevelDescription(lang.level)}
               </p>
             )}
           </div>
@@ -145,6 +171,18 @@ export function LanguagesForm({
             </div>
           </div>
 
+          <div>
+            <p className={labelCls}>Description enrichie</p>
+            <textarea
+              value={lang.description || ''}
+              onChange={e => isNew
+                ? setNewLanguage({ ...lang, description: e.target.value })
+                : onUpdate(lang.id, { description: e.target.value })}
+              placeholder="Ex: Anglais professionnel - documentation technique, reunions client..."
+              className="w-full min-h-[76px] px-3 py-2 rounded-lg border border-border bg-background text-sm resize-y"
+            />
+          </div>
+
           {isNew && (
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="outline" onClick={handleCancel}>{t('nav.cancel')}</Button>
@@ -165,10 +203,23 @@ export function LanguagesForm({
       <p className="text-sm text-muted-foreground mb-8">{t('languages.subtitle')}</p>
 
       <motion.div variants={staggerContainer} initial="hidden" animate="visible">
-        <Button variant="outline" size="sm" onClick={handleAdd} className="mb-4">
-          <Plus className="w-4 h-4" />
-          {t('languages.add')}
-        </Button>
+        <div className="flex items-center gap-2 mb-4">
+          <Button variant="outline" size="sm" onClick={handleAdd}>
+            <Plus className="w-4 h-4" />
+            {t('languages.add')}
+          </Button>
+          <AIButton
+            onClick={handleImproveLanguages}
+            label={t('ai.improveLanguages')}
+            disabled={languages.length === 0}
+          />
+        </div>
+
+        {aiError && (
+          <p className="mb-4 text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2">
+            {aiError}
+          </p>
+        )}
 
         <AnimatePresence mode="wait">
           {newLanguage && (

@@ -502,6 +502,20 @@ function App() {
     updateCVData(prev => ({ ...prev, profile }));
   }, [updateCVData]);
 
+  const applyCVUpdates = useCallback((updates: Partial<CVData>) => {
+    updateCVData(prev => ({ ...prev, ...updates }));
+  }, [updateCVData]);
+
+  const notify = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    if (type === 'success') {
+      success(message);
+    } else if (type === 'error') {
+      error(message);
+    } else {
+      info(message);
+    }
+  }, [error, info, success]);
+
   const updatePhoto = useCallback((photo: string | undefined) => {
     updateCVData(prev => ({
       ...prev,
@@ -834,6 +848,7 @@ function App() {
           return (
             <ExperienceForm
               experiences={cvData.experiences}
+              settings={settings}
               onAdd={addExperience}
               onUpdate={updateExperience}
               onDelete={deleteExperience}
@@ -860,6 +875,7 @@ function App() {
           return (
             <SkillsForm
               skills={cvData.skills}
+              cvData={cvData}
               settings={settings}
               setSettings={setSettings}
               onAdd={addSkill}
@@ -874,6 +890,8 @@ function App() {
           return (
             <LanguagesForm
               languages={cvData.languages}
+              settings={settings}
+              jobTitle={cvData.contact.jobTitle}
               onAdd={addLanguage}
               onUpdate={updateLanguage}
               onDelete={deleteLanguage}
@@ -922,6 +940,8 @@ function App() {
           return (
             <ProfileForm
               profile={cvData.profile}
+              cvData={cvData}
+              settings={settings}
               onUpdate={updateProfile}
               onNext={handleNext}
               onBack={handleBack}
@@ -934,7 +954,9 @@ function App() {
               cvData={cvData}
               settings={settings}
               setSettings={setSettings}
+              onApplyCVData={applyCVUpdates}
               updateContact={updateContact}
+              notify={notify}
               onNext={() => {}}
               onBack={handleBack}
               onExport={handleExport}

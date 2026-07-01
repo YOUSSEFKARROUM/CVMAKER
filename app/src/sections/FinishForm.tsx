@@ -9,7 +9,12 @@ import { PhotoUpload } from '../components/PhotoUpload';
 import { CVPreview } from '../components/CVPreview';
 import { CVThumbnail } from '../components/CVThumbnail';
 import { ExportModal } from '../components/ExportModal';
-import type { CVData, CVSettings, ContactInfo } from '../types/cv';
+import AIButton from '@/components/AIButton';
+import ATSOptimizer, { type ATSOptimizationResult } from '@/components/ATSOptimizer';
+import CoverLetterModal from '@/components/CoverLetterModal';
+import PolishAllButton from '@/components/PolishAllButton';
+import { useAI } from '@/hooks/useAI';
+import type { CVData, CVSettings, ContactInfo, Skill } from '../types/cv';
 import { Switch } from '@/components/ui/switch';
 import { SortableList } from '../components/SortableList';
 import { DEFAULT_SECTION_ORDER, type LayoutSectionId } from '../components/templates/utils';
@@ -22,7 +27,9 @@ interface FinishFormProps {
   cvData: CVData;
   settings: CVSettings;
   setSettings: (settings: CVSettings) => void;
+  onApplyCVData: (updates: Partial<CVData>) => void;
   updateContact: (field: keyof ContactInfo, value: string) => void;
+  notify?: (message: string, type?: 'success' | 'error' | 'info') => void;
   onNext: () => void;
   onBack: () => void;
   onExport: () => void;
@@ -41,25 +48,28 @@ const cvLanguages = [
   { code: 'ru', name: 'Русский' },
 ];
 
-type FinishTab = 'template' | 'colors' | 'fonts' | 'display' | 'sections' | 'data';
+type FinishTab = 'template' | 'colors' | 'fonts' | 'display' | 'ai' | 'sections' | 'data';
 
 const TABS: { id: FinishTab; label: string; icon: React.ElementType }[] = [
   { id: 'template', label: 'Template',  icon: Layout   },
   { id: 'colors',   label: 'Couleurs',  icon: Palette  },
   { id: 'fonts',    label: 'Polices',   icon: Type     },
   { id: 'display',  label: 'Affichage', icon: Sparkles },
+  { id: 'ai',       label: 'IA',        icon: Sparkles },
   { id: 'sections', label: 'Sections',  icon: Layers   },
   { id: 'data',     label: 'Données',   icon: User     },
 ];
 
 export function FinishForm({
-  cvData, settings, setSettings, updateContact, onBack,
+  cvData, settings, setSettings, onApplyCVData, updateContact, notify, onBack,
 }: FinishFormProps) {
   const { t } = useTranslation();
+  const { generate, loading: aiLoading, error: aiError } = useAI();
   const [activeTab, setActiveTab] = useState<FinishTab>('template');
   const [previewScale, setPreviewScale] = useState(0.65);
   const [manualScale, setManualScale] = useState<number | null>(null);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showCoverLetter, setShowCoverLetter] = useState(false);
   const [contentHeightPx, setContentHeightPx] = useState(1123);
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
@@ -74,6 +84,168 @@ export function FinishForm({
 
   const updateSettings = (patch: Partial<CVSettings>) =>
     setSettings({ ...settings, ...patch });
+
+  const handleApplyPolish = (updates: Partial<CVData>) => {
+    onApplyCVData(updates);
+  };
+
+  const handleApplyATS = (changes: ATSOptimizationResult) => {
+    const updates: Partial<CVData> = {};
+
+    changes.suggestedChanges?.forEach(change => {
+      if (change.section === 'profile' && change.suggested) {
+        updates.profile = change.suggested;
+      }
+
+      if (change.section === 'experience' && typeof change.index === 'number' && change.suggested) {
+        updates.experiences = (updates.experiences ?? cvData.experiences).map((exp, index) => {
+          if (index !== change.index) return exp;
+          return {
+            ...exp,
+            [change.field || 'description']: change.suggested,
+          };
+        });
+      }
+    });
+
+    if (changes.newSkills?.length) {
+      const existing = new Set(cvData.skills.map(skill => skill.name.toLowerCase()));
+      const nextSkills: Skill[] = [
+        ...cvData.skills,
+        ...changes.newSkills
+          .filter(name => !existing.has(name.toLowerCase()))
+          .map(name => ({
+            id: crypto.randomUUID(),
+            name,
+            level: 'intermediate' as const,
+          })),
+      ];
+      updates.skills = nextSkills;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      onApplyCVData(updates);
+      notify?.('Suggestions ATS appliquees', 'success');
+    }
+  };
+
+  const handleTranslateCV = async () => {
+    const targetLang = settings.language === 'fr' ? 'en' : 'fr';
+    const result = await generate('translate-cv', {
+      sourceLang: settings.language,
+      cvContent: {
+        profile: cvData.profile,
+        experiences: cvData.experiences.map(exp => ({
+          id: exp.id,
+          jobTitle: exp.jobTitle,
+          employer: exp.employer,
+          description: exp.description,
+        })),
+        educations: cvData.educations.map(edu => ({
+          id: edu.id,
+          diploma: edu.diploma,
+          school: edu.school,
+          fieldOfStudy: edu.fieldOfStudy,
+          description: edu.description,
+        })),
+        skills: cvData.skills.map(skill => ({ id: skill.id, name: skill.name })),
+        languages: cvData.languages.map(lang => ({
+          id: lang.id,
+          name: lang.name,
+          description: lang.description,
+        })),
+        projects: cvData.projects.map(project => ({
+          id: project.id,
+          name: project.name,
+          description: project.description,
+        })),
+        interests: cvData.interests,
+      },
+      language: targetLang,
+    });
+
+    if (!result || typeof result !== 'object') return;
+    const translated = result as {
+      profile?: string;
+      experiences?: Array<{ id?: string; jobTitle?: string; description?: string }>;
+      educations?: Array<{ id?: string; diploma?: string; fieldOfStudy?: string; description?: string }>;
+      skills?: Array<{ id?: string; name?: string }>;
+      languages?: Array<{ id?: string; name?: string; description?: string }>;
+      projects?: Array<{ id?: string; name?: string; description?: string }>;
+      interests?: string[];
+    };
+
+    const updates: Partial<CVData> = {};
+    if (translated.profile) updates.profile = translated.profile;
+
+    if (translated.experiences?.length) {
+      updates.experiences = cvData.experiences.map((exp, index) => {
+        const item = translated.experiences?.find(entry => entry.id === exp.id) ?? translated.experiences?.[index];
+        return item
+          ? {
+              ...exp,
+              jobTitle: item.jobTitle || exp.jobTitle,
+              description: item.description || exp.description,
+            }
+          : exp;
+      });
+    }
+
+    if (translated.educations?.length) {
+      updates.educations = cvData.educations.map((edu, index) => {
+        const item = translated.educations?.find(entry => entry.id === edu.id) ?? translated.educations?.[index];
+        return item
+          ? {
+              ...edu,
+              diploma: item.diploma || edu.diploma,
+              fieldOfStudy: item.fieldOfStudy || edu.fieldOfStudy,
+              description: item.description || edu.description,
+            }
+          : edu;
+      });
+    }
+
+    if (translated.skills?.length) {
+      updates.skills = cvData.skills.map((skill, index) => {
+        const item = translated.skills?.find(entry => entry.id === skill.id) ?? translated.skills?.[index];
+        return item ? { ...skill, name: item.name || skill.name } : skill;
+      });
+    }
+
+    if (translated.languages?.length) {
+      updates.languages = cvData.languages.map((lang, index) => {
+        const item = translated.languages?.find(entry => entry.id === lang.id) ?? translated.languages?.[index];
+        return item
+          ? {
+              ...lang,
+              name: item.name || lang.name,
+              description: item.description || lang.description,
+            }
+          : lang;
+      });
+    }
+
+    if (translated.projects?.length) {
+      updates.projects = cvData.projects.map((project, index) => {
+        const item = translated.projects?.find(entry => entry.id === project.id) ?? translated.projects?.[index];
+        return item
+          ? {
+              ...project,
+              name: item.name || project.name,
+              description: item.description || project.description,
+            }
+          : project;
+      });
+    }
+
+    if (translated.interests?.length) {
+      updates.interests = translated.interests;
+    }
+
+    onApplyCVData(updates);
+    updateSettings({ language: targetLang });
+    notify?.(`CV traduit en ${targetLang === 'fr' ? 'francais' : 'anglais'}`, 'success');
+  };
 
   // Auto-scale preview to fit container
   useEffect(() => {
@@ -481,6 +653,70 @@ export function FinishForm({
                 </div>
               )}
 
+              {/* ── AI tab ───────────────────────────────────────── */}
+              {activeTab === 'ai' && (
+                <div className="space-y-5">
+                  <div>
+                    <h3 className="text-sm font-semibold text-foreground">Assistant IA</h3>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Ameliorez le contenu, adaptez le CV a une offre ou preparez une lettre.
+                    </p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Card className="p-3 space-y-2">
+                      <div>
+                        <h4 className="text-sm font-medium text-foreground">{t('ai.polishAll')}</h4>
+                        <p className="text-xs text-muted-foreground mt-0.5">{t('ai.polishAllDesc')}</p>
+                      </div>
+                      <PolishAllButton
+                        cvData={cvData}
+                        settings={settings}
+                        onApply={handleApplyPolish}
+                        onNotify={notify}
+                      />
+                    </Card>
+
+                    <Card className="p-3 space-y-3">
+                      <h4 className="text-sm font-medium text-foreground">Actions rapides</h4>
+                      <AIButton
+                        onClick={handleTranslateCV}
+                        label={settings.language === 'fr' ? t('ai.translateToEn') : t('ai.translateToFr')}
+                        disabled={aiLoading}
+                        className="w-full"
+                      />
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowCoverLetter(true)}
+                        className="w-full gap-1.5"
+                      >
+                        <FileText className="w-4 h-4" />
+                        {t('ai.coverLetter')}
+                      </Button>
+                      {aiError && (
+                        <p className="text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2">
+                          {aiError}
+                        </p>
+                      )}
+                    </Card>
+                  </div>
+
+                  <Card className="p-3 space-y-3">
+                    <div>
+                      <h4 className="text-sm font-medium text-foreground">{t('ai.optimizeATS')}</h4>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Collez une offre pour obtenir un score, des mots-cles et des suggestions.
+                      </p>
+                    </div>
+                    <ATSOptimizer
+                      cvData={cvData}
+                      settings={settings}
+                      onApplyChanges={handleApplyATS}
+                    />
+                  </Card>
+                </div>
+              )}
+
               {/* ── Sections tab ─────────────────────────────────── */}
               {activeTab === 'sections' && (
                 <div className="space-y-3">
@@ -648,6 +884,13 @@ export function FinishForm({
       </div>
 
       {/* Modale d'export PDF */}
+      <CoverLetterModal
+        open={showCoverLetter}
+        onClose={() => setShowCoverLetter(false)}
+        cvData={cvData}
+        settings={settings}
+      />
+
       <ExportModal
         isOpen={showExportModal}
         onClose={() => setShowExportModal(false)}

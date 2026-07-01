@@ -1,19 +1,22 @@
 ﻿import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, ArrowLeft, Plus, Trash2, ChevronUp, Wrench } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Plus, Trash2, ChevronUp, Wrench, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import AIButton from '@/components/AIButton';
+import { useAI } from '@/hooks/useAI';
 import { SortableList } from '../components/SortableList';
 import { AutocompleteInput } from '../components/AutocompleteInput';
 import { commonSkills } from '../utils/aiSuggestions';
 import { fadeInUp, staggerContainer } from '../styles/design-system';
-import type { Skill, CVSettings } from '../types/cv';
+import type { CVData, Skill, CVSettings } from '../types/cv';
 
 interface SkillsFormProps {
   skills: Skill[];
+  cvData: CVData;
   settings: CVSettings;
   setSettings: (settings: CVSettings) => void;
   onAdd: (skill: Skill) => void;
@@ -33,12 +36,24 @@ const levelColors: Record<string, string> = {
   expert:       'bg-success',
 };
 
+interface SkillSuggestion {
+  name: string;
+  reason?: string;
+  level?: Skill['level'];
+}
+
+const isSkillLevel = (value: unknown): value is Skill['level'] =>
+  value === 'beginner' || value === 'intermediate' || value === 'advanced' || value === 'expert';
+
 export function SkillsForm({
-  skills, settings, setSettings, onAdd, onUpdate, onDelete, onReorder, onNext, onBack,
+  skills, cvData, settings, setSettings, onAdd, onUpdate, onDelete, onReorder, onNext, onBack,
 }: SkillsFormProps) {
   const { t } = useTranslation();
+  const { generate, error: aiError } = useAI();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [newSkill, setNewSkill] = useState<Skill | null>(null);
+  const [suggestions, setSuggestions] = useState<SkillSuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const getSkillLevels = () => [
     { value: 'beginner',     label: t('skills.levels.beginner'),     color: levelColors.beginner },
@@ -64,6 +79,30 @@ export function SkillsForm({
   const handleCancel = () => {
     setNewSkill(null);
     setExpandedId(null);
+  };
+
+  const handleSuggestSkills = async () => {
+    const result = await generate('suggest-skills', {
+      jobTitle: cvData.contact.jobTitle,
+      skills: cvData.skills,
+      experiences: cvData.experiences,
+      language: settings.language,
+    });
+
+    if (result && typeof result === 'object' && 'suggested' in result) {
+      const nextSuggestions = (result.suggested as SkillSuggestion[] | undefined) ?? [];
+      setSuggestions(nextSuggestions);
+      setShowSuggestions(nextSuggestions.length > 0);
+    }
+  };
+
+  const addSuggestedSkill = (suggestion: SkillSuggestion, index: number) => {
+    onAdd({
+      id: crypto.randomUUID(),
+      name: suggestion.name,
+      level: isSkillLevel(suggestion.level) ? suggestion.level : 'intermediate',
+    });
+    setSuggestions(prev => prev.filter((_, idx) => idx !== index));
   };
 
   const getLevelLabel = (level: string) =>
@@ -160,10 +199,49 @@ export function SkillsForm({
       <p className="text-sm text-muted-foreground mb-8">{t('skills.subtitle')}</p>
 
       <motion.div variants={staggerContainer} initial="hidden" animate="visible">
-        <Button variant="outline" size="sm" onClick={handleAdd} className="mb-4">
-          <Plus className="w-4 h-4" />
-          {t('skills.add')}
-        </Button>
+        <div className="flex items-center gap-2 mb-4">
+          <Button variant="outline" size="sm" onClick={handleAdd}>
+            <Plus className="w-4 h-4" />
+            {t('skills.add')}
+          </Button>
+          <AIButton onClick={handleSuggestSkills} label={t('ai.suggestSkills')} />
+        </div>
+
+        {aiError && (
+          <p className="mb-4 text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2">
+            {aiError}
+          </p>
+        )}
+
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="mb-4 p-4 rounded-xl border border-blue-500/20 bg-blue-500/5">
+            <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-blue-500" />
+              {t('ai.suggestedSkills')}
+            </h4>
+            <div className="space-y-2">
+              {suggestions.map((suggestion, index) => (
+                <div key={`${suggestion.name}-${index}`} className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <span className="text-sm font-medium text-foreground">{suggestion.name}</span>
+                    {suggestion.reason && (
+                      <span className="text-xs text-muted-foreground ml-2">- {suggestion.reason}</span>
+                    )}
+                  </div>
+                  <Button size="sm" variant="outline" onClick={() => addSuggestedSkill(suggestion, index)}>
+                    + {t('ai.addSkill')}
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowSuggestions(false)}
+              className="text-xs text-muted-foreground mt-3 hover:underline"
+            >
+              Fermer
+            </button>
+          </div>
+        )}
 
         <AnimatePresence mode="wait">
           {newSkill && (

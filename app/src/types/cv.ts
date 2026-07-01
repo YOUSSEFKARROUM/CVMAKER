@@ -58,6 +58,7 @@ export interface Language {
   id: string;
   name: string;
   level: ProficiencyLevel;
+  description?: string;
 }
 
 export interface Certification {

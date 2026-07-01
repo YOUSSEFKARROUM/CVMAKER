@@ -56,6 +56,7 @@ export const LanguageSchema = z.object({
   id: z.string(),
   name: z.string(),
   level: z.enum(['beginner', 'intermediate', 'advanced', 'expert', 'native']),
+  description: z.string().optional(),
 });
 
 export const CertificationSchema = z.object({
@@ -86,6 +87,9 @@ export const CVSettingsSchema = z.object({
   showSkillsAsTags: z.boolean(),
   sectionOrder: z.array(z.string()).optional(),
   hiddenSections: z.array(z.string()).optional(),
+  pageMode: z.enum(['single', 'auto-fit', 'multi-page']).optional(),
+  compactDescriptions: z.boolean().optional(),
+  baseFontSize: z.number().optional(),
 });
 
 export const CVDataSchema = z.object({
@@ -219,6 +223,7 @@ function normalizeLanguage(lang: unknown): unknown {
     id: safeId(l.id),
     name: l.name ?? '',
     level: normalizeLanguageLevel(l.level),
+    description: l.description ?? undefined,
   };
 }
 
@@ -311,6 +316,7 @@ export function normalizeForImport(data: unknown): unknown {
     language:       settings.language       ?? 'fr',
     showSkillLevels: settings.showSkillLevels !== undefined ? settings.showSkillLevels : true,
     showSkillsAsTags: settings.showSkillsAsTags !== undefined ? settings.showSkillsAsTags : false,
+    pageMode: settings.pageMode ?? 'auto-fit',
     ...settings,
   };
 

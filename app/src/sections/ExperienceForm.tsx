@@ -8,16 +8,19 @@ import { Card } from '@/components/ui/card';
 import { FormField } from '@/components/ui/form-field';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import AIButton from '@/components/AIButton';
+import { useAI } from '@/hooks/useAI';
 import { SortableList } from '../components/SortableList';
 import { AISuggestionButton } from '../components/AISuggestionButton';
 import { AutocompleteInput } from '../components/AutocompleteInput';
 import { RichTextArea } from '../components/RichTextArea';
 import { generateExperienceSuggestions, commonJobTitles } from '../utils/aiSuggestions';
 import { fadeInUp, staggerContainer } from '../styles/design-system';
-import type { Experience } from '../types/cv';
+import type { CVSettings, Experience } from '../types/cv';
 
 interface ExperienceFormProps {
   experiences: Experience[];
+  settings: CVSettings;
   onAdd: (experience: Experience) => void;
   onUpdate: (id: string, experience: Partial<Experience>) => void;
   onDelete: (id: string) => void;
@@ -43,9 +46,10 @@ const emptyExperience: Experience = {
 const labelCls = 'block text-sm font-medium text-foreground mb-1';
 
 export function ExperienceForm({
-  experiences, onAdd, onUpdate, onDelete, onReorder, onNext, onBack, onSkip,
+  experiences, settings, onAdd, onUpdate, onDelete, onReorder, onNext, onBack, onSkip,
 }: ExperienceFormProps) {
   const { t } = useTranslation();
+  const { generate, error: aiError } = useAI();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [newExperience, setNewExperience] = useState<Experience | null>(null);
 
@@ -70,6 +74,22 @@ export function ExperienceForm({
 
   const handleNext = () => {
     if (experiences.length === 0) { onSkip(); } else { onNext(); }
+  };
+
+  const handleImproveExperience = async (exp: Experience, isNew: boolean) => {
+    const result = await generate('improve-experience', {
+      jobTitle: exp.jobTitle,
+      employer: exp.employer,
+      description: exp.description,
+      language: settings.language,
+    });
+
+    if (typeof result !== 'string') return;
+    if (isNew) {
+      setNewExperience(prev => prev ? { ...prev, description: result } : prev);
+    } else {
+      onUpdate(exp.id, { description: result });
+    }
   };
 
   const renderExperienceForm = (exp: Experience, isNew: boolean) => {
@@ -188,7 +208,14 @@ export function ExperienceForm({
             </FormField>
 
             <div>
-              <p className={labelCls}>{t('experience.description')}</p>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-sm font-medium text-foreground">{t('experience.description')}</p>
+                <AIButton
+                  onClick={() => handleImproveExperience(exp, isNew)}
+                  label={t('ai.improveExperience')}
+                  disabled={!exp.jobTitle.trim() && !exp.description.trim()}
+                />
+              </div>
               <RichTextArea
                 value={exp.description}
                 onChange={html => isNew
@@ -202,6 +229,11 @@ export function ExperienceForm({
                 onApply={applySuggestion}
                 buttonText={t('experience.aiSuggestions')}
               />
+              {aiError && (
+                <p className="mt-2 text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2">
+                  {aiError}
+                </p>
+              )}
             </div>
 
             {isNew && (

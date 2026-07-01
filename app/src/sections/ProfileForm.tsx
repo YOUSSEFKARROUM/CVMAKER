@@ -3,10 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight, ArrowLeft, Bold, Italic, Underline, Strikethrough, List, ListOrdered, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AISuggestionButton } from '../components/AISuggestionButton';
+import AIButton from '@/components/AIButton';
+import { useAI } from '@/hooks/useAI';
 import { generateProfileSuggestion } from '../utils/aiSuggestions';
+import type { CVData, CVSettings } from '../types/cv';
 
 interface ProfileFormProps {
   profile: string;
+  cvData: CVData;
+  settings: CVSettings;
   onUpdate: (profile: string) => void;
   onNext: () => void;
   onBack: () => void;
@@ -15,8 +20,9 @@ interface ProfileFormProps {
 
 const labelCls = 'block text-sm font-medium text-foreground mb-1';
 
-export function ProfileForm({ profile, onUpdate, onNext, onBack, onSkip }: ProfileFormProps) {
+export function ProfileForm({ profile, cvData, settings, onUpdate, onNext, onBack, onSkip }: ProfileFormProps) {
   const { t } = useTranslation();
+  const { generate, error: aiError } = useAI();
   const [charCount, setCharCount] = useState(profile.length);
 
   const handleChange = (value: string) => {
@@ -31,6 +37,22 @@ export function ProfileForm({ profile, onUpdate, onNext, onBack, onSkip }: Profi
   ];
 
   const applySuggestion = (suggestion: string) => handleChange(suggestion);
+
+  const handleGenerateProfile = async () => {
+    const result = await generate('generate-profile', {
+      firstName: cvData.contact.firstName,
+      lastName: cvData.contact.lastName,
+      jobTitle: cvData.contact.jobTitle,
+      experiences: cvData.experiences,
+      skills: cvData.skills,
+      educations: cvData.educations,
+      language: settings.language,
+    });
+
+    if (typeof result === 'string') {
+      handleChange(result);
+    }
+  };
 
   const handleNext = () => {
     if (!profile.trim()) { onSkip(); } else { onNext(); }
@@ -129,14 +151,22 @@ export function ProfileForm({ profile, onUpdate, onNext, onBack, onSkip }: Profi
         </div>
 
         <div className="flex items-center justify-between mt-2">
-          <AISuggestionButton
-            onSuggest={getAISuggestions}
-            onApply={applySuggestion}
-            buttonText={t('profile.aiButton')}
-            dialogTitle={t('profile.aiTitle')}
-          />
+          <div className="flex items-center gap-2">
+            <AIButton onClick={handleGenerateProfile} label={t('ai.generateProfile')} />
+            <AISuggestionButton
+              onSuggest={getAISuggestions}
+              onApply={applySuggestion}
+              buttonText={t('profile.aiButton')}
+              dialogTitle={t('profile.aiTitle')}
+            />
+          </div>
           <span className="text-xs text-muted-foreground">{t('profile.maxCharacters')}</span>
         </div>
+        {aiError && (
+          <p className="mt-2 text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2">
+            {aiError}
+          </p>
+        )}
       </div>
 
       <div className="flex justify-between mt-8">

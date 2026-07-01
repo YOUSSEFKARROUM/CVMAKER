@@ -1,5 +1,13 @@
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { config } from 'dotenv';
 import express from 'express';
 import cors from 'cors';
+import aiRoutes from './ai-routes.mjs';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, '../.env') });
+config();
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -28,6 +36,8 @@ app.use(
 app.get('/health', (_req, res) => {
   res.json({ ok: true });
 });
+
+app.use('/ai', aiRoutes);
 
 app.listen(port, () => {
   console.log(`[cv-maker-backend] Listening on port ${port}`);
