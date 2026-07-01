@@ -19,72 +19,65 @@ type Html2CanvasOptions = NonNullable<Parameters<typeof html2canvas>[1]> & {
 
 /**
  * Exporte un CV vers PDF multi-page A4.
+ * Capture l'élément en haute résolution, puis le découpe en tranches A4.
  *
- * ARCHITECTURE DE LA CAPTURE :
- * On clone l'élément dans le document principal (position: fixed hors-écran)
- * plutôt que de modifier l'élément original. Cela garantit que le navigateur
- * calcule les styles corrects avant que html2canvas ne capture quoi que ce soit.
- *
- * CAUSE RACINE DES MOTS COLLÉS :
- * letterRendering:true force html2canvas à appeler ctx.fillText(char) pour chaque
- * caractère individuellement. Le caractère espace ' ' retourne measureText().width=0
- * dans certains contextes Canvas 2D → espaces invisibles. En passant à false,
- * html2canvas utilise ctx.fillText(mot_entier) et laisse le navigateur gérer les
- * espaces nativement → résultat correct sans exception.
+ * Fix mots collés : letterRendering:false — html2canvas rend les mots entiers
+ * (ctx.fillText(mot)) plutôt que caractère par caractère. En mode letter-by-letter,
+ * ctx.measureText(' ').width = 0 dans certains contextes Canvas → espaces invisibles.
  */
 export async function exportCVToPDF(
   element: HTMLElement,
   filename: string
 ): Promise<void> {
   await document.fonts.ready;
+  await new Promise(resolve => setTimeout(resolve, 300));
 
-  // Cloner dans le document principal hors-écran pour un rendu navigateur fiable
-  const clone = element.cloneNode(true) as HTMLElement;
-  clone.classList.add('pdf-export-mode');
-  // Position fixe juste à droite du viewport : hors de vue mais dans le layout
-  clone.style.cssText = [
-    'position:fixed',
-    `left:${window.innerWidth + 20}px`,
-    'top:0',
-    `width:${A4_W_PX}px`,
-    `max-width:${A4_W_PX}px`,
-    'height:auto',
-    'max-height:none',
-    'overflow:visible',
-    'transform:none',
-    'z-index:-1',
-    'pointer-events:none',
-  ].join(';');
-
-  // Forcer word-spacing sur tous les éléments du clone (sécurité supplémentaire)
-  clone.querySelectorAll<HTMLElement>('*').forEach(el => {
-    el.style.wordSpacing = '3px';
-  });
-
-  document.body.appendChild(clone);
-
-  // Laisser le navigateur calculer le layout + les polices
-  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-  await new Promise(resolve => setTimeout(resolve, 400));
+  const hadPdfExportClass = element.classList.contains('pdf-export-mode');
+  const saved = {
+    width: element.style.width,
+    maxWidth: element.style.maxWidth,
+    height: element.style.height,
+    maxHeight: element.style.maxHeight,
+    transform: element.style.transform,
+    position: element.style.position,
+    left: element.style.left,
+    top: element.style.top,
+    overflow: element.style.overflow,
+    overflowX: element.style.overflowX,
+    overflowY: element.style.overflowY,
+  };
 
   try {
-    const contentHeight = clone.scrollHeight;
+    element.classList.add('pdf-export-mode');
+    element.style.width = `${A4_W_PX}px`;
+    element.style.maxWidth = `${A4_W_PX}px`;
+    element.style.height = 'auto';
+    element.style.maxHeight = 'none';
+    element.style.transform = 'none';
+    element.style.position = 'relative';
+    element.style.left = '0';
+    element.style.top = '0';
+    element.style.overflow = 'visible';
+    element.style.overflowX = 'visible';
+    element.style.overflowY = 'visible';
+
+    await new Promise(resolve => setTimeout(resolve, 300));
 
     // 1. Capturer tout le contenu en une seule image haute résolution
-    const fullCanvas = await html2canvas(clone, {
+    const fullCanvas = await html2canvas(element, {
       scale: CAPTURE_SCALE,
       useCORS: true,
       allowTaint: true,
       logging: false,
       backgroundColor: '#ffffff',
       width: A4_W_PX,
-      height: contentHeight,
+      height: element.scrollHeight,
       windowWidth: A4_W_PX,
       x: 0,
       y: 0,
       scrollX: 0,
       scrollY: 0,
-      letterRendering: false,   // CORRIGE les mots collés : rendu mot-par-mot, pas caractère-par-caractère
+      letterRendering: false,  // Fix mots collés : rendu mot-par-mot, espaces gérés nativement
       foreignObjectRendering: false,
     } as Html2CanvasOptions);
 
@@ -155,10 +148,18 @@ export async function exportCVToPDF(
     pdf.save(filename);
 
   } finally {
-    // Supprimer le clone hors-écran dans tous les cas (succès ou erreur)
-    if (document.body.contains(clone)) {
-      document.body.removeChild(clone);
-    }
+    if (!hadPdfExportClass) element.classList.remove('pdf-export-mode');
+    element.style.width = saved.width;
+    element.style.maxWidth = saved.maxWidth;
+    element.style.height = saved.height;
+    element.style.maxHeight = saved.maxHeight;
+    element.style.transform = saved.transform;
+    element.style.position = saved.position;
+    element.style.left = saved.left;
+    element.style.top = saved.top;
+    element.style.overflow = saved.overflow;
+    element.style.overflowX = saved.overflowX;
+    element.style.overflowY = saved.overflowY;
   }
 }
 

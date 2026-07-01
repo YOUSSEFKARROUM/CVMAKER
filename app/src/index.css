@@ -214,7 +214,6 @@
   color-scheme: light;
 }
 [data-cv-preview] * {
-  word-spacing: 0.15em;
   -webkit-font-smoothing: antialiased;
 }
 [data-cv-preview] p,
