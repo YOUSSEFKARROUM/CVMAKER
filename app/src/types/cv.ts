@@ -130,6 +130,9 @@ export interface CVSettings {
   showSkillsAsTags: boolean;
   sectionOrder?: string[];
   hiddenSections?: string[];
+  pageMode: 'single' | 'auto-fit' | 'multi-page';
+  compactDescriptions?: boolean;
+  baseFontSize?: number;
 }
 
 export type Step = 'landing' | 'my-cvs' | 'admin' | 'profile-page' | 'settings-page' | 'contact' | 'experience' | 'education' | 'skills' | 'languages' | 'certifications' | 'projects' | 'interests' | 'profile' | 'finish' | 'download';

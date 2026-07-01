@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Download, Layout, Palette, Type, Layers, Check, User, ZoomIn, ZoomOut } from 'lucide-react';
+import { ArrowLeft, Download, Layout, Palette, Type, Layers, Check, User, ZoomIn, ZoomOut, FileText, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { CVPreview } from '../components/CVPreview';
 import { CVThumbnail } from '../components/CVThumbnail';
 import { ExportModal } from '../components/ExportModal';
 import type { CVData, CVSettings, ContactInfo } from '../types/cv';
+import { Switch } from '@/components/ui/switch';
 import { SortableList } from '../components/SortableList';
 import { DEFAULT_SECTION_ORDER, type LayoutSectionId } from '../components/templates/utils';
 import { THEME_COLORS, TITLE_FONTS, BODY_FONTS, LABEL_CLASS } from '../styles/design-system';
@@ -40,14 +41,15 @@ const cvLanguages = [
   { code: 'ru', name: 'Русский' },
 ];
 
-type FinishTab = 'template' | 'colors' | 'fonts' | 'sections' | 'data';
+type FinishTab = 'template' | 'colors' | 'fonts' | 'display' | 'sections' | 'data';
 
 const TABS: { id: FinishTab; label: string; icon: React.ElementType }[] = [
-  { id: 'template', label: 'Template',  icon: Layout  },
-  { id: 'colors',   label: 'Couleurs',  icon: Palette },
-  { id: 'fonts',    label: 'Polices',   icon: Type    },
-  { id: 'sections', label: 'Sections',  icon: Layers  },
-  { id: 'data',     label: 'Données',   icon: User    },
+  { id: 'template', label: 'Template',  icon: Layout   },
+  { id: 'colors',   label: 'Couleurs',  icon: Palette  },
+  { id: 'fonts',    label: 'Polices',   icon: Type     },
+  { id: 'display',  label: 'Affichage', icon: Sparkles },
+  { id: 'sections', label: 'Sections',  icon: Layers   },
+  { id: 'data',     label: 'Données',   icon: User     },
 ];
 
 export function FinishForm({
@@ -58,9 +60,14 @@ export function FinishForm({
   const [previewScale, setPreviewScale] = useState(0.65);
   const [manualScale, setManualScale] = useState<number | null>(null);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [contentHeightPx, setContentHeightPx] = useState(1123);
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const cvPreviewRef = useRef<HTMLDivElement>(null);
+
+  const handleContentHeightChange = useCallback((h: number) => {
+    setContentHeightPx(h);
+  }, []);
 
   const getFilename = () =>
     `CV-${cvData.contact.firstName || 'CV'}-${cvData.contact.lastName || ''}`.replace(/\s+/g, '-');
@@ -333,6 +340,147 @@ export function FinishForm({
                 </div>
               )}
 
+              {/* ── Display tab ──────────────────────────────────── */}
+              {activeTab === 'display' && (
+                <div className="space-y-3">
+                  <div>
+                    <h3 className="text-sm font-semibold text-foreground">{t('pageMode.title')}</h3>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Choisissez comment votre CV est mis en page et exporté en PDF.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    {/* Option 1 — 1 page */}
+                    <button
+                      onClick={() => updateSettings({ pageMode: 'single' })}
+                      className={cn(
+                        'w-full text-left px-4 py-3 rounded-xl border-2 transition-all',
+                        (settings.pageMode ?? 'auto-fit') === 'single'
+                          ? 'border-blue-500 bg-blue-500/5'
+                          : 'border-border hover:border-blue-500/30'
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                          <FileText className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium text-foreground">{t('pageMode.single')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('pageMode.singleDesc')}</div>
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Option 2 — Auto-fit */}
+                    <button
+                      onClick={() => updateSettings({ pageMode: 'auto-fit' })}
+                      className={cn(
+                        'w-full text-left px-4 py-3 rounded-xl border-2 transition-all',
+                        (settings.pageMode ?? 'auto-fit') === 'auto-fit'
+                          ? 'border-blue-500 bg-blue-500/5'
+                          : 'border-border hover:border-blue-500/30'
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                          <Sparkles className="w-4 h-4 text-blue-500" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-foreground">{t('pageMode.autoFit')}</span>
+                            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600">
+                              {t('pageMode.autoFitRecommended')}
+                            </span>
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('pageMode.autoFitDesc')}</div>
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Option 3 — Multi-page */}
+                    <button
+                      onClick={() => updateSettings({ pageMode: 'multi-page' })}
+                      className={cn(
+                        'w-full text-left px-4 py-3 rounded-xl border-2 transition-all',
+                        (settings.pageMode ?? 'auto-fit') === 'multi-page'
+                          ? 'border-blue-500 bg-blue-500/5'
+                          : 'border-border hover:border-blue-500/30'
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                          <Layers className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium text-foreground">{t('pageMode.multiPage')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('pageMode.multiPageDesc')}</div>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+
+                  {/* Contrôles supplémentaires pour mode "single" */}
+                  {(settings.pageMode ?? 'auto-fit') === 'single' && (
+                    <div className="space-y-3 pt-2 border-t border-border">
+                      <p className="text-xs text-muted-foreground">Options pour réduire le contenu :</p>
+
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm text-foreground">{t('pageMode.compactSkills')}</label>
+                        <Switch
+                          checked={settings.showSkillsAsTags}
+                          onCheckedChange={v => updateSettings({ showSkillsAsTags: v })}
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm text-foreground">{t('pageMode.hideSkillLevels')}</label>
+                        <Switch
+                          checked={!settings.showSkillLevels}
+                          onCheckedChange={v => updateSettings({ showSkillLevels: !v })}
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm text-foreground">{t('pageMode.compactDescriptions')}</label>
+                        <Switch
+                          checked={settings.compactDescriptions ?? false}
+                          onCheckedChange={v => updateSettings({ compactDescriptions: v })}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-sm text-foreground block mb-1">
+                          {t('pageMode.fontSize')} : {settings.baseFontSize ?? 11}px
+                        </label>
+                        <input
+                          type="range"
+                          min="9"
+                          max="12"
+                          step="0.5"
+                          value={settings.baseFontSize ?? 11}
+                          onChange={e => updateSettings({ baseFontSize: parseFloat(e.target.value) })}
+                          className="w-full accent-blue-500"
+                        />
+                        <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                          <span>{t('pageMode.compact')}</span>
+                          <span>{t('pageMode.normal')}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Info multi-page */}
+                  {(settings.pageMode ?? 'auto-fit') === 'multi-page' && (
+                    <div className="pt-2 border-t border-border">
+                      <p className="text-xs text-muted-foreground bg-muted/50 px-3 py-2 rounded-lg">
+                        {t('pageMode.multiPageInfo')}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* ── Sections tab ─────────────────────────────────── */}
               {activeTab === 'sections' && (
                 <div className="space-y-3">
@@ -433,25 +581,49 @@ export function FinishForm({
             {/* Preview meta */}
             <div className="flex items-center justify-between w-full max-w-[680px] mb-3">
               <span className="text-xs text-muted-foreground">Aperçu en temps réel</span>
-              <span className="text-xs text-muted-foreground capitalize">{settings.template}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground capitalize">{settings.template}</span>
+                {(settings.pageMode ?? 'auto-fit') !== 'auto-fit' && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 font-medium">
+                    {(settings.pageMode ?? 'auto-fit') === 'single' ? '1 page' : 'Multi-page'}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* CV sheet */}
-            <div
-              className="relative bg-white shadow-2xl overflow-hidden flex-shrink-0"
-              style={{
-                width: `${794 * effectiveScale}px`,
-                height: `${1123 * effectiveScale}px`,
-              }}
-            >
-              <div
-                ref={previewRef}
-                className="absolute top-0 left-0 origin-top-left"
-                style={{ width: '794px', transform: `scale(${effectiveScale})` }}
-              >
-                <CVPreview ref={cvPreviewRef} cvData={cvData} settings={settings} />
-              </div>
-            </div>
+            {(() => {
+              const pageMode = settings.pageMode ?? 'auto-fit';
+              // single: clip à 1 page
+              // auto-fit: affiche tout le contenu (la compression se fait dans le PDF)
+              // multi-page: affiche tout le contenu avec indicateurs de pages
+              const isSingle = pageMode === 'single';
+              const previewH = isSingle ? 1123 * effectiveScale : contentHeightPx * effectiveScale;
+              const autoFitScale = (pageMode === 'auto-fit' && contentHeightPx > 1123)
+                ? 1123 / contentHeightPx
+                : 1;
+              const innerScale = effectiveScale * autoFitScale;
+
+              return (
+                <div
+                  className={cn('relative bg-white shadow-2xl flex-shrink-0', isSingle && 'overflow-hidden')}
+                  style={{ width: `${794 * effectiveScale}px`, height: `${previewH}px` }}
+                >
+                  <div
+                    ref={previewRef}
+                    className="absolute top-0 left-0 origin-top-left"
+                    style={{ width: '794px', transform: `scale(${innerScale})` }}
+                  >
+                    <CVPreview
+                      ref={cvPreviewRef}
+                      cvData={cvData}
+                      settings={settings}
+                      onContentHeightChange={handleContentHeightChange}
+                    />
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Zoom controls */}
             <div className="flex items-center gap-3 mt-4">
@@ -482,6 +654,7 @@ export function FinishForm({
         previewElement={cvPreviewRef.current}
         filename={getFilename()}
         cvTemplate={settings.template}
+        pageMode={settings.pageMode ?? 'auto-fit'}
       />
     </div>
   );

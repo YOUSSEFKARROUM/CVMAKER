@@ -57,6 +57,13 @@ export function isSectionVisible(sectionId: string, settings: CVSettings): boole
   return !settings.hiddenSections.includes(sectionId);
 }
 
+export function truncateBullets(html: string, maxBullets: number): string {
+  // Split on <li> tags or bullet characters
+  const parts = html.split(/(?=<li>|(?<=\s)[•·\-])/);
+  if (parts.length <= maxBullets) return html;
+  return parts.slice(0, maxBullets).join('');
+}
+
 export function isLightColor(hex: string): boolean {
   const c = hex.replace('#', '');
   if (c.length !== 6) return false;

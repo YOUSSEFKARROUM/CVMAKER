@@ -240,6 +240,20 @@
   @apply bg-white;
 }
 
+/* ─── Page modes ─────────────────────────────────────────────────────────── */
+
+/* Multi-page : empêcher les coupures au milieu des sections */
+[data-page-mode="multi-page"] section,
+[data-page-mode="multi-page"] > div > div {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Single : taille de police de base pilotée via style inline (baseFontSize) */
+[data-page-mode="single"] {
+  position: relative;
+}
+
 /* ─── Print ──────────────────────────────────────────────────────────────── */
 @media print {
   .no-print {

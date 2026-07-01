@@ -15,10 +15,11 @@ interface ExportModalProps {
   previewElement: HTMLElement | null;
   filename: string;
   cvTemplate?: string;
+  pageMode?: 'single' | 'auto-fit' | 'multi-page';
   onSuccess?: () => void;
 }
 
-export function ExportModal({ isOpen, onClose, previewElement, filename, cvTemplate = '', onSuccess }: ExportModalProps) {
+export function ExportModal({ isOpen, onClose, previewElement, filename, cvTemplate = '', pageMode = 'auto-fit', onSuccess }: ExportModalProps) {
   const [isExporting, setIsExporting] = useState(false);
   const { success, error } = useToast();
   const { checkDownloadStatus } = useDownloadRequest();
@@ -50,7 +51,7 @@ export function ExportModal({ isOpen, onClose, previewElement, filename, cvTempl
     }
     setIsExporting(true);
     try {
-      await exportCVToPDF(previewElement, `${filename}.pdf`);
+      await exportCVToPDF(previewElement, `${filename}.pdf`, pageMode);
       success('PDF exporté avec succès !');
       onSuccess?.();
 

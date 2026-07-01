@@ -83,6 +83,7 @@ const initialSettings: CVSettings = {
   language: 'fr',
   showSkillLevels: true,
   showSkillsAsTags: false,
+  pageMode: 'auto-fit',
 };
 
 const steps: Exclude<Step, 'landing' | 'download'>[] = ['contact', 'experience', 'education', 'skills', 'languages', 'certifications', 'projects', 'interests', 'profile', 'finish'];

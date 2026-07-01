@@ -62,6 +62,24 @@
     "justNow": "Just now",
     "history": "History"
   },
+  "pageMode": {
+    "title": "Display mode",
+    "single": "Single page CV",
+    "singleDesc": "Manually control density. Adjust the options below.",
+    "autoFit": "Smart auto-fit",
+    "autoFitDesc": "CV automatically adapts to fit on 1 page.",
+    "autoFitRecommended": "Recommended",
+    "multiPage": "Multi-page",
+    "multiPageDesc": "CV extends across multiple pages with clean breaks.",
+    "multiPageInfo": "Each section stays intact — never split between pages.",
+    "overflowWarning": "Content exceeds 1 page — reduce or switch to Auto-fit",
+    "compactSkills": "Skills as tags",
+    "hideSkillLevels": "Hide skill levels",
+    "compactDescriptions": "Short descriptions",
+    "fontSize": "Text size",
+    "compact": "Compact",
+    "normal": "Normal"
+  },
   "zen": {
     "title": "Zen Mode",
     "description": "Focus on your CV without distractions",

@@ -38,7 +38,8 @@ type Html2CanvasOptions = NonNullable<Parameters<typeof html2canvas>[1]> & {
  */
 export async function exportCVToPDF(
   element: HTMLElement,
-  filename: string
+  filename: string,
+  pageMode: 'single' | 'auto-fit' | 'multi-page' = 'auto-fit'
 ): Promise<void> {
   await document.fonts.ready;
 
@@ -98,48 +99,73 @@ export async function exportCVToPDF(
       foreignObjectRendering: false,
     } as Html2CanvasOptions);
 
-    const totalImgHeight = fullCanvas.height;
-    const pageImgH = A4_H_PX * CAPTURE_SCALE;
-    const totalPages = Math.ceil(totalImgHeight / pageImgH);
-    let pageCount = totalPages;
-
-    if (totalPages > 1) {
-      const lastPageStart = (totalPages - 1) * pageImgH;
-      const lastPageHeight = totalImgHeight - lastPageStart;
-      const lastPageCanvas = document.createElement('canvas');
-      lastPageCanvas.width = fullCanvas.width;
-      lastPageCanvas.height = Math.min(pageImgH, lastPageHeight);
-      const lastPageCtx = lastPageCanvas.getContext('2d')!;
-      lastPageCtx.drawImage(
-        fullCanvas,
-        0, lastPageStart, fullCanvas.width, lastPageHeight,
-        0, 0, fullCanvas.width, lastPageHeight
-      );
-      const imageData = lastPageCtx.getImageData(0, 0, lastPageCanvas.width, lastPageCanvas.height);
-      let nonWhitePixels = 0;
-      const totalPixels = imageData.data.length / 4;
-      for (let i = 0; i < imageData.data.length; i += 4) {
-        const r = imageData.data[i], g = imageData.data[i + 1], b = imageData.data[i + 2];
-        if (r < 250 || g < 250 || b < 250) nonWhitePixels++;
-      }
-      if (nonWhitePixels / totalPixels < 0.02) pageCount = totalPages - 1;
-    }
-
-    // 2. Créer le PDF A4
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const pageCanvas = document.createElement('canvas');
-    pageCanvas.width = fullCanvas.width;
-    pageCanvas.height = pageImgH;
-    const ctx = pageCanvas.getContext('2d')!;
+    const pageImgH = A4_H_PX * CAPTURE_SCALE;
+    const totalImgHeight = fullCanvas.height;
 
-    for (let page = 0; page < pageCount; page++) {
-      if (page > 0) pdf.addPage();
-      const srcY = page * pageImgH;
-      const srcH = Math.min(pageImgH, totalImgHeight - srcY);
+    if (pageMode === 'single' || pageMode === 'auto-fit') {
+      // ── Tout tenir sur 1 page — compression proportionnelle si nécessaire ──
+      const pageCanvas = document.createElement('canvas');
+      pageCanvas.width = fullCanvas.width;
+      pageCanvas.height = pageImgH;
+      const ctx = pageCanvas.getContext('2d')!;
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-      ctx.drawImage(fullCanvas, 0, srcY, fullCanvas.width, srcH, 0, 0, fullCanvas.width, srcH);
-      pdf.addImage(pageCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+
+      if (totalImgHeight > pageImgH) {
+        // Compression proportionnelle (maintient le ratio largeur/hauteur)
+        const scaleRatio = pageImgH / totalImgHeight;
+        const scaledW = Math.round(fullCanvas.width * scaleRatio);
+        const xOffset = Math.round((pageCanvas.width - scaledW) / 2);
+        ctx.drawImage(fullCanvas, 0, 0, fullCanvas.width, totalImgHeight, xOffset, 0, scaledW, pageImgH);
+      } else {
+        // Contenu tient déjà sur 1 page — pas de compression
+        ctx.drawImage(fullCanvas, 0, 0);
+      }
+
+      pdf.addImage(pageCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
+    } else {
+      // ── Multi-page : découper le canvas en tranches A4 ──
+      const totalPages = Math.ceil(totalImgHeight / pageImgH);
+      let pageCount = totalPages;
+
+      // Détecter et supprimer la dernière page si quasi-vide
+      if (totalPages > 1) {
+        const lastPageStart = (totalPages - 1) * pageImgH;
+        const lastPageHeight = totalImgHeight - lastPageStart;
+        const lastPageCanvas = document.createElement('canvas');
+        lastPageCanvas.width = fullCanvas.width;
+        lastPageCanvas.height = Math.min(pageImgH, lastPageHeight);
+        const lastPageCtx = lastPageCanvas.getContext('2d')!;
+        lastPageCtx.drawImage(
+          fullCanvas,
+          0, lastPageStart, fullCanvas.width, lastPageHeight,
+          0, 0, fullCanvas.width, lastPageHeight
+        );
+        const imageData = lastPageCtx.getImageData(0, 0, lastPageCanvas.width, lastPageCanvas.height);
+        let nonWhitePixels = 0;
+        const totalPixels = imageData.data.length / 4;
+        for (let i = 0; i < imageData.data.length; i += 4) {
+          const r = imageData.data[i], g = imageData.data[i + 1], b = imageData.data[i + 2];
+          if (r < 250 || g < 250 || b < 250) nonWhitePixels++;
+        }
+        if (nonWhitePixels / totalPixels < 0.02) pageCount = totalPages - 1;
+      }
+
+      const pageCanvas = document.createElement('canvas');
+      pageCanvas.width = fullCanvas.width;
+      pageCanvas.height = pageImgH;
+      const ctx = pageCanvas.getContext('2d')!;
+
+      for (let page = 0; page < pageCount; page++) {
+        if (page > 0) pdf.addPage();
+        const srcY = page * pageImgH;
+        const srcH = Math.min(pageImgH, totalImgHeight - srcY);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+        ctx.drawImage(fullCanvas, 0, srcY, fullCanvas.width, srcH, 0, 0, fullCanvas.width, srcH);
+        pdf.addImage(pageCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+      }
     }
 
     pdf.save(filename);

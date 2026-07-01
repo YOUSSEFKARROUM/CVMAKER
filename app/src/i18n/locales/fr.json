@@ -130,6 +130,24 @@
       "member": "Membre depuis"
     }
   },
+  "pageMode": {
+    "title": "Mode d'affichage",
+    "single": "CV sur 1 page",
+    "singleDesc": "Contrôlez manuellement la densité. Ajustez les options ci-dessous.",
+    "autoFit": "Auto-fit intelligent",
+    "autoFitDesc": "Le CV s'adapte automatiquement pour tenir sur 1 page.",
+    "autoFitRecommended": "Recommandé",
+    "multiPage": "Multi-page",
+    "multiPageDesc": "Le CV s'étend sur plusieurs pages avec des sauts propres.",
+    "multiPageInfo": "Chaque section restera intacte — jamais coupée entre 2 pages.",
+    "overflowWarning": "Le contenu dépasse 1 page — réduisez ou passez en Auto-fit",
+    "compactSkills": "Compétences en tags",
+    "hideSkillLevels": "Masquer les niveaux",
+    "compactDescriptions": "Descriptions courtes",
+    "fontSize": "Taille du texte",
+    "compact": "Compact",
+    "normal": "Normal"
+  },
   "zen": {
     "title": "Mode Zen",
     "description": "Concentrez-vous sur votre CV sans distractions",
