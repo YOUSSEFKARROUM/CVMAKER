@@ -6,6 +6,7 @@ import { getTemplateComponent, getAllTemplates } from './templates';
 import { TEMPLATE_SAMPLE_MAP, TEMPLATE_SETTINGS } from '../data/sampleCVData';
 import { Button } from './ui/button';
 import { fadeInUp } from '../styles/design-system';
+import type { CVSettings } from '../types/cv';
 
 interface Props {
   onSelectTemplate?: (templateId: string) => void;
@@ -51,7 +52,7 @@ const TemplatePreviewCard = memo(
 
     const TemplateComponent = getTemplateComponent(templateId);
     const cvData = TEMPLATE_SAMPLE_MAP[templateId] ?? TEMPLATE_SAMPLE_MAP['budapest'];
-    const settings = {
+    const settings: CVSettings = {
       template: templateId,
       primaryColor: TEMPLATE_SETTINGS[templateId]?.primaryColor ?? '#1a1a1a',
       titleFont: 'Bebas Neue',
@@ -59,6 +60,7 @@ const TemplatePreviewCard = memo(
       language: 'fr',
       showSkillLevels: true,
       showSkillsAsTags: false,
+      pageMode: 'auto-fit',
     };
 
     return (
