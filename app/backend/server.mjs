@@ -19,12 +19,14 @@ app.use(express.json());
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
   .split(',')
   .map((o) => o.trim())
+  .map((o) => o.replace(/\/+$/, ''))
   .filter(Boolean);
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+      const normalizedOrigin = origin?.replace(/\/+$/, '');
+      if (!normalizedOrigin || allowedOrigins.length === 0 || allowedOrigins.includes(normalizedOrigin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
