@@ -340,12 +340,43 @@ ALLOWED_ORIGINS=http://localhost:5173,http://localhost:4173
 - **Après login** → automatiquement redirigé vers `my-cvs` (CVGalleryPage)
 - **Logout** → retour à `landing`
 - **Import JSON** : fonctionne via `importData(file)` de `useCVStorage` + redirect vers `contact`
-- **Export PDF** : `src/utils/pdfExport.ts` utilise html2canvas sur le `CVPreview` puis jsPDF
+- **Export PDF** : `src/utils/pdfExport.ts` utilise html2canvas sur un **clone** du `CVPreview` puis jsPDF (voir section dédiée ci-dessous)
 - **Undo/Redo** : Ctrl+Z / Ctrl+Y — limité à 50 états via `useHistory`
 - **Zen Mode** : icône en bas à droite, cache tout sauf le contenu du formulaire
 - **Mobile** : preview CV accessible via bouton flottant en bas de page
 - **Auto-save** : s'exécute toutes les 5 secondes si des changements ont eu lieu
 - **CVPreview** : memoïsé avec `areEqual()` custom pour éviter les re-renders inutiles
+
+---
+
+## Export PDF — Fonctionnement et Règles
+
+**Fichier** : `src/utils/pdfExport.ts`
+
+### Pourquoi un clone ?
+html2canvas dans son contexte Canvas2D ne rend pas la largeur naturelle des espaces pour certaines polices (Lato, Bebas Neue) — `ctx.measureText(' ').width = 0`. La seule solution fiable est d'ajouter `word-spacing` CSS explicite **avant** que html2canvas lise les computed styles, sur un clone dans le document principal (pas via `onclone` qui utilise un document interne ignoré par `getComputedStyle`).
+
+### Ce que fait le clone
+1. Clone l'élément CV dans le document principal à `position:absolute; left:-9999px`
+2. Applique sur **tous** les descendants :
+   - `word-spacing: 0.2em` — relatif, scale avec la taille de police (Bebas Neue 48px → 9.6px d'espace)
+   - `letter-spacing: 0.01em` — évite la fusion des glyphes accentués (é, à, ê) dans Canvas2D
+   - `overflow: visible` sur tout sauf `.rounded-full` et `<img>` (pour éviter de couper les photos)
+3. Attend 2 frames + 600ms pour que le navigateur recalcule layout et polices
+4. Capture avec `html2canvas` (scale=2, letterRendering=false)
+5. Découpe en pages A4 (794×1123px) avec détection de page blanche finale
+
+### Règles à respecter dans les templates pour le PDF
+- **Ne jamais utiliser `truncate`** sur les noms de projets, diplômes, titres de postes → remplacer par `break-words`
+- **Ne jamais utiliser `overflow-hidden`** sur les wrappers de projets → remplacer par `min-w-0` seul
+- **Les classes `rounded-full`** sont protégées (photos de profil) — ne pas les retirer
+- **`overflow-hidden` sur les photos** est intentionnel — ne pas toucher `<div className="... rounded-full overflow-hidden">`
+
+### Templates et leur statut PDF
+| Template | Statut |
+|----------|--------|
+| stanford, oxford, otago, berkeley, harvard, auckland, edinburgh, princeton | Propres — pas de truncate/overflow-hidden sur projets |
+| budapest, cambridge, chicago, modern, brunei, shanghai, kiev, rotterdam, tokyo, vladivostok, sydney | Corrigés (commit `11a7140`) — truncate → break-words, overflow-hidden retiré |
 
 ---
 
