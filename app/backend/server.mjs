@@ -2,7 +2,6 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { config } from 'dotenv';
 import express from 'express';
-import cors from 'cors';
 import aiRoutes from './ai-routes.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -13,8 +12,6 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 // PayPal désactivé — remplacé par virement bancaire (30 DH = 4 téléchargements PDF)
-
-app.use(express.json());
 
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
   .split(',')
@@ -42,15 +39,30 @@ function isOriginAllowed(origin) {
     || defaultPreviewOrigins.some((pattern) => pattern.test(origin));
 }
 
-app.use(
-  cors({
-    origin(origin, callback) {
-      const normalizedOrigin = origin?.replace(/\/+$/, '');
-      callback(null, isOriginAllowed(normalizedOrigin) ? normalizedOrigin : false);
-    },
-    optionsSuccessStatus: 204,
-  })
-);
+app.use((req, res, next) => {
+  const origin = req.headers.origin?.replace(/\/+$/, '');
+  const isAllowed = isOriginAllowed(origin);
+
+  if (isAllowed) {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+    res.setHeader('Vary', 'Origin');
+  }
+
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    req.headers['access-control-request-headers'] || 'Content-Type, X-User-Id, Authorization'
+  );
+  res.setHeader('Access-Control-Max-Age', '86400');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(isAllowed ? 204 : 403).end();
+  }
+
+  return next();
+});
+
+app.use(express.json());
 
 app.get('/', (_req, res) => {
   res.json({
