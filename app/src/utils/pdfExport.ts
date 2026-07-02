@@ -78,6 +78,53 @@ export async function exportCVToPDF(
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   await new Promise(resolve => setTimeout(resolve, 600));
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // FIX SIDEBAR PLEINE HAUTEUR (templates stanford, budapest, harvard, kiev,
+  // edinburgh, vladivostok...).
+  // Ces templates utilisent <div class="flex min-h-[297mm]"> avec une sidebar
+  // sombre en `self-stretch`. html2canvas ne respecte pas toujours
+  // align-items:stretch quand la hauteur du flex est imposée par l'AUTRE colonne
+  // → la sidebar est rendue à sa hauteur de contenu et son fond s'arrête avant
+  // le bas de la page (compétences coupées, bande blanche).
+  //
+  // Solution indépendante des templates : on fige la hauteur réelle du conteneur
+  // flex, puis on force chaque enfant direct (sidebar + contenu) à occuper 100%
+  // de cette hauteur. Le fond de la sidebar couvre alors toute la page.
+  // ─────────────────────────────────────────────────────────────────────────
+  // On ne cible QUE le conteneur flex-row racine du layout (sidebar | contenu),
+  // pas les nombreux petits flex horizontaux internes (lignes de contact, etc.).
+  // Critère : flex-row, descendant proche du root, dont un enfant direct est une
+  // colonne étroite type sidebar (< 45% de la largeur, l'autre étant le contenu).
+  const cloneWidth = clone.getBoundingClientRect().width || A4_W_PX;
+  clone.querySelectorAll<HTMLElement>('*').forEach(el => {
+    const cs = window.getComputedStyle(el);
+    if (cs.display !== 'flex' || cs.flexDirection.startsWith('column')) return;
+
+    const children = Array.from(el.children).filter(
+      (c): c is HTMLElement => c instanceof HTMLElement
+    );
+    if (children.length < 2) return;
+
+    // Un layout sidebar a un enfant nettement plus étroit que le conteneur
+    const widths = children.map(c => c.getBoundingClientRect().width);
+    const hasSidebar = widths.some(w => w > 0 && w < cloneWidth * 0.45)
+      && widths.some(w => w > cloneWidth * 0.45);
+    if (!hasSidebar) return;
+
+    const rowHeight = el.scrollHeight;
+    if (rowHeight <= 0) return;
+
+    el.style.height = `${rowHeight}px`;
+    el.style.alignItems = 'stretch';
+    children.forEach(child => {
+      child.style.alignSelf = 'stretch';
+      child.style.minHeight = `${rowHeight}px`;
+    });
+  });
+
+  // Laisser le layout se recalculer après le forçage de hauteur
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
   try {
     const contentHeight = clone.scrollHeight;
 
