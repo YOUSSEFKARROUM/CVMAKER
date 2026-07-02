@@ -22,11 +22,22 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
   .map((o) => o.replace(/\/+$/, ''))
   .filter(Boolean);
 
+const wildcardOrigins = allowedOrigins
+  .filter((origin) => origin.includes('*'))
+  .map((origin) => new RegExp(`^${origin.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*')}$`));
+
+const exactOrigins = allowedOrigins.filter((origin) => !origin.includes('*'));
+
+function isOriginAllowed(origin) {
+  if (!origin || allowedOrigins.length === 0) return true;
+  return exactOrigins.includes(origin) || wildcardOrigins.some((pattern) => pattern.test(origin));
+}
+
 app.use(
   cors({
     origin(origin, callback) {
       const normalizedOrigin = origin?.replace(/\/+$/, '');
-      if (!normalizedOrigin || allowedOrigins.length === 0 || allowedOrigins.includes(normalizedOrigin)) {
+      if (isOriginAllowed(normalizedOrigin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
