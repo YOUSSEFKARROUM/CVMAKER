@@ -257,7 +257,6 @@ interface SavedCV {
 | Route | Méthode | Description | Rate Limit |
 |-------|---------|-------------|-----------|
 | `/health` | GET | Health check → `{ ok: true }` | - |
-| `/debug-cors` | GET | Diagnostic CORS (origin, allowedOrigins, isAllowed) — **sans secret**, temporaire | - |
 | `/ai/generate` | POST | Génération IA via Groq (voir `ai-routes.mjs`) | 30/15min |
 
 **Notes** :
