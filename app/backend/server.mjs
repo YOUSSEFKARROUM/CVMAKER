@@ -28,21 +28,27 @@ const wildcardOrigins = allowedOrigins
 
 const exactOrigins = allowedOrigins.filter((origin) => !origin.includes('*'));
 
+const defaultPreviewOrigins = [
+  /^https:\/\/cvmaker-[a-z0-9-]+\.vercel\.app$/i,
+  /^http:\/\/localhost:\d+$/i,
+  /^http:\/\/127\.0\.0\.1:\d+$/i,
+];
+
 function isOriginAllowed(origin) {
   if (!origin || allowedOrigins.length === 0) return true;
-  return exactOrigins.includes(origin) || wildcardOrigins.some((pattern) => pattern.test(origin));
+  if (exactOrigins.includes('*')) return true;
+  return exactOrigins.includes(origin)
+    || wildcardOrigins.some((pattern) => pattern.test(origin))
+    || defaultPreviewOrigins.some((pattern) => pattern.test(origin));
 }
 
 app.use(
   cors({
     origin(origin, callback) {
       const normalizedOrigin = origin?.replace(/\/+$/, '');
-      if (isOriginAllowed(normalizedOrigin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
+      callback(null, isOriginAllowed(normalizedOrigin) ? normalizedOrigin : false);
     },
+    optionsSuccessStatus: 204,
   })
 );
 
