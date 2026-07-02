@@ -32,34 +32,52 @@ const defaultPreviewOrigins = [
 ];
 
 function isOriginAllowed(origin) {
-  if (!origin || allowedOrigins.length === 0) return true;
-  if (exactOrigins.includes('*')) return true;
-  return exactOrigins.includes(origin)
-    || wildcardOrigins.some((pattern) => pattern.test(origin))
-    || defaultPreviewOrigins.some((pattern) => pattern.test(origin));
+  try {
+    if (!origin || allowedOrigins.length === 0) return true;
+    if (exactOrigins.includes('*')) return true;
+    return exactOrigins.includes(origin)
+      || wildcardOrigins.some((pattern) => pattern.test(origin))
+      || defaultPreviewOrigins.some((pattern) => pattern.test(origin));
+  } catch (err) {
+    console.error('[cors] isOriginAllowed failed', { origin, message: err?.message });
+    return true;
+  }
 }
 
+// Middleware CORS manuel — ne doit JAMAIS jeter (sinon 500 sur le préflight).
 app.use((req, res, next) => {
-  const origin = req.headers.origin?.replace(/\/+$/, '');
-  const isAllowed = isOriginAllowed(origin);
+  try {
+    const origin = typeof req.headers.origin === 'string'
+      ? req.headers.origin.replace(/\/+$/, '')
+      : undefined;
+    const isAllowed = isOriginAllowed(origin);
 
-  if (isAllowed) {
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
-    res.setHeader('Vary', 'Origin');
+    if (isAllowed) {
+      res.setHeader('Access-Control-Allow-Origin', origin || '*');
+      res.setHeader('Vary', 'Origin');
+    }
+
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      req.headers['access-control-request-headers'] || 'Content-Type, X-User-Id, Authorization'
+    );
+    res.setHeader('Access-Control-Max-Age', '86400');
+
+    if (req.method === 'OPTIONS') {
+      return res.status(isAllowed ? 204 : 403).end();
+    }
+
+    return next();
+  } catch (err) {
+    console.error('[cors] middleware failed', { message: err?.message, stack: err?.stack });
+    // Réponse permissive de secours pour ne pas casser le préflight
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-User-Id, Authorization');
+    if (req.method === 'OPTIONS') return res.status(204).end();
+    return next();
   }
-
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    req.headers['access-control-request-headers'] || 'Content-Type, X-User-Id, Authorization'
-  );
-  res.setHeader('Access-Control-Max-Age', '86400');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(isAllowed ? 204 : 403).end();
-  }
-
-  return next();
 });
 
 app.use(express.json());
