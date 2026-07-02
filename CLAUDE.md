@@ -249,17 +249,30 @@ interface SavedCV {
 
 ---
 
-## Backend Express (PayPal uniquement)
+## Backend Express (IA Groq)
 
-**Fichier** : `app/backend/server.mjs` | **Port** : 4000
+**Fichiers** : `app/backend/server.mjs` (app + CORS), `app/backend/ai-routes.mjs` (routes IA) | **Port** : 4000
+**Déploiement** : Vercel — `Root Directory: app/backend`, config dans `app/backend/vercel.json`
 
 | Route | Méthode | Description | Rate Limit |
 |-------|---------|-------------|-----------|
-| `/payments/create-order` | POST | Créer commande PayPal | 10/15min |
-| `/payments/capture-order` | POST | Capturer paiement PayPal | 10/15min |
-| `/health` | GET | Health check | - |
+| `/health` | GET | Health check → `{ ok: true }` | - |
+| `/debug-cors` | GET | Diagnostic CORS (origin, allowedOrigins, isAllowed) — **sans secret**, temporaire | - |
+| `/ai/generate` | POST | Génération IA via Groq (voir `ai-routes.mjs`) | 30/15min |
 
-**Note** : L'auth (register/forgot-password) est gérée 100% côté client via Supabase SDK. Le backend ne fait que PayPal.
+**Notes** :
+- L'auth (register/forgot-password) est gérée 100% côté client via Supabase SDK.
+- **PayPal est désactivé** (remplacé par virement bancaire) — plus de routes `/payments/*`.
+- La clé `GROQ_API_KEY` reste **uniquement côté backend**, jamais exposée au frontend.
+
+### CORS — Points critiques (Vercel)
+- Middleware CORS **manuel** placé **avant** `express.json()` et **avant** `app.use('/ai', ...)` — l'ordre est obligatoire.
+- Un preflight `OPTIONS /ai/generate` doit répondre **204** avec `Access-Control-Allow-Origin`, `-Methods`, `-Headers`. S'il répond 500, c'est en général un **build Vercel obsolète** (redéployer le dernier commit).
+- Origines autorisées : `ALLOWED_ORIGINS` (exact ou wildcard `https://cvmaker-*.vercel.app`) + fallback previews (`cvmaker-*.vercel.app`, `localhost`, `127.0.0.1`).
+- Un **error handler Express** en fin de `server.mjs` loggue la vraie cause des 500 dans les logs Vercel (au lieu du HTML générique).
+- Frontend : `VITE_BACKEND_URL` **sans slash final** ; normalisé dans `src/hooks/useAI.ts` (`.replace(/\/+$/, '')`).
+
+**Variables backend requises** : `GROQ_API_KEY`, `GROQ_MODEL` (défaut `llama-3.3-70b-versatile`), `AI_MAX_TOKENS` (défaut 2000), `ALLOWED_ORIGINS`.
 
 ---
 

@@ -76,7 +76,33 @@ app.get('/health', (_req, res) => {
   res.json({ ok: true });
 });
 
+app.get('/debug-cors', (req, res) => {
+  const origin = req.headers.origin?.replace(/\/+$/, '');
+  res.json({
+    ok: true,
+    origin,
+    allowedOrigins,
+    isAllowed: isOriginAllowed(origin),
+    vercel: Boolean(process.env.VERCEL),
+    nodeEnv: process.env.NODE_ENV || null,
+  });
+});
+
 app.use('/ai', aiRoutes);
+
+// Error handler — expose la vraie cause des 500 dans les logs Vercel
+app.use((err, req, res, _next) => {
+  console.error('[backend-error]', {
+    method: req.method,
+    path: req.path,
+    message: err?.message,
+    stack: err?.stack,
+  });
+
+  if (!res.headersSent) {
+    res.status(500).json({ error: 'Internal Server Error', detail: err?.message || 'Unknown error' });
+  }
+});
 
 if (!process.env.VERCEL) {
   app.listen(port, () => {
